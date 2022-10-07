@@ -2,8 +2,8 @@
 #include<math.h>
 
 int main(){
-    float a = 9, b = 0, c = 0;  //coefficienti (a !=0 per ipotesi)
-    float x1=0, x2=0;   //risultati
+    float a = 9.0f, b = 0.0f, c = 0.0f;  //coefficienti (a !=0 per ipotesi)
+    float x1=0.0f, x2=0.0f;   //risultati
 
     float delta = sqrtf(powf(b,2) - 4*a*c);
     if (delta > 0) {

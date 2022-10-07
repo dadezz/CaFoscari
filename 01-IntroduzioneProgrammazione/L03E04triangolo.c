@@ -14,6 +14,5 @@ int main (){
         if (ipotenusa == sqrtf(a*a + b*b)) printf(" ed è pure rettangolo!");
         else printf(" ma sfortunatamente non è rettangolo...");
     }
-
     return 0;
 }
