@@ -11,7 +11,7 @@ int main (){
         float ipotenusa = a;      //l'ipotenusa è sicuramente il più lungo di questi tre lati
         if (b>ipotenusa) ipotenusa = b;
         if (c>ipotenusa) ipotenusa = c;
-        if (ipotenusa == sqrtf(a*a + b*b)) printf(" ed è pure rettangolo!");
+        if (ipotenusa == sqrtf(a*a + b*b+ c*c - ipotenusa*ipotenusa)) printf(" ed è pure rettangolo!");
         else printf(" ma sfortunatamente non è rettangolo...");
     }
     return 0;
