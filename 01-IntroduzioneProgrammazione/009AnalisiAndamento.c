@@ -1,31 +1,86 @@
 /*
 Analisi andamento bitcoin
+Scrivere una funzione che implementi una strategia di acquisto e vendita.
+    ○ quanto comprare, quando vendere?
+Possibili strategie:
+    ○ strategia I: se la media mobile è crescente c’è un trend di crescita: compra! (viceversa vendi)
+    ○ strategia II: se la media mobile a breve termine supera la media mobile a lungo termine,
+        significa che c’è un trend in crescita: compra! (viceversa vendi)
+Definizione: la media mobile a w giorni di una data sequenza X è una nuova
+sequenza che al giorno i assume valore pari alla media dei valori della
+sequenza X nella finestra di w giorni che termina nel giorno i incluso.*/
 
-scrivere una funzione che implementi una strategia a posteriori 
-(compro basso e vendo alto) a partire dallo storico dei prezzi giornalieri.
-dire quanto si avrebbe perso / guadagnato
-*/
 
-void f(float *x){
-    float min = x[0];
-    for (int i=0; i<366; i++){
-        if (x[i]<min) min = x[i];
+#include<stdio.h>
+
+//per prima cosa, mi faccio una funzione che, dati finestra w (periodo) e giorno, mi ritorni la media mobile 
+float media_mobile (float *x, int x_size, int periodo, int giorno){
+    //il bisogno dei vari "periodo-1" è dovuto al fatto che l'array inizia da 0 e non da 1.
+    //se il periodo è 3 giorni, il giorno avrà indice 2
+
+    if (giorno<periodo-1 || periodo>=x_size || giorno>=x_size){
+        printf("valore senza senso\n");
+        return -1;
     }
-    printf("il minimo è %f\n", min);
-} //è brutto perché funziona solo se è 366, ho bisogno di sapere la dimension per renfelo generale
+    else{
+        int i = (giorno-(periodo-1)); //inizio a calcolare la media dal giorno (giorno che cerco - periodo precedente).
+        float media = x[i]; // il primo valore che ha la media è quello del primo giorno, a cui verranno sommati quelli successivi
+        while (i<giorno){ //nel ciclo faccio questo: alzo di uno l'indice del giorno e sommo il prezzo a quelli precedenti
+            i += 1;
+            media += x[i];
+        }
+        media = media/(periodo); //media = somma di tutti i prezzi / periodo preso in considerazione
+        return media;
+    }
+}
 
-//quindi:
-void f2 (float *x, int x_size ){
+//fatta la media mobile, posso implementare la strategia 1.
+//stampo la stringa "compra" o "vendi" a seconda della crescita o decrescita della media mobile
+void strategia_1 (float *x, int x_size, int periodo, int giorno){
+    if (giorno-1 < periodo-1) {
+        printf("STRATEGIA 1: è il primo giorno in cui si può calcolare la media, non posso dirti nulla\n");
+        return;
+    }
+    float media_giorno_scorso = media_mobile (x, x_size, periodo, giorno-1);
+    float media_oggi = media_mobile (x, x_size, periodo, giorno);
+    if (media_giorno_scorso < media_oggi) printf("STRATEGIA 1: COMPRA!\n");
+    else if (media_giorno_scorso == media_oggi) printf("STRATEGIA 1: NON FAR NULLA\n");
+    else printf("STRATEGIA 1: VENDI!\n");
+}
+
+//implemento strategia 2. controllo quindi la differenza tra le due medie. se si sono incrociate,
+//la differenza in un giorno sarà di segno discorde dalla differenza nel giorno dopo.
+void strategia_2 (float *x, int x_size, int periodo_breve, int periodo_lungo, int giorno){
+    if (giorno-1 < periodo_lungo-1) {
+        printf("STRATEGIA 2: è il primo giorno in cui si può calcolare la media a lungo periodo, non posso dirti nulla\n");
+        return;
+    }
+    float media_breve_giorno_scorso = media_mobile (x, x_size, periodo_breve, giorno-1);
+    float media_lunga_giorno_scorso = media_mobile (x, x_size, periodo_lungo, giorno-1);
+    float media_breve_oggi = media_mobile (x, x_size, periodo_breve, giorno);
+    float media_lunga_oggi = media_mobile (x, x_size, periodo_lungo, giorno);
+
+    if((media_lunga_giorno_scorso - media_breve_giorno_scorso >= 0) && (media_lunga_oggi - media_breve_oggi < 0))
+        printf("STRATEGIA 2: COMPRA!\n");
+    else if ((media_lunga_giorno_scorso - media_breve_giorno_scorso <= 0) && (media_lunga_oggi - media_breve_oggi > 0))
+        printf("STRATEGIA 2: VENDI!\n");
+    else printf("STRATEGIA 2: non far nulla.\n");
+}
+
+
+
+/*void f2 (float *x, int x_size ){
     if (x_size>0){}
         float min = x[0];
         for (int i=0; i<x_size; i++){
             if (x[i]<min) min = x[i];
         }
     printf("il minimo è %f\n", min);
-}
+}*/
 
 int main (){
    
+    //dati di prezzo giornaliero di un anno (366 giorni)
     float btc[] = {10923.63, 10679.14, 10621.66, 10804.00, 10684.43, 10565.49, 10585.16, 10623.33, 10787.62, 10848.83, 10721.33, 10774.43, 10754.44, 10702.29,
     10745.55, 10225.86, 10538.46, 10462.26, 10938.27, 11094.35, 10944.59, 10948.99, 10974.90, 10796.95, 10680.84, 10323.76, 10442.17, 10400.91,
     10363.14, 10242.35, 10131.52, 10369.56, 10280.35, 10169.57, 10511.81, 10245.30, 11414.03, 11970.48, 11680.82, 11711.51, 11506.87, 11542.50,
@@ -51,6 +106,12 @@ int main (){
     9324.72, 9261.10, 9199.58, 9205.73, 9427.69, 9256.15, 9551.71, 9244.97, 8660.70, 7493.49, 7514.67, 8078.20, 8243.72, 8222.08, 7988.56, 7973.21,
     8103.91, 8047.53, 8205.37, 8374.69, 8321.01, 8336.56, 8321.76, 8586.47, 8595.74};
 
-    f2(btc, 366); //il size qualcuno me lo deve dire, non posso misurarlo in qualche modo.
+    //vedo cosa avrei dovuto fare il giorno 12 agosto (giorno numero 224). usando la media a 3gg nella prima strategia e la media 3/7 gg nella seconda
+    printf("cosa dovevo fare il 12 agosto?\n");
+    strategia_1(btc, 366, 3, 224);
+    strategia_2(btc, 366, 3,7, 224);
+    printf("\n");
+    //printf("%f\n",media_mobile(btc,366, 3, 2));
 
+    return 0;
 }

@@ -90,7 +90,7 @@ int giorni_trascorsi (int anno, int mese, int giorno){
 }
 
 int main (){
-    int output = giorni_trascorsi(2022, 12, 31);
+    int output = giorni_trascorsi(2020, 8, 12);
     if (output == -1){
         printf("ci dev'essere stato un errore con l'input\n");
     }
