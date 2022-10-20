@@ -36,47 +36,120 @@ float media_mobile (float *x, int x_size, int periodo, int giorno){
 
 //fatta la media mobile, posso implementare la strategia 1.
 //stampo la stringa "compra" o "vendi" a seconda della crescita o decrescita della media mobile
-void strategia_1 (float *x, int x_size, int periodo, int giorno){
+int strategia_1 (float *x, int x_size, int periodo, int giorno){
     if (giorno-1 < periodo-1) {
-        printf("STRATEGIA 1: è il primo giorno in cui si può calcolare la media, non posso dirti nulla\n");
-        return;
+        //printf("STRATEGIA 1: non si può calcolare la media, non posso dirti nulla\n");
+        return 0;
     }
     float media_giorno_scorso = media_mobile (x, x_size, periodo, giorno-1);
     float media_oggi = media_mobile (x, x_size, periodo, giorno);
-    if (media_giorno_scorso < media_oggi) printf("STRATEGIA 1: COMPRA!\n");
-    else if (media_giorno_scorso == media_oggi) printf("STRATEGIA 1: NON FAR NULLA\n");
-    else printf("STRATEGIA 1: VENDI!\n");
+    if (media_giorno_scorso == -1 || media_oggi == -1) return 0; //controllo che non mi dia errore il calcolo della media mobile
+    else {
+        if (media_giorno_scorso < media_oggi) return 1;
+        else if (media_giorno_scorso == media_oggi) return 3;
+        else return 2;
+    }
 }
 
 //implemento strategia 2. controllo quindi la differenza tra le due medie. se si sono incrociate,
 //la differenza in un giorno sarà di segno discorde dalla differenza nel giorno dopo.
-void strategia_2 (float *x, int x_size, int periodo_breve, int periodo_lungo, int giorno){
+int strategia_2 (float *x, int x_size, int periodo_breve, int periodo_lungo, int giorno){
     if (giorno-1 < periodo_lungo-1) {
-        printf("STRATEGIA 2: è il primo giorno in cui si può calcolare la media a lungo periodo, non posso dirti nulla\n");
-        return;
+        //printf("STRATEGIA 2: è il primo giorno in cui si può calcolare la media a lungo periodo, non posso dirti nulla\n");
+        return 0;
     }
     float media_breve_giorno_scorso = media_mobile (x, x_size, periodo_breve, giorno-1);
     float media_lunga_giorno_scorso = media_mobile (x, x_size, periodo_lungo, giorno-1);
     float media_breve_oggi = media_mobile (x, x_size, periodo_breve, giorno);
     float media_lunga_oggi = media_mobile (x, x_size, periodo_lungo, giorno);
 
-    if((media_lunga_giorno_scorso - media_breve_giorno_scorso >= 0) && (media_lunga_oggi - media_breve_oggi < 0))
-        printf("STRATEGIA 2: COMPRA!\n");
-    else if ((media_lunga_giorno_scorso - media_breve_giorno_scorso <= 0) && (media_lunga_oggi - media_breve_oggi > 0))
-        printf("STRATEGIA 2: VENDI!\n");
-    else printf("STRATEGIA 2: non far nulla.\n");
+    if (media_breve_giorno_scorso == -1 || media_breve_oggi == -1) return 0; //controllo che non mi dia errore il calcolo della media mobile
+    else {
+        if((media_lunga_giorno_scorso - media_breve_giorno_scorso >= 0) && (media_lunga_oggi - media_breve_oggi < 0))
+            return 1;
+        else if ((media_lunga_giorno_scorso - media_breve_giorno_scorso <= 0) && (media_lunga_oggi - media_breve_oggi > 0))
+            return 2;
+        else return 3;
+    }
 }
 
 
 
-/*void f2 (float *x, int x_size ){
-    if (x_size>0){}
-        float min = x[0];
-        for (int i=0; i<x_size; i++){
-            if (x[i]<min) min = x[i];
+
+float backtest_strategia_1 (float dollari_partenza, float *x, int x_size, int periodo){
+    //controllo backtest
+    float wall_fiat = dollari_partenza; //dollari di partenza
+    float wall_btc = 0.0f; //btc di partenza
+    _Bool hobtc = 0; //possiedo btc?
+
+    for (int i=0; i<x_size; i++){
+        int cosa_faccio = strategia_1 (x, x_size, periodo, i);
+        if (cosa_faccio == 1 && hobtc==0){  //return 1 se compra
+            wall_btc = wall_fiat/x[i];
+            //printf("ho comprato il giorno %d, partendo da %f dollari, acquistato %f bitcoin\n", i, wall_fiat, wall_btc);
+            wall_fiat = 0;
+            hobtc = 1;
         }
-    printf("il minimo è %f\n", min);
-}*/
+        else if(cosa_faccio == 2 && hobtc){
+            wall_fiat = wall_btc*x[i];
+            //printf("ho venduto il giorno %d, partendo da %f btc, riottenuto %f dollari\n", i, wall_btc, wall_fiat);
+            wall_btc = 0;
+            hobtc = 0;
+        }
+    }
+    /* QUESTO ERA NEL CASO DI FUNZIONE VOID (CHE IN STO PROGRAMMA PREFERISCO), CON STAMPA DEI RISULTATI.
+    NON MI PERMETTE PERÒ DI FARE AGEVOLMENTE I CONTROLLI CON TUTTI I POSSIBILI VALORI
+    printf("al momento possiedo %f btc\n", wall_btc);
+    printf("al momento possiedo %f dollari\n", wall_fiat);
+    if (hobtc){
+        printf("il controvalore dei miei btc in dollari è: %f\n", wall_btc*x[365]);
+    }
+    */
+    if (hobtc) return wall_btc*x[365];
+    else return wall_fiat;
+}
+
+float backtest_strategia_2 (float dollari_partenza, float *x, int x_size, int periodo_breve, int periodo_lungo){
+    //controllo backtest
+    float wall_fiat = dollari_partenza; //dollari di partenza
+    float wall_btc = 0.0f; //btc di partenza
+    _Bool hobtc = 0; //possiedo btc?
+
+    for (int i=0; i<x_size; i++){
+        int cosa_faccio = strategia_2 (x, x_size, periodo_breve, periodo_lungo, i);
+        if (cosa_faccio == 1 && hobtc==0){  //return 1 se compra
+            wall_btc = wall_fiat/x[i];
+            //printf("ho comprato il giorno %d, partendo da %f dollari, acquistato %f bitcoin\n", i, wall_fiat, wall_btc);
+            wall_fiat = 0;
+            hobtc = 1;
+        }
+        else if(cosa_faccio == 2 && hobtc){
+            wall_fiat = wall_btc*x[i];
+            //printf("ho venduto il giorno %d, partendo da %f btc, riottenuto %f dollari\n", i, wall_btc, wall_fiat);
+            wall_btc = 0;
+            hobtc = 0;
+        }
+    }
+    /* QUESTO ERA NEL CASO DI FUNZIONE VOID (CHE IN STO PROGRAMMA PREFERISCO), CON STAMPA DEI RISULTATI.
+    NON MI PERMETTE PERÒ DI FARE AGEVOLMENTE I CONTROLLI CON TUTTI I POSSIBILI VALORI
+    printf("al momento possiedo %f btc\n", wall_btc);
+    printf("al momento possiedo %f dollari\n", wall_fiat);
+    if (hobtc){
+        printf("il controvalore dei miei btc in dollari è: %f\n", wall_btc*x[365]);
+    }
+    */
+    if (hobtc) return wall_btc*x[365];
+    else return wall_fiat;
+}
+
+
+
+
+//*****************************************************************************************************************************************************************
+//                                                                      MAIN                                                                                      //
+//****************************************************************************************************************************************************************//
+
+
 
 int main (){
    
@@ -106,12 +179,56 @@ int main (){
     9324.72, 9261.10, 9199.58, 9205.73, 9427.69, 9256.15, 9551.71, 9244.97, 8660.70, 7493.49, 7514.67, 8078.20, 8243.72, 8222.08, 7988.56, 7973.21,
     8103.91, 8047.53, 8205.37, 8374.69, 8321.01, 8336.56, 8321.76, 8586.47, 8595.74};
 
-    //vedo cosa avrei dovuto fare il giorno 12 agosto (giorno numero 224). usando la media a 3gg nella prima strategia e la media 3/7 gg nella seconda
-    printf("cosa dovevo fare il 12 agosto?\n");
-    strategia_1(btc, 366, 3, 224);
-    strategia_2(btc, 366, 3,7, 224);
-    printf("\n");
-    //printf("%f\n",media_mobile(btc,366, 3, 2));
+    int x_size = 366;
 
+    //vedo cosa avrei dovuto fare il giorno 12 agosto (giorno numero 224). usando la media a 3gg nella prima strategia e la media 3/7 gg nella seconda
+    /*printf("cosa dovevo fare il 12 agosto?\n");
+    strategia_1(btc, x_size, 3, 224);
+    strategia_2(btc, x_size, 3,7, 224);
+    printf("\n");
+    */
+
+    float dollari_partenza = 10000.0f;
+
+    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+    printf("  STRATEGIA 1: quando la media mobile inizia a crescere, compra, quando inizia a scendere, vendi\n");
+    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+    float max_1 = 0;
+    int periodo_ideale = 0;
+    for (int i = 2; i < 360; i++){
+        float prova = backtest_strategia_1(dollari_partenza, btc, 366, i);
+        if (prova > max_1){
+            periodo_ideale = i;
+            max_1 = prova;
+        }
+    }
+    printf("**********************************\n");
+    printf("STRATEGIA 1: usando media mobile a %d periodi\n ", periodo_ideale);
+    printf("possiedo (o ho come controvalore) %f dollari\n", max_1);
+    
+    
+    
+    
+    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+    printf("     STRATEGIA 2: compra o vendi a seconda di come (e se) la media breve inrocia quella lunga  \n");
+    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+    float max_2 = 0;
+    int periodo_breve_ideale = 0;
+    int periodo_lungo_ideale = 0;
+    for (int i_l = 2; i_l<300; i_l++){
+        for (int i_b = 2; i_b<i_l; i_b++){
+            float prova = backtest_strategia_2(dollari_partenza, btc, 366, i_b, i_l);
+            if (prova > max_2){
+                periodo_breve_ideale = i_b;
+                periodo_lungo_ideale = i_l;
+                max_2 = prova;
+            }
+        }
+    }
+    printf("STRATEGIA 2: usando media mobile lunga a %d periodi e la media mobile breve a %d periodi\n", periodo_lungo_ideale, periodo_breve_ideale);
+    printf("possiedo (o ho come controvalore) %f dollari\n", max_2);
+    printf("**********************************\n");
+    
+    
     return 0;
 }
