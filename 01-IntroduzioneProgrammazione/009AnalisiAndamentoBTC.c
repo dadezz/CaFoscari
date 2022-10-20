@@ -20,7 +20,7 @@ float media_mobile (float *x, int x_size, int periodo, int giorno){
 
     if (giorno<periodo-1 || periodo>=x_size || giorno>=x_size){
         printf("valore senza senso\n");
-        return -1;
+        return -1; //se ci fosse stato input da utente, nel main ci sarebbe stato un while di controllo input...
     }
     else{
         int i = (giorno-(periodo-1)); //inizio a calcolare la media dal giorno (giorno che cerco - periodo precedente).
