@@ -43,43 +43,49 @@ void controllo_input (char x[][19], int *riga_o, int *col_o, int carattere_in_in
     / non serve controllare che lo spostamento sia all'interno del bordo superiore o inferiore del labirinto, perché quest'ultimo è 
     / delimitato sopra e sottoda # e controllo direttamente che non vada a capitare sopra un cancelletto
     */
-    if (carattere_in_input == 'a'){                         // controllo qual'è il carattere  inserito (a, s, d, w)
-        if ( (*col_o-1)>0 && x[*riga_o][*col_o-1] != '#'){  // siccome vado a sinistra, controllo di non andare in una posizione '-1' in array (serve soltanto alla prima mossa)
-                                                            // e controllo anche che la nuova posizione dove mi dovrei spostare non sia un muro. Se entrambe le condizioni sono valide, 
-            x[*riga_o][*col_o] = ' ';                       // sostituisco la posizione dove mi trovo (che adesso è 'o' ) con uno spazio, 
-            x[*riga_o][*col_o-1] = 'o';                     // e sostituisco la posizione dove devo andare (che adesso è vuoto, ovvero ' ' ) con il carattere 'o'. in questo modo, dò l'illusione di un effettivo spostamento.
-            *col_o = *col_o + 1;                            // Infine, aggiorno le coordinate del mio personaggino 'o'.
+    switch (carattere_in_input){
+        case 'a':{                         // controllo qual'è il carattere  inserito (a, s, d, w)
+            if ( (*col_o-1)>0 && x[*riga_o][*col_o-1] != '#'){  // siccome vado a sinistra, controllo di non andare in una posizione '-1' in array (serve soltanto alla prima mossa)
+                                                                // e controllo anche che la nuova posizione dove mi dovrei spostare non sia un muro. Se entrambe le condizioni sono valide, 
+                x[*riga_o][*col_o] = ' ';                       // sostituisco la posizione dove mi trovo (che adesso è 'o' ) con uno spazio, 
+                x[*riga_o][*col_o-1] = 'o';                     // e sostituisco la posizione dove devo andare (che adesso è vuoto, ovvero ' ' ) con il carattere 'o'. in questo modo, dò l'illusione di un effettivo spostamento.
+                *col_o = *col_o + 1;                            // Infine, aggiorno le coordinate del mio personaggino 'o'.
+            }
+            else printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n"); //nel caso le condizioni sopra non fossero soddisfatte (fuori dal labirinto o muro), semplicemente printo errore 
+            break;
         }
-        else printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n"); //nel caso le condizioni sopra non fossero soddisfatte (fuori dal labirinto o muro), semplicemente printo errore 
-    }
-    else if (carattere_in_input == 'd'){
-        if ( (*col_o+1)<18 && x[*riga_o][*col_o+1] != '#'){
-            x[*riga_o][*col_o] = ' ';
-            x[*riga_o][*col_o+1] = 'o';
-            *col_o = *col_o + 1;
+        case 'd': {
+            if ( (*col_o+1)<18 && x[*riga_o][*col_o+1] != '#'){
+                x[*riga_o][*col_o] = ' ';
+                x[*riga_o][*col_o+1] = 'o';
+                *col_o = *col_o + 1;
+            }
+            else if((*col_o+1)==18 && x[*riga_o][*col_o+1] != '#') {                           // unica cosa in più da spiegare: se il personaggino arriva senza errori all'ultima colonna (ovvero non va su un muro dell'ultima colonna)
+                printf("grandioso! hai vinto!\n");              // vince.
+                *gioco = 0;                                     // di conseguenza, il gioco termina.
+            }
+            else {printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
+            //printf("\033[%dm", 40 + 1);
+            }
+            break;
         }
-        else if((*col_o+1)==18) {                           // unica cosa in più da spiegare: se il personaggino arriva senza errori all'ultima colonna (ovvero non va su un muro dell'ultima colonna)
-            printf("grandioso! hai vinto!\n");              // vince.
-            *gioco = 0;                                     // di conseguenza, il gioco termina.
+        case 's': {
+            if (x[*riga_o+1][*col_o] != '#'){
+                x[*riga_o][*col_o] = ' ';
+                x[*riga_o+1][*col_o] = 'o';
+                *riga_o = *riga_o + 1;
+            }
+            else printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
+            break;
         }
-        else {printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
-           //printf("\033[%dm", 40 + 1);
+        case 'w': {
+            if (x[*riga_o-1][*col_o] != '#'){
+                x[*riga_o][*col_o] = ' ';
+                x[*riga_o-1][*col_o] = 'o';
+                *riga_o = *riga_o - 1;
+            }
+            else printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
+            break;
         }
-    }
-    else if (carattere_in_input == 's'){
-        if (x[*riga_o+1][*col_o] != '#'){
-            x[*riga_o][*col_o] = ' ';
-            x[*riga_o+1][*col_o] = 'o';
-            *riga_o = *riga_o + 1;
-        }
-        else printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
-    }
-    else { //non serve l'if, perché il controllo del carattere c'è già nello scanf
-        if (x[*riga_o-1][*col_o] != '#'){
-            x[*riga_o][*col_o] = ' ';
-            x[*riga_o-1][*col_o] = 'o';
-            *riga_o = *riga_o - 1;
-        }
-        else printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
     }
 }

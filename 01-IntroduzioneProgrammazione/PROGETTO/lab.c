@@ -67,13 +67,15 @@ punteggio += (dollari*3)
 
     //corpo del gioco. tutto va avanti obv finché non finisce
 
+
     while (gioco){                                                                              // il gioco va avanti finché il bool 'gioco' è vero (si falsifica all'uscita del labirinto).
-        printf("Inserisci la prossima mossa: \n");                                              // chiedo la mossa
+        print_lab(struttura_labirinto, 15, 19);                                      // mostro lo stato attuale del labirinto. notare che (voluto) l'ultima mossa
+                                                                                                // non verrà mai mostrata, ma viene solo stampato messaggio di vittoria.
+        printf("Inserisci la prossima mossa: \n");                                              // chiedo la mossa successiva
         scanf_lab(&carattere_in_input);                                                         // e la scanfo.
         punteggio -= 1;                                                                         // a prescindere dalla correttezza della mossa (muro, non comando sbagliato), tolgo un punto.
         system("clear");                                                                        // pulisco lo schermo del terminale, in modo da dare l'illusione di un movimento in tempo reale
         controllo_input(struttura_labirinto, &riga_o, &col_o, carattere_in_input, &gioco);      // eseguo la logica del gioco (effettivo movimento)
-        if (gioco) print_lab(struttura_labirinto, 15, 19);                                      // controllo di essere in gioco e printo la nuova versione del labirinto (con la mossa effettuata. se ho vinto non serve)
         printf("%d\n", punteggio);                                                              // printo il punteggio derivante dalla mossa appena fatta.                                                                
         
     }
