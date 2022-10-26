@@ -8,13 +8,16 @@ extern void print_lab(char x[][19], int righe, int colonne);
 //funzione contenuta in gestione_io, controlla il carattere in input
 extern void scanf_lab(char *x);
 //funzione contenuta in gestione_io, muove 'o' a seconda del a,s,d,w.
-extern void controllo_input(char x[][19], int *riga_o, int *col_o, int carattere_in_input, _Bool *gioco);
+extern void controllo_input(char x[][19], int *riga_o, int *col_o, int carattere_in_input, _Bool *gioco,int *numero_dollari);
+//funzione contenuta in gestione_io, inserisce N dollari in posizioni randomiche nel labirinto
+void inserisci_dollari (int bonus, char s[][19]);
 
 
 int main (){
 
     char carattere_in_input = '*';  //variabile su cui viene salvato il carattere di input usato per spostarsi
     int punteggio = 100;            //(i passi necessari sono circa una 50ina)
+    int bonus = 10;                 //quanti dollari devono esserci nel labirinto.
     int numero_dollari = 0;         //variabile che conta la quantita di bonus raccolti
     _Bool gioco = 1;                //"sei nel gioco?" diventa false quando riesce ad arrivare alla colonna 18 (così si ferma il while)
     int riga_o = 1, col_o = 0;      //coordinate di 'o', inizializzate alla partenza (struttura_labirinto[1]
@@ -35,6 +38,7 @@ int main (){
                                         {'#',' ',' ',' ',' ',' ','#',' ',' ','#',' ',' ','#',' ',' ','#',' ',' ','#'},  //a[13][0], a[13][1], a[13][2] etc
                                         {'#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#'}}; //a[14][0], a[14][1], a[14][2] etc
 
+    inserisci_dollari(bonus, struttura_labirinto);    
 
 /*LOGICA PER INSERIRE i dollari a casissimo dentro al labirinto (pseudocodice).
 for i in range numero_di_dollari_che_ voglio : meglio usare un while, così posso incrementare solo se il dollaro finisce dove non c'è un cancelletto
@@ -69,14 +73,14 @@ punteggio += (dollari*3)
 
 
     while (gioco){                                                                              // il gioco va avanti finché il bool 'gioco' è vero (si falsifica all'uscita del labirinto).
-        print_lab(struttura_labirinto, 15, 19);                                      // mostro lo stato attuale del labirinto. notare che (voluto) l'ultima mossa
+        print_lab(struttura_labirinto, 15, 19);                                                 // mostro lo stato attuale del labirinto. notare che (voluto) l'ultima mossa
                                                                                                 // non verrà mai mostrata, ma viene solo stampato messaggio di vittoria.
         printf("Inserisci la prossima mossa: \n");                                              // chiedo la mossa successiva
         scanf_lab(&carattere_in_input);                                                         // e la scanfo.
         punteggio -= 1;                                                                         // a prescindere dalla correttezza della mossa (muro, non comando sbagliato), tolgo un punto.
         system("clear");                                                                        // pulisco lo schermo del terminale, in modo da dare l'illusione di un movimento in tempo reale
-        controllo_input(struttura_labirinto, &riga_o, &col_o, carattere_in_input, &gioco);      // eseguo la logica del gioco (effettivo movimento)
-        printf("%d\n", punteggio);                                                              // printo il punteggio derivante dalla mossa appena fatta.                                                                
+        controllo_input(struttura_labirinto, &riga_o, &col_o, carattere_in_input, &gioco, &numero_dollari);      // eseguo la logica del gioco (effettivo movimento)
+        printf("punteggio attuale: %d, \nbonus raccolti: %d\n", punteggio, numero_dollari);                                                              // printo il punteggio derivante dalla mossa appena fatta.                                                                
         
     }
 

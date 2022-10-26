@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include "gestione_io.c"
 /*LOGICA PER INSERIRE i dollari a casissimo dentro al labirinto (pseudocodice).
 for i in range numero_di_dollari_che_ voglio : meglio usare un while, così posso incrementare solo se il dollaro finisce dove non c'è un cancelletto
     a, b = randint (10)(19)
@@ -16,9 +17,12 @@ A FINE PROGRAMMA
 punteggio += (dollari*3)
 */
 
+extern void print_lab(char x[][19], int righe, int colonne);
+
+
 int main(){
 
- char struttura_labirinto [][19] =  {{'#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#'},  //a[0][0],  a[0][1],  a[0][2] etc
+    char struttura_labirinto [][19] =  {{'#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#'},  //a[0][0],  a[0][1],  a[0][2] etc
                                         {'o',' ',' ','#',' ',' ','#',' ',' ','#',' ',' ',' ',' ',' ','#',' ',' ','#'},  //a[1][0],  a[1][1],  a[1][2] etc
                                         {'#',' ',' ','#',' ',' ','#',' ',' ','#',' ',' ','#',' ',' ','#',' ',' ','#'},  //a[2][0],  a[2][1],  a[2][2] etc
                                         {'#',' ',' ','#',' ',' ','#',' ',' ','#',' ',' ','#',' ',' ','#',' ',' ','#'},  //a[3][0],  a[3][1],  a[3][2] etc
@@ -35,10 +39,7 @@ int main(){
                                         {'#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#'}}; //a[14][0], a[14][1], a[14][2] etc
 
 int bonus_voluti = 10;
-int i = 0;
-while (i<bonus_voluti){
-    int n = rand() % 20;
-    printf("%d\n", n);
-    i++;
-}
+inserisci_dollari(bonus_voluti, struttura_labirinto);
+
+print_lab(struttura_labirinto, 15, 19);
 }
