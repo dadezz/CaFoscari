@@ -4,7 +4,7 @@
 
 
 //funzione contenuta in gestione_io, stampa il labirinto.
-extern void print_lab(char x[][19], int righe, int colonne);
+extern void print_lab(char x[][19], int righe, int colonne, int *punteggio);
 //funzione contenuta in gestione_io, controlla il carattere in input
 extern void scanf_lab(char *x);
 //funzione contenuta in gestione_io, muove 'o' a seconda del a,s,d,w.
@@ -56,24 +56,11 @@ A FINE PROGRAMMA
 punteggio += (dollari*3)
 */
 
-    /*
-    * per quanto riguarda il carattere_in_input, vengono usati i classici comandi da gioco:
-    * 'a' = sinistra
-    * 's' = giù
-    * 'd' = destra
-    * 'w' = su
-    * In particolare:
-    *   - se l'utente vuole spostarsi verso su, significa che la coordinata riga deve decrementare di 1
-    *   - se l'utente vuole spostarsi verso giu, significa che la coordinata riga deve incrementare di 1
-    *   - se l'utente vuole spostarsi verso sinistra, significa che la coordinata colonna deve decrementare di 1
-    *   - se l'utente vuole spostarsi verso destra, significa che la coordinata colonna deve incrementare di 1
-    */
-
     //corpo del gioco. tutto va avanti obv finché non finisce
 
 
     while (gioco){                                                                              // il gioco va avanti finché il bool 'gioco' è vero (si falsifica all'uscita del labirinto).
-        print_lab(struttura_labirinto, 15, 19);                                                 // mostro lo stato attuale del labirinto. notare che (voluto) l'ultima mossa
+        print_lab(struttura_labirinto, 15, 19, &punteggio);                                                 // mostro lo stato attuale del labirinto. notare che (voluto) l'ultima mossa
                                                                                                 // non verrà mai mostrata, ma viene solo stampato messaggio di vittoria.
         printf("Inserisci la prossima mossa: \n");                                              // chiedo la mossa successiva
         scanf_lab(&carattere_in_input);                                                         // e la scanfo.
@@ -83,6 +70,8 @@ punteggio += (dollari*3)
         printf("punteggio attuale: %d, \nbonus raccolti: %d\n", punteggio, numero_dollari);                                                              // printo il punteggio derivante dalla mossa appena fatta.                                                                
         
     }
+
+
 
     return 0;                                                                                   // Fine del programma.
 }
