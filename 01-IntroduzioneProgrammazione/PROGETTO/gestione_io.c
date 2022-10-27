@@ -1,14 +1,37 @@
 #include <stdio.h>
 #include<stdlib.h>
 
-void print_lab (char x[][19], int righe, int colonne){  // Funzione che mi serve per stampare la struttura del labirinto.
+void print_lab (char x[][19], int righe, int colonne, int *punteggio){  // Funzione che mi serve per stampare la struttura del labirinto.
 
+    for (int i=0; i<colonne*2+5; i++){
+        printf("-");
+    }
+    printf("\n");
     for (int i=0; i<righe; i++){            // Per ogni riga, 
+        printf("|  ");
         for (int j=0; j<colonne; j++){      // 
             printf("%c ", x[i][j]);         // stampa di fila ogni elemento della colonna (con uno spazio intermeio per bellezza)
         }                                   //
+        printf(" |");
         printf("\n");                       // dopodiché va a capo.
     } 
+    for (int i=0; i<colonne*2+5; i++){
+        printf("-");
+    }
+    printf("\n");
+    //riquadro sotto con punteggio e bonus.
+    for (int i=0; i<((colonne*2+5)-13)/2; i++){
+        printf(" ");
+    }
+    printf("punteggio: %d", *punteggio);
+        for (int i=0; i<((colonne*2+5)-13)/2; i++){
+        printf(" ");
+    }
+    printf("\n");
+    for (int i=0; i<colonne*2+5; i++){
+        printf("-");
+    }
+    printf("\n");
 }
 
 void scanf_lab (char *x){   // Funzione che mi serve per prendere in input il carattere
@@ -17,7 +40,6 @@ void scanf_lab (char *x){   // Funzione che mi serve per prendere in input il ca
         if (*x != 'w' && *x != 'a' && *x != 's' && *x != 'd') printf("carattere inserito non valido...\n"); //se non è valido printa errore
     } while( *x != 'w' && *x != 'a' && *x != 's' && *x != 'd'); //e se non è valido lo riscanna.
 }
-
 
 /*
 * per quanto riguarda il carattere_in_input, vengono usati i classici comandi da gioco:
@@ -32,7 +54,6 @@ void scanf_lab (char *x){   // Funzione che mi serve per prendere in input il ca
 *   - se l'utente vuole spostarsi verso destra (d), significa che la coordinata colonna deve incrementare di 1
 */
 
-
 void controllo_input (char x[][19], int *riga_o, int *col_o, int carattere_in_input, _Bool *gioco, int *numero_dollari){
     // x -> struttura labirinto; riga_o, col_o -> coordinate attuali di 'o'; carattere in input -> inserimento utente (asdw); gioco -> booleano che falsifico quando arrivo alla fine del gioco
     
@@ -45,8 +66,9 @@ void controllo_input (char x[][19], int *riga_o, int *col_o, int carattere_in_in
     */
     switch (carattere_in_input){
         case 'a':{                         // controllo qual'è il carattere  inserito (a, s, d, w)
-            if ((*col_o-1)>0 && x[*riga_o][*col_o-1] != '#'){  // siccome vado a sinistra, controllo di non andare in una posizione '-1' in array (serve soltanto alla prima mossa)
-                if (x[*riga_o][*col_o-1] == '$') *numero_dollari +=1 ;   // e controllo anche che la nuova posizione dove mi dovrei spostare non sia un muro. Se entrambe le condizioni sono valide, 
+            if ((*col_o-1)>0 && x[*riga_o][*col_o-1] != '#'){        // siccome vado a sinistra, controllo di non andare in una posizione '-1' in array (serve soltanto alla prima mossa)
+                                                                     // e controllo anche che la nuova posizione dove mi dovrei spostare non sia un muro. Se entrambe le condizioni sono valide, 
+                  if (x[*riga_o][*col_o-1] == '$') *numero_dollari +=1 ;   //allo stesso modo, controllo se c'è un dollaro, in caso affermativo, aggiorno il contatore (per ora non ho ancora fatto che si aggiorna il punteggio)
                 x[*riga_o][*col_o] = ' ';                       // sostituisco la posizione dove mi trovo (che adesso è 'o' ) con uno spazio, 
                 x[*riga_o][*col_o-1] = 'o';                     // e sostituisco la posizione dove devo andare (che adesso è vuoto, ovvero ' ' ) con il carattere 'o'. in questo modo, dò l'illusione di un effettivo spostamento.
                 *col_o = *col_o - 1;                            // Infine, aggiorno le coordinate del mio personaggino 'o'.
@@ -66,7 +88,6 @@ void controllo_input (char x[][19], int *riga_o, int *col_o, int carattere_in_in
                 *gioco = 0;                                     // di conseguenza, il gioco termina.
             }
             else {printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
-            //printf("\033[%dm", 40 + 1);
             }
             break;
         }
@@ -94,15 +115,15 @@ void controllo_input (char x[][19], int *riga_o, int *col_o, int carattere_in_in
 }
 
 
-void inserisci_dollari (int bonus, char s[][19]){
-    int i = 0, j = 0;
-    while (i<bonus && j<bonus){
-        int x = (rand() % 13)+1;
-        int y = (rand() % 18)+1;
-        if (s[x][y] != '#') {
-            s[x][y] = '$';
+void inserisci_dollari (int bonus, char s[][19]){       //inserisce in modo casuale dei dollari (in realtà è casuale solo la prima volta perché manca i seed, poi saranno sempre nella stessa posizione)
+    int i = 0, j = 0;                                   //coordinate dei futuri dollari
+    while (i<bonus && j<bonus){                         //bonus è il numero di dollari che volgio inserire
+        int x = (rand() % 13)+1;                        //posizione random per la riga
+        int y = (rand() % 18)+1;                        // e per la colonna
+        if (s[x][y] != '#') {                           //controllo che in quella posizoine non ci sia un muro
+            s[x][y] = '$';                              //se è così, inserisco il dollaro
         }
-        j++;
+        j++;                                            
         i++;
     }
 
