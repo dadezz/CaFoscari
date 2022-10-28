@@ -10,7 +10,9 @@ extern void scanf_lab(char *x);
 //funzione contenuta in gestione_io, muove 'o' a seconda del a,s,d,w.
 extern void controllo_input(char x[][19], int *riga_o, int *col_o, int carattere_in_input, _Bool *gioco,int *numero_dollari);
 //funzione contenuta in gestione_io, inserisce N dollari in posizioni randomiche nel labirinto
-void inserisci_dollari (int bonus, char s[][19]);
+extern void inserisci_dollari (int bonus, char s[][19]);
+//funzione contenuta in gestione_io, inserisce N ! in posizioni randomiche nel labirinto
+extern void inserisci_imprevisti (int imprevisti, char s[][19]);
 
 
 int main (){
@@ -18,6 +20,7 @@ int main (){
     char carattere_in_input = '*';  //variabile su cui viene salvato il carattere di input usato per spostarsi
     int punteggio = 100;            //(i passi necessari sono circa una 50ina)
     int bonus = 10;                 //quanti dollari devono esserci nel labirinto.
+    int imprevisti = 3;             //quanti ! devono esserci nel labirinto.
     int numero_dollari = 0;         //variabile che conta la quantita di bonus raccolti
     _Bool gioco = 1;                //"sei nel gioco?" diventa false quando riesce ad arrivare alla colonna 18 (così si ferma il while)
     int riga_o = 1, col_o = 0;      //coordinate di 'o', inizializzate alla partenza (struttura_labirinto[1]
@@ -38,7 +41,8 @@ int main (){
                                         {'#',' ',' ',' ',' ',' ','#',' ',' ','#',' ',' ','#',' ',' ','#',' ',' ','#'},  //a[13][0], a[13][1], a[13][2] etc
                                         {'#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#'}}; //a[14][0], a[14][1], a[14][2] etc
 
-    inserisci_dollari(bonus, struttura_labirinto);    
+    inserisci_dollari(bonus, struttura_labirinto); 
+    inserisci_imprevisti(imprevisti, struttura_labirinto);   
 
 /*LOGICA PER INSERIRE i dollari a casissimo dentro al labirinto (pseudocodice).
 for i in range numero_di_dollari_che_ voglio : meglio usare un while, così posso incrementare solo se il dollaro finisce dove non c'è un cancelletto
@@ -71,7 +75,7 @@ punteggio += (dollari*3)
         
     }
 
-
+    printf("punteggio finale: punteggio + 3 punti per ogni bonus = %d ", 3*numero_dollari + punteggio);
 
     return 0;                                                                                   // Fine del programma.
 }

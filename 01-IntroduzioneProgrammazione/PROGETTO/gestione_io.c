@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include<stdlib.h>
+#include<time.h>
 
 void print_lab (char x[][19], int righe, int colonne, int *punteggio){  // Funzione che mi serve per stampare la struttura del labirinto.
 
@@ -68,7 +69,8 @@ void controllo_input (char x[][19], int *riga_o, int *col_o, int carattere_in_in
         case 'a':{                         // controllo qual'è il carattere  inserito (a, s, d, w)
             if ((*col_o-1)>0 && x[*riga_o][*col_o-1] != '#'){        // siccome vado a sinistra, controllo di non andare in una posizione '-1' in array (serve soltanto alla prima mossa)
                                                                      // e controllo anche che la nuova posizione dove mi dovrei spostare non sia un muro. Se entrambe le condizioni sono valide, 
-                  if (x[*riga_o][*col_o-1] == '$') *numero_dollari +=1 ;   //allo stesso modo, controllo se c'è un dollaro, in caso affermativo, aggiorno il contatore (per ora non ho ancora fatto che si aggiorna il punteggio)
+                if (x[*riga_o][*col_o-1] == '$') *numero_dollari +=1 ;   //allo stesso modo, controllo se c'è un dollaro, in caso affermativo, aggiorno il contatore (per ora non ho ancora fatto che si aggiorna il punteggio)
+                if (x[*riga_o][*col_o-1] == '!') *numero_dollari /= 2 ;   //allo stesso modo, controllo se c'è un !, in caso affermativo, aggiorno il contatore dei bonus
                 x[*riga_o][*col_o] = ' ';                       // sostituisco la posizione dove mi trovo (che adesso è 'o' ) con uno spazio, 
                 x[*riga_o][*col_o-1] = 'o';                     // e sostituisco la posizione dove devo andare (che adesso è vuoto, ovvero ' ' ) con il carattere 'o'. in questo modo, dò l'illusione di un effettivo spostamento.
                 *col_o = *col_o - 1;                            // Infine, aggiorno le coordinate del mio personaggino 'o'.
@@ -79,6 +81,7 @@ void controllo_input (char x[][19], int *riga_o, int *col_o, int carattere_in_in
         case 'd': {
             if ( (*col_o+1)<18 && x[*riga_o][*col_o+1] != '#'){
                 if (x[*riga_o][*col_o+1] == '$') *numero_dollari += 1; 
+                if (x[*riga_o][*col_o+1] == '!') *numero_dollari /= 2 ;
                 x[*riga_o][*col_o] = ' ';
                 x[*riga_o][*col_o+1] = 'o';
                 *col_o = *col_o + 1;
@@ -94,6 +97,7 @@ void controllo_input (char x[][19], int *riga_o, int *col_o, int carattere_in_in
         case 's': {
             if (x[*riga_o+1][*col_o] != '#'){
                 if (x[*riga_o+1][*col_o] == '$') *numero_dollari +=1; 
+                if (x[*riga_o+1][*col_o] == '!') *numero_dollari /= 2 ;
                 x[*riga_o][*col_o] = ' ';
                 x[*riga_o+1][*col_o] = 'o';
                 *riga_o = *riga_o + 1;
@@ -104,6 +108,7 @@ void controllo_input (char x[][19], int *riga_o, int *col_o, int carattere_in_in
         case 'w': {
             if (x[*riga_o-1][*col_o] != '#'){
                 if (x[*riga_o-1][*col_o] == '$') *numero_dollari +=1; 
+                if (x[*riga_o-1][*col_o] == '!') *numero_dollari /= 2 ;
                 x[*riga_o][*col_o] = ' ';
                 x[*riga_o-1][*col_o] = 'o';
                 *riga_o = *riga_o - 1;
@@ -117,15 +122,27 @@ void controllo_input (char x[][19], int *riga_o, int *col_o, int carattere_in_in
 
 void inserisci_dollari (int bonus, char s[][19]){       //inserisce in modo casuale dei dollari (in realtà è casuale solo la prima volta perché manca i seed, poi saranno sempre nella stessa posizione)
     int i = 0, j = 0;                                   //coordinate dei futuri dollari
+    srand(time(NULL));                                  //metto il seed della fuzione randomd
     while (i<bonus && j<bonus){                         //bonus è il numero di dollari che volgio inserire
         int x = (rand() % 13)+1;                        //posizione random per la riga
         int y = (rand() % 18)+1;                        // e per la colonna
         if (s[x][y] != '#') {                           //controllo che in quella posizoine non ci sia un muro
             s[x][y] = '$';                              //se è così, inserisco il dollaro
+            j++;                                            
+            i++;
         }
-        j++;                                            
-        i++;
     }
+}
 
-
+void inserisci_imprevisti (int imprevisti, char s[][19]){   //inserisce in modo casuale dei ! (in realtà è casuale solo la prima volta perché manca i seed, poi saranno sempre nella stessa posizione)
+    int i = 0, j = 0;                                       //coordinate dei futuri dollari
+    while (i<imprevisti && j<imprevisti){                   //bonus è il numero di dollari che volgio inserire
+        int x = (rand() % 13)+1;                            //posizione random per la riga
+        int y = (rand() % 18)+1;                            // e per la colonna
+        if (s[x][y] != '#' && s[x][y] != '$' && s[x][y] != 'o') {             //controllo che in quella posizoine non ci sia un muro
+            s[x][y] = '!';                                  //se è così, inserisco il dollaro
+            j++;                                            
+            i++;
+        }
+    }
 }
