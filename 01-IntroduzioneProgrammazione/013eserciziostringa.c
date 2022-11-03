@@ -10,13 +10,16 @@ CONVERTIRE STRINGA IN INPUT IN FORMATO B1FF
 int main(){
 
     char *str_in = (char*) malloc(100);
+    if(str_in==NULL){
+        return 1;
+    }
     printf("inserire stringa: ");
     for(unsigned int i=0;i<99&&(str_in[i]=getchar())!='\n';i++);
     
     str_in[99]='\0';
     str_in = (char*) realloc(str_in, strlen(str_in)+1);
     char *str_out = (char*) malloc(strlen(str_in)+11);
-        if(str_in==NULL){
+    if(str_in==NULL){
         return 1;
     }
    
