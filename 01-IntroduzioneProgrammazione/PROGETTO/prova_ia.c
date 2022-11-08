@@ -47,7 +47,6 @@ void stampa(int direzione){
         }
 }
 
-
 int main(){    
 
     int posizione = 1*colonne + 0; //RIGA*colonne + COLONNA (matrice[i][j] = matrice[riga][colonna])
