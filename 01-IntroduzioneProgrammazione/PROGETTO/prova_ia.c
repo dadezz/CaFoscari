@@ -107,18 +107,16 @@ int main(){
         if      (struttura_labirinto[destra(posizione, direzione)] == '#' && struttura_labirinto[avanti(posizione, direzione)] == ' ') {
             posizione = avanti(posizione, direzione);
             stampa(direzione);
-            if(posizione%19==18) siamo_in_gioco = 0;
+            if((posizione%colonne) == (colonne-1)) siamo_in_gioco = 0;
         }
         else if (struttura_labirinto[destra(posizione, direzione)] == '#' && struttura_labirinto[avanti(posizione, direzione)] == '#') {
-            if (direzione != 1) direzione -= 1;
-            else direzione = 4;
+            direzione = (direzione != 1) ? (direzione - 1) :  4;
         }
         else if (struttura_labirinto[destra(posizione, direzione)] == ' ') {
-            if (direzione != 4) direzione += 1;
-            else direzione = 1;
+            direzione = (direzione != 4) ? (direzione + 1) :  1;
             posizione = avanti(posizione, direzione);
             stampa(direzione);
-            if(posizione%19==18) siamo_in_gioco = 0;
+            if((posizione%colonne) == (colonne-1)) siamo_in_gioco = 0;
         }
         else printf("non so cosa fare\n");
     }
