@@ -52,6 +52,9 @@ void print_IA_output(int direction){
 int find_start_IA(char* map, int size){
     for (int i=0; i<size; i++) if (map[i]=='o') return i;
 }
+int find_end_IA(char* map, int size){
+    for (int i=0; i<size; i++) if (map[i]=='_') return i;
+}
 
 int find_direction_IA(char*map, int position, int rows, int columns){
     if (position>=0 && position < columns) return 3;
@@ -66,7 +69,9 @@ int find_direction_IA(char*map, int position, int rows, int columns){
 
 void mod_ai (char* map, int rows, int columns){ 
     int position = find_start_IA(map, rows*columns);
+    int end = find_end_IA(map, rows*columns);
     _Bool game = 1;
+    if(position == end) game = 0;
     int direction = find_direction_IA(map, position, rows, columns);
     printf("%d\n", position);
     printf("%d\n", position%columns);
@@ -75,7 +80,7 @@ void mod_ai (char* map, int rows, int columns){
         if      (map[right_IA(position, direction, columns)] == '#' && map[forward_IA(position, direction, columns)] != '#') {
             position = forward_IA(position, direction, columns);
             print_IA_output(direction);
-            if((position%columns) == (columns-1)) game = 0;
+            if(position == end) game = 0;
         }
         else if (map[right_IA(position, direction, columns)] == '#' && map[forward_IA(position, direction, columns)] == '#') {
             direction = (direction != 1) ? (direction - 1) :  4;
@@ -84,7 +89,7 @@ void mod_ai (char* map, int rows, int columns){
             direction = (direction != 4) ? (direction + 1) :  1;
             position = forward_IA(position, direction, columns);
             print_IA_output(direction);
-            if((position%columns) == (columns-1)) game = 0;
+            if(position == end) game = 0;
         }
         else printf("non so cosa fare\n");
     }
@@ -161,72 +166,8 @@ void ins_taxes (int tax, char* map, int map_size){
     while (i<tax){  
         int x = rand() % map_size;
         if (map[x] == ' ') {  
-            map[x] = '$';                                         
+            map[x] = '!';                                         
             i++;
-        }
-    }
-}
-
-void controllo_input (char x[][19], int *riga_o, int *col_o, int carattere_in_input, _Bool *gioco, int *numero_dollari){
-    // x -> struttura labirinto; riga_o, col_o -> coordinate attuali di 'o'; carattere in input -> inserimento utente (asdw); gioco -> booleano che falsifico quando arrivo alla fine del gioco
-    
-    /*
-    / È il corpo vero e proprio del programma, la struttura logica che permette il movimento del pallino.
-    / Commento uno solo dei caratteri, perché per gli altri la logica è la stessa, cambia solo la direzione
-    / 
-    / non serve controllare che lo spostamento sia all'interno del bordo superiore o inferiore del labirinto, perché quest'ultimo è 
-    / delimitato sopra e sottoda # e controllo direttamente che non vada a capitare sopra un cancelletto
-    */
-    switch (carattere_in_input){
-        case 'a':{                         // controllo qual'è il carattere  inserito (a, s, d, w)
-            if ((*col_o-1)>0 && x[*riga_o][*col_o-1] != '#'){        // siccome vado a sinistra, controllo di non andare in una posizione '-1' in array (serve soltanto alla prima mossa)
-                                                                     // e controllo anche che la nuova posizione dove mi dovrei spostare non sia un muro. Se entrambe le condizioni sono valide, 
-                if (x[*riga_o][*col_o-1] == '$') *numero_dollari +=1 ;   //allo stesso modo, controllo se c'è un dollaro, in caso affermativo, aggiorno il contatore (per ora non ho ancora fatto che si aggiorna il punteggio)
-                if (x[*riga_o][*col_o-1] == '!') *numero_dollari /= 2 ;   //allo stesso modo, controllo se c'è un !, in caso affermativo, aggiorno il contatore dei bonus
-                x[*riga_o][*col_o] = ' ';                       // sostituisco la posizione dove mi trovo (che adesso è 'o' ) con uno spazio, 
-                x[*riga_o][*col_o-1] = 'o';                     // e sostituisco la posizione dove devo andare (che adesso è vuoto, ovvero ' ' ) con il carattere 'o'. in questo modo, dò l'illusione di un effettivo spostamento.
-                *col_o = *col_o - 1;                            // Infine, aggiorno le coordinate del mio personaggino 'o'.
-            }
-            else printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n"); //nel caso le condizioni sopra non fossero soddisfatte (fuori dal labirinto o muro), semplicemente printo errore 
-            break;
-        }
-        case 'd': {
-            if ( (*col_o+1)<18 && x[*riga_o][*col_o+1] != '#'){
-                if (x[*riga_o][*col_o+1] == '$') *numero_dollari += 1; 
-                if (x[*riga_o][*col_o+1] == '!') *numero_dollari /= 2 ;
-                x[*riga_o][*col_o] = ' ';
-                x[*riga_o][*col_o+1] = 'o';
-                *col_o = *col_o + 1;
-            }
-            else if((*col_o+1)==18 && x[*riga_o][*col_o+1] != '#') {                           // unica cosa in più da spiegare: se il personaggino arriva senza errori all'ultima colonna (ovvero non va su un muro dell'ultima colonna)
-                printf("grandioso! hai vinto!\n");              // vince.
-                *gioco = 0;                                     // di conseguenza, il gioco termina.
-            }
-            else {printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
-            }
-            break;
-        }
-        case 's': {
-            if (x[*riga_o+1][*col_o] != '#'){
-                if (x[*riga_o+1][*col_o] == '$') *numero_dollari +=1; 
-                if (x[*riga_o+1][*col_o] == '!') *numero_dollari /= 2 ;
-                x[*riga_o][*col_o] = ' ';
-                x[*riga_o+1][*col_o] = 'o';
-                *riga_o = *riga_o + 1;
-            }
-            else printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
-            break;
-        }
-        case 'w': {
-            if (x[*riga_o-1][*col_o] != '#'){
-                if (x[*riga_o-1][*col_o] == '$') *numero_dollari +=1; 
-                if (x[*riga_o-1][*col_o] == '!') *numero_dollari /= 2 ;
-                x[*riga_o][*col_o] = ' ';
-                x[*riga_o-1][*col_o] = 'o';
-                *riga_o = *riga_o - 1;
-            }
-            else printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
-            break;
         }
     }
 }
@@ -270,74 +211,64 @@ void input_char_INTER(char* x){
     } while( *x != 'w' && *x != 'a' && *x != 's' && *x != 'd');
 }
 
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-///int posizione = 1*columns + 0;        row_o*columns + col_o [i][j]=[row_o][col_o]  x[i*columns + j]     
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-void controllo_input (char* x, int *riga_o, int *col_o, int carattere_in_input, _Bool *gioco, int *numero_dollari){
-    // x -> struttura labirinto; riga_o, col_o -> coordinate attuali di 'o'; carattere in input -> inserimento utente (asdw); gioco -> booleano che falsifico quando arrivo alla fine del gioco
-    
-    /*
-    / È il corpo vero e proprio del programma, la struttura logica che permette il movimento del pallino.
-    / Commento uno solo dei caratteri, perché per gli altri la logica è la stessa, cambia solo la direzione
-    / 
-    / non serve controllare che lo spostamento sia all'interno del bordo superiore o inferiore del labirinto, perché quest'ultimo è 
-    / delimitato sopra e sottoda # e controllo direttamente che non vada a capitare sopra un cancelletto
-    */
-    switch (carattere_in_input){
-        case 'a':{                         // controllo qual'è il carattere  inserito (a, s, d, w)
-            if ((*col_o-1)>0 && x[*riga_o][*col_o-1] != '#'){        // siccome vado a sinistra, controllo di non andare in una posizione '-1' in array (serve soltanto alla prima mossa)
-                                                                     // e controllo anche che la nuova posizione dove mi dovrei spostare non sia un muro. Se entrambe le condizioni sono valide, 
-                if (x[*riga_o][*col_o-1] == '$') *numero_dollari +=1 ;   //allo stesso modo, controllo se c'è un dollaro, in caso affermativo, aggiorno il contatore (per ora non ho ancora fatto che si aggiorna il punteggio)
-                if (x[*riga_o][*col_o-1] == '!') *numero_dollari /= 2 ;   //allo stesso modo, controllo se c'è un !, in caso affermativo, aggiorno il contatore dei bonus
-                x[*riga_o][*col_o] = ' ';                       // sostituisco la posizione dove mi trovo (che adesso è 'o' ) con uno spazio, 
-                x[*riga_o][*col_o-1] = 'o';                     // e sostituisco la posizione dove devo andare (che adesso è vuoto, ovvero ' ' ) con il carattere 'o'. in questo modo, dò l'illusione di un effettivo spostamento.
-                *col_o = *col_o - 1;                            // Infine, aggiorno le coordinate del mio personaggino 'o'.
-            }
-            else printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n"); //nel caso le condizioni sopra non fossero soddisfatte (fuori dal labirinto o muro), semplicemente printo errore 
-            break;
-        }
-        case 'd': {
-            if ( (*col_o+1)<18 && x[*riga_o][*col_o+1] != '#'){
-                if (x[*riga_o][*col_o+1] == '$') *numero_dollari += 1; 
-                if (x[*riga_o][*col_o+1] == '!') *numero_dollari /= 2 ;
-                x[*riga_o][*col_o] = ' ';
-                x[*riga_o][*col_o+1] = 'o';
-                *col_o = *col_o + 1;
-            }
-            else if((*col_o+1)==18 && x[*riga_o][*col_o+1] != '#') {                           // unica cosa in più da spiegare: se il personaggino arriva senza errori all'ultima colonna (ovvero non va su un muro dell'ultima colonna)
-                printf("grandioso! hai vinto!\n");              // vince.
-                *gioco = 0;                                     // di conseguenza, il gioco termina.
-            }
-            else {printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
+int next_position_INTER (int input_char, int position, int columns){
+    switch (input_char){
+        case 'a':
+            return position-1;
+        case 'd':
+            return position+1;
+        case 'w':
+            return position-columns;
+        case 's':
+            return position+columns;
+    }
+}
+void INTER_control (char* x, int rows, int columns, int *position, int input_char, _Bool *game, int* bonuses, int* taxes){
+    _Bool ok = 1;
+    switch(input_char){
+        case 'w':{
+            if (next_position_INTER(input_char, *position, columns)<0) {
+                printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
+                ok = 0;
             }
             break;
         }
-        case 's': {
-            if (x[*riga_o+1][*col_o] != '#'){
-                if (x[*riga_o+1][*col_o] == '$') *numero_dollari +=1; 
-                if (x[*riga_o+1][*col_o] == '!') *numero_dollari /= 2 ;
-                x[*riga_o][*col_o] = ' ';
-                x[*riga_o+1][*col_o] = 'o';
-                *riga_o = *riga_o + 1;
+        case 'a':{
+            if (next_position_INTER(input_char, *position, columns)%columns == (columns-1)){
+                printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
+                ok = 0;
             }
-            else printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
             break;
         }
-        case 'w': {
-            if (x[*riga_o-1][*col_o] != '#'){
-                if (x[*riga_o-1][*col_o] == '$') *numero_dollari +=1; 
-                if (x[*riga_o-1][*col_o] == '!') *numero_dollari /= 2 ;
-                x[*riga_o][*col_o] = ' ';
-                x[*riga_o-1][*col_o] = 'o';
-                *riga_o = *riga_o - 1;
+        case 's':{
+            if (next_position_INTER(input_char, *position, columns)>rows*columns) {
+                printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
+                ok = 0;
             }
-            else printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
             break;
+        }
+        case 'd':{
+            if (next_position_INTER(input_char, *position, columns)%columns == 0) {
+                printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
+                ok = 0;
+            }
+        }
+    }
+    if (ok){
+        if (x[next_position_INTER(input_char, *position, columns)] == '#'){
+            printf("Mi spiace, di qua non puoi andare, hai sprecato un punto...\n");
+            ok = 0;
+        }
+        else if (x[next_position_INTER(input_char, *position, columns)] == '_'){
+            printf("Grandioso, hai vinto!\n");
+            *game = 0;
+        }
+        else if (x[next_position_INTER(input_char, *position, columns)] == '$') *bonuses += 1;
+        else if (x[next_position_INTER(input_char, *position, columns)] == '!') *taxes += 1;
+        if (ok){
+            x[*position] = ' ';
+            *position = next_position_INTER(input_char, *position, columns);
+            x[*position] = '.';
         }
     }
 }
@@ -349,8 +280,6 @@ void mod_interactive(char* map, int rows, int columns, _Bool need_bon_tax){
     int points = 1000, qt_bonuses = 10, qt_taxes = 3, bonuses = 0, taxes = 0; 
         //punti del gioco, quantità di bonus e imprevisti nel gioco, quantità di bonus e imprevisti racccolti
     int position = find_start_IA(map, rows*columns);
-    int row_o = position/columns;
-    int col_o = position%columns;
     _Bool game = 1;
         //sei nel gioco?
 
@@ -363,11 +292,35 @@ void mod_interactive(char* map, int rows, int columns, _Bool need_bon_tax){
         printf("Inserisci la prossima mossa: \n");
         input_char_INTER(&input_char);
         points -= 1;
-        //INTER_control(map, &riga_o, &col_o, input_char, &game, &bonuses, &taxes);
-        printf("punteggio attuale: %d, \nbonus raccolti: %d\n", points, bonuses);   
+        INTER_control(map, rows, columns, &position, input_char, &game, &bonuses, &taxes);
+        printf("punteggio attuale: %d, \nbonus raccolti: %d\nimprevisti raccolti: %d\n", points, bonuses, taxes);   
     }
-    printf("punteggio finale: punteggio + 10 punti per ogni bonus = %d ", 10*bonuses + points);
+    if (taxes != 0){
+        bonuses = bonuses/(2*taxes);
+    }
+    printf("bonus risultanti: %d.\npunteggio finale:\npunteggio + 10 punti per ogni bonus  = %d ", bonuses, 10*bonuses + points);
 } 
 
-int ask_mod(){}
+int ask_mod(){
+    printf("Ciao, benvenuto nel giochino!1!1!1!1!1!1\n");
+    printf("Per giocare con la modalità interattiva, premi 1 \n");
+    printf("Per testare invece la modalità IA, premi 2.\n");
+    int choice;
+    printf("scelta: ");
+    do{
+        scanf("%d", &choice);
+        if (choice!=1 && choice!=2) printf("\nSorry, scelta non valida, riprova: ");
+    } while(choice!=1 && choice!=2);
+    return choice;
+}
 
+int ask_default(){
+    printf("Premi 1 se vuoi usare il labirinto di default\npremi 2 se vuoi inserire un labirinto custom in input.\n");
+    int choice;
+    printf("scelta: ");
+    do{
+        scanf("%d", &choice);
+        if (choice!=1 && choice!=2) printf("\nSorry, scelta non valida, riprova: ");
+    } while(choice!=1 && choice!=2);
+    return choice;
+}
