@@ -57,10 +57,8 @@ int main(int argc, char* argv[]){
                     printf("\nci sono già bonus e imprevisti?(si=1/no=0): ");
                     do {
                         scanf("%d", &x);
-                        printf("%d", x);
                     } while (x != 1 && x != 0);
                     _Bool need;
-                    printf("\n fuori ciclo%d\n", x);
                     if (x == 'n') {need = 1;}
                     else need = 0;
 
