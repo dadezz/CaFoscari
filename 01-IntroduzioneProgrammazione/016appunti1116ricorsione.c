@@ -5,7 +5,7 @@ appunti 16 novembre 2022
 #include<stdlib.h>
 
 
-//interessante sullo scanf
+// piccola parentesi interessante e utile sullo scanf
 void scannnnnnn(){
     char* stringa;
     scanf("%s", &stringa);
@@ -29,12 +29,13 @@ int tutti_pari1(int* v, size_t l){
     */
 
    if (l==1) return v[0]%2==0;
-   else return v[l-1]%2==0 && tutti_pari(v, l-1);
+   else return v[l-1]%2==0 && tutti_pari1(v, l-1);
 }
 
-int main1(){
+int main1(){ //sarebbe il main relativo alla funz sopra
     int x[] =  {2, 4, 6, 8, 10};
-    printf("%d", tutti_pari(x, 5));
+    printf("%d", tutti_pari1(x, 5));
+    return 0;
 }
 
 int tutti_pari(int* v, size_t l){
@@ -61,6 +62,7 @@ int main2(){
     * vera o falsa, cosiì da non dover eseguire la seconda parte, e risparmiare cicli di cpu.
     */
     printf("%d", tutti_pari(x, 5));
+    return 0;
 }
 
 /*
@@ -96,7 +98,7 @@ _Bool subset_sum(int* v, size_t l, int t){
      * basta che una delle due mi dica true per poter rispondere true.
      * 
      * o è vera la prima e trovo la somma nel sottinsieme, o è vera la secoda e trovo un elemento più il gap nel
-     * sttinsieme, quindi bsta una sola delle due.
+     * sttinsieme, quindi bsta una sola delle due. (=> or logico).
      * 
      * Ma i casi base? 
      * abbiamo solo ciamato la funzione, ma quando dobiamo fermarci?
@@ -115,6 +117,12 @@ _Bool subset_sum(int* v, size_t l, int t){
      * casi su cui ragionare: t=0, numeri negativi
      * [tip: dipende anche se l'insieme vuoto lo consideriamo come somma 0 o meno]
     */
+    if (l==0 && t>0) return 0; //se sono arrivato alla fine dell'array e la somma non è ancora 0, ritorno false
+    if (t==0) return 1; //se la somma arriva a zero, ho rislto e ritorno true
+    if (v[l - 1] > t) return subset_sum(v, l-1, t); //skippo gli elementi tropo grandi
+    return (subset_sum(v, l-1, t) || subset_sum(v, l-1, t-v[l-1]));
+        //il famoso or logico di prima: o richiamo la funzione su tutti i valori meno l'ultimo escluso, oppure 
+        //richiamo la funzione sempre con l'elemento in meno ma con il gap mancante corretto.
 }
 
 int main(){
