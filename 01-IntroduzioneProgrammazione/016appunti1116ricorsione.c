@@ -125,9 +125,78 @@ _Bool subset_sum(int* v, size_t l, int t){
         //richiamo la funzione sempre con l'elemento in meno ma con il gap mancante corretto.
 }
 
-int main(){
+int main3(){
     int x[]={2, 4, 5, 6, 6, 11};
     printf("%d\n", subset_sum(x, 6, 25));
+    return 0;
+}
+
+/**
+ * Scrivere funzione ricorsiva che mi dica se una stringa è palindroma
+*/
+int pal(char* s, int l){
+    //caso base: se l==1, return v[0] == v[l-1] 
+    //passo induttivo: return pal(v+1, l-1)
+    if (l<=1) return 1;
+    else return s[0] == s[l-1] && pal(s+1, l-2);
+}
+int  main4(){
+    char* s1 = "abcddcba";
+    char* s2 = "abcdcba";
+    char* s3 = "asdfghjk";
+    char* s4 = "asdfghj";
+    printf("palindroma pari: %d\n", pal(s1, 8));
+    printf("palindroma dispari: %d\n", pal(s2, 7));
+    printf("non palindroma pari: %d\n", pal(s3, 8));
+    printf("non palindroma dispari: %d\n", pal(s4, 7));
+    return 0;
+}
+/**
+ * per la frase "i topi non avevano nipoti", come si risolve, dati gli spazi?
+*/
+int pal_space(char* s, int l){
+    if (l<=1) return 1;
+    else {
+        if (s[0]==' ') return pal_space(s+1, l-1);
+        else if (s[l-1]==' ') return pal_space(s, l-1);
+        else return s[0] == s[l-1] && pal_space(s+1, l-2);
+    }
+}
+int  main5(){
+    char* s1 = "i topi non avevano nipoti";
+    printf("%d\n", pal_space(s1, 25));
+    return 0;
+}
+
+/*
+ * Abbiamo una scorta infinita di pali di legno di 4 colori diversi con i quali dobbiamo costruire una staccionata
+ * composta da n pali in tutto, con un solo vincolo: due pali dello stesso colore devono avere almeno altri due
+ * pali di colore diverso a separarli. Scrivere una funzione che dato n restituisca il numero di configurazioni
+ * possibili.
+ * esempio: fence(1) = 4;
+ *          fence(4) = 48;
+*/
+int fence(int n, int p, int pp){
+    // logica: se non ho paletti, ho un solo modo di non mettere nulla. => caso base: if n==0, return 1.
+    //      se metto un paletto, mi mancano n-1 paletti, mi interessa quindi sapere fence (n-1).
+    //      per ogni opzione di colore del paletto 1, ho tot modi di mettere n-1 paletti.
+    //      di conseguenza, la quantità di possibilità totali è la somma delle possibilità per le 4 opzioni.
+    //      ora serve il vincolo: tra due paletti dello stesso colore servono due paletti di colore diverso.
+    //      mi servono quindi due informazioni che mi mancano: colore del paletto precedente e colore del paletto pre-precedente
+    //      quindi se p!=1 e pp!=1, posso mettere paletto di colore 1.
+    //      ugualmente, se p!=2 e pp!=2 posso mettere paletto di colore 2, etc.
+    //      la somma di tutte le combinazioni possibili mi da il risultato del problema.
+    if (n==0) return 1;
+    int sum = 0;
+    if (p!=1 && pp!=1) sum += fence(n-1, 1, p);
+    if (p!=2 && pp!=2) sum += fence(n-1, 2, p);
+    if (p!=3 && pp!=3) sum += fence(n-1, 3, p);
+    if (p!=4 && pp!=4) sum += fence(n-1, 4, p);
+    return sum;
+}
+int main(){
+    int n = 10;
+    printf("%d\n", fence(n, 0, 0));
     return 0;
 }
 
