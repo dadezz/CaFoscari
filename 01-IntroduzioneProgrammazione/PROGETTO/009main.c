@@ -26,8 +26,8 @@ int main(int argc, char* argv[]){
         if(string_comparison(argv[1],"--challenge")) play_challenge();
     }
     else {
-        int choice_mod = ask_mod();
-        int choice_default = ask_default();
+        int choice_mod = ask_mod(); // Modalità interattiva (1) o IA (0)
+        int choice_default = ask_default(); //vuole inserire mappa in input: si (0), no (1)
         if (choice_default == 1) {
             switch (choice_mod){
                 case 1: 
@@ -41,42 +41,19 @@ int main(int argc, char* argv[]){
         else {
             switch (choice_mod){
                 case 1: {
-                    int columns;
-                    int rows;
-                    printf("colonne: ");
-                    scanf("%d", &columns);
-                    printf("righe: ");
-                    scanf("%d", &rows);
-                    char* map = (char*) malloc((rows*columns)*sizeof(char));
-                    if (map == NULL){
-                        printf("ERRORE di allocazione memoria (malloc)");
-                        exit(EXIT_FAILURE);
-                    }
-                    map_scan_from_input(map, rows, columns);
-                    int x;
-                    printf("\nci sono già bonus e imprevisti?(si=1/no=0): ");
-                    do {
-                        scanf("%d", &x);
-                    } while (x != 1 && x != 0);
-                    _Bool need;
-                    if (x == 'n') {need = 1;}
-                    else need = 0;
-
-                    mod_interactive(map, rows, columns, need);
+                    int rows, columns;
+                    char* map = map_input_creation(&rows, &columns);
+                    do_you_need_bonuses(rows*columns, map);
+                    mod_interactive(map, rows, columns);
+                    free(map);
                     break;
                 }
                 case 2: {
-                    int columns;
-                    int rows;
-                    scanf("%d", &columns);
-                    scanf("%d", &rows);
-                    char* map = (char*) malloc((rows*columns)*sizeof(char));
-                    if (map == NULL){
-                        printf("ERRORE di allocazione memoria (malloc)");
-                        exit(EXIT_FAILURE);
-                    }
-                    map_scan_from_input(map, rows, columns);
-                    mod_ai(map,rows, columns);
+                    int rows, columns;
+                    char* map = map_input_creation(&rows, &columns);
+                    do_you_need_bonuses(rows*columns, map);
+                    mod_ai(map, rows, columns);
+                    free(map);
                     break;
                 }
             }
