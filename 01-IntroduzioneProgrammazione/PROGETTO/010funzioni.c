@@ -104,13 +104,9 @@ char* map_input_creation(int *rows, int *columns){
     return map;
 }
 
-int find_start(char* map, int size){
-    //guardo dov'è l'inizio del labirinto
-    for (int i=0; i<size; i++) if (map[i]=='o') return i;
-}
-int find_end(char* map, int size){
-    //guardo dov'è la fine del labirinto
-    for (int i=0; i<size; i++) if (map[i]=='_') return i;
+int find_char(char* map, int size, char c_to_be_found){
+    //trova la posizione di un carattere specifico all'interno della mappa
+    for (int i=0; i<size; i++) if (map[i]==c_to_be_found) return i;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -176,8 +172,8 @@ void print_IA_output(int direction){
 ///////////////////////////////////////////////////////////////
 
 void mod_ai (char* map, int rows, int columns){ 
-    int position = find_start(map, rows*columns); //posizione di inizio
-    int end = find_end(map, rows*columns);        //posizione di fine
+    int position = find_char(map, rows*columns, 'o'); //posizione di inizio
+    int end = find_char(map, rows*columns, '_');        //posizione di fine
     _Bool game = 1; //diventerà 0 quando arrivo alla fine
     int direction = find_start_direction_IA(map, position, rows, columns);
     
