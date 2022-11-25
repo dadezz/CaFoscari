@@ -22,7 +22,7 @@ int main(int argc, char* argv[]){
                            '#',' ',' ',' ',' ',' ','#',' ',' ','#',' ',' ','#',' ',' ','#',' ',' ','#',
                            '#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#'};
 
-    if (argc == 2){
+    if (argc > 1){
         if(string_comparison(argv[1],"--challenge")) play_challenge();
     }
     else {
@@ -31,7 +31,7 @@ int main(int argc, char* argv[]){
         if (choice_default == 1) {
             switch (choice_mod){
                 case 1: 
-                    mod_interactive(default_map, default_rows, default_columns, 1);
+                    mod_interactive(default_map, default_rows, default_columns);
                     break;
                 case 2:
                     mod_ai(default_map, default_rows, default_columns);
