@@ -15,16 +15,6 @@ int find_char(char* map, int size, char c_to_be_found){
 }
 
 
-
-
-
-
-
-
-
-
-
-
 int risoluzione_ricorsiva(char* map, int *path, int c, int r, int inizio, int fine, int lunghezza_path){
     /**
      * se inizio coincide con la fine, ritorno la mia attuale posizione come elemento di path
@@ -47,34 +37,6 @@ int risoluzione_ricorsiva(char* map, int *path, int c, int r, int inizio, int fi
     return inizio;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 int soluzione_easy(char* map, int *path, int inizio, int fine, int lunghezza_path, int c, int r){
     sleep(1);
     map[inizio]='+';
@@ -83,7 +45,6 @@ int soluzione_easy(char* map, int *path, int inizio, int fine, int lunghezza_pat
     path[1] = soluzione_easy(map, path+1, inizio+1, fine, lunghezza_path-1, c, r);
     return inizio;
 }
-
 
 int main(){
     int c=4, r=3;
@@ -98,12 +59,6 @@ int main(){
     path[0] = soluzione_easy(map, path, inizio, fine, c, c, r);
     for(int i=0; i<c; i++) printf("%d\n",path[i]);
 }
-
-
-
-
-
-
 
 
 int main1(){
