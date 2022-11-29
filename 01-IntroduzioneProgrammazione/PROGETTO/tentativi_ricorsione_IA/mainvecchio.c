@@ -1,6 +1,6 @@
-#include <stdlib.h>
-#include<stdio.h>
 #include<stdbool.h>
+#include<stdio.h>
+#include<stdlib.h>
 
 void stampa(char* map, int r, int c){
     for (int i=0; i<r; i++){
@@ -15,7 +15,6 @@ int find_char(char* map, int size, char c_to_be_found){
     for (int i=0; i<size; i++) if (map[i]==c_to_be_found) return i;
 }
 
-#ifdef PROVA
 int risoluzione_ricorsiva(char* map, int *path, int c, int r, int inizio, int fine, int lunghezza_path){
     /**
      * se inizio coincide con la fine, ritorno la mia attuale posizione come elemento di path
@@ -29,7 +28,7 @@ int risoluzione_ricorsiva(char* map, int *path, int c, int r, int inizio, int fi
     stampa(map, r, c);
 
     path[0] = inizio;
-    if (*path==fine) return fine;
+    if (*path==fine) return inizio;
     if (map[inizio+1] != '#' && map[inizio+1] != '+')
         inizio = risoluzione_ricorsiva(map, path+1, c, r, inizio+1, fine, lunghezza_path-1);
     if (map[inizio+c] != '#' && map[inizio+c] != '+')
@@ -38,54 +37,8 @@ int risoluzione_ricorsiva(char* map, int *path, int c, int r, int inizio, int fi
         inizio = risoluzione_ricorsiva(map, path+1, c, r, inizio-c, fine, lunghezza_path-1);
     if (map[inizio-1] != '#' && map[inizio-1] != '+')
         inizio = risoluzione_ricorsiva(map, path+1, c, r, inizio-1, fine, lunghezza_path-1);
-    else inizio = risoluzione_ricorsiva(map, path-1, c, r, *(path-1), fine, lunghezza_path-1);
-    return fine;
+    return inizio;
 }
-#endif
-
-
-bool punto_valido(char* map, int position){
-    return map[position] == ' ' || map[position] == 'o' || map[position] == '_';
-}
-
-bool esiste_percorso(char* map, int position, int fine, int c, int* path){
-    /**
-     * per quanto concerne il path: 
-     * 1 significa NORD (mi son spostato verso l'alto)
-     * 2 significa EST (mi son spostato verso destra)
-     * 3 significa SUD (mi son spostato verso il basso)
-     * 4 significa OVEST (mi son spostato verso sinistra)
-    */
-    if (punto_valido(map, position)){
-       
-       if (position==fine) return true; //caso base
-       
-       map[position] = '+'; //marco con un + il mio percorso
-       
-       //inizio guardando a destra
-       bool esiste = esiste_percorso(map, position+1, fine, c, path+1); 
-       if (esiste) *path = 2;
-       //se non esiste la possibilità di andare a destra, vado in basso
-       if(!esiste) {
-           esiste = esiste_percorso(map, position+c, fine, c, path+1);
-           *path  = 3;
-       }
-       //se non esiste la possibilità di andare in basso, vado in alto
-       if(!esiste){
-           esiste = esiste_percorso(map, position-c, fine, c, path+1);
-           *path = 1;
-       }
-       //se non esiste la possibilità di andare in alto, vado a sinistra
-       if(!esiste) {
-           esiste = esiste_percorso(map, position-1, fine, c, path+1);
-           *path = 4;
-       }
-
-       return esiste;
-    }
-}
-
-
 
 int main(){
     
@@ -96,7 +49,7 @@ int main(){
                            '#',' ',' ','#',' ',' ','#',
                            '#',' ',' ','#','#','#','#',
                            '#',' ',' ',' ',' ',' ','#',
-                           '#',' ',' ','#',' ','#','#',
+                           '#',' ',' ','#',' ',' ','#',
                            '#',' ',' ','#',' ',' ','#',
                            '#',' ',' ','#',' ',' ','_',
                            '#','#','#','#','#','#','#'};
@@ -106,9 +59,7 @@ int main(){
     int inizio = find_char(default_map, default_columns*default_rows, 'o');
     int fine = find_char(default_map, default_columns*default_rows, '_');
 
-    int a = esiste_percorso(default_map, inizio, fine, default_columns, path);
-    printf("eiste percorso: %d\n", a);
-    stampa(default_map, default_rows, default_columns);
+    risoluzione_ricorsiva(default_map, path, default_columns, default_rows, inizio, fine, default_columns*default_rows);
 
     size_t size = 0;
     for (int j=0; j<default_columns*default_rows; j++) if (path[j]!=0) ++size;
