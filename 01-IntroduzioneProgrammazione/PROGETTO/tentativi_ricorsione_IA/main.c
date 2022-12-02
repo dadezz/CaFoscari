@@ -15,34 +15,6 @@ int find_char(char* map, int size, char c_to_be_found){
     for (int i=0; i<size; i++) if (map[i]==c_to_be_found) return i;
 }
 
-#ifdef PROVA
-int risoluzione_ricorsiva(char* map, int *path, int c, int r, int inizio, int fine, int lunghezza_path){
-    /**
-     * se inizio coincide con la fine, ritorno la mia attuale posizione come elemento di path
-    */
-
-    //appunto sul path: in questo caso registravo le posizioni invece degli spostamenti, ma il succo non cambia 
-
-    //printf("%d\n", inizio);
-    //sleep(1);
-    map[inizio]='+';
-    stampa(map, r, c);
-
-    path[0] = inizio;
-    if (*path==fine) return fine;
-    if (map[inizio+1] != '#' && map[inizio+1] != '+')
-        inizio = risoluzione_ricorsiva(map, path+1, c, r, inizio+1, fine, lunghezza_path-1);
-    if (map[inizio+c] != '#' && map[inizio+c] != '+')
-        inizio = risoluzione_ricorsiva(map, path+1, c, r, inizio+c, fine, lunghezza_path-1);
-    if (map[inizio-c] != '#' && map[inizio-c] != '+')
-        inizio = risoluzione_ricorsiva(map, path+1, c, r, inizio-c, fine, lunghezza_path-1);
-    if (map[inizio-1] != '#' && map[inizio-1] != '+')
-        inizio = risoluzione_ricorsiva(map, path+1, c, r, inizio-1, fine, lunghezza_path-1);
-    else inizio = risoluzione_ricorsiva(map, path-1, c, r, *(path-1), fine, lunghezza_path-1);
-    return fine;
-}
-#endif
-
 
 bool punto_valido(char* map, int position){
     return map[position] == ' ' || map[position] == 'o' || map[position] == '_';

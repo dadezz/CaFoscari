@@ -1,6 +1,27 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<time.h>
+#include<stdbool.h>
+
+
+
+void stampa_char(char* map, int r, int c){
+    for (int i=0; i<r; i++){
+        for (int j=0; j<c; j++){
+        printf("%c ", map[i*c+j]);
+        }
+        printf("\n");
+    }
+}
+void stampa_int(int* map, int r, int c){
+    for (int i=0; i<r; i++){
+        for (int j=0; j<c; j++){
+            if (map[i*c+j]>=0 && map[i*c+j]<10) printf(" %d   ", map[i*c+j]);
+            else printf("%d   ", map[i*c+j]);
+        }
+        printf("\n");
+    }
+}
 
 ///////////////////////////////////////////////////////////////
 //                      GENERAL FUNCS                        //
@@ -211,18 +232,102 @@ void mod_ai (char* map, int rows, int columns){
 ///////////////////////////////////////////////////////////////
 
 void play_challenge (){
-    int columns;
-    int rows;
-    scanf("%d", &columns);
-    scanf("%d", &rows);
-    char* map = (char*) malloc((rows*columns)*sizeof(char));
+    int c;
+    int r;
+    scanf("%d", &c);
+    scanf("%d", &r);
+    char* map = (char*) malloc((r*c)*sizeof(char));
     if (map == NULL){
         printf("ERRORE di allocazione memoria (malloc)");
         exit(EXIT_FAILURE);
     }
-    map_scan_from_input(map, rows, columns);
-    mod_ai (map, rows, columns);
+    map_scan_from_input(map, r, c);
+    
+    int inizio = find_char(map, c*r, 'o');
+    int fine = find_char(map, c*r, '_');
+    
+    /**
+     * creo copia del interi fatta da interi.
+     * il muro ha valore -1,
+     * lo spazio e la fine hanno valore 0, 
+     * la o ha valore 1 (non servirebbe, ma risparmio un passaggio)
+    */
+    int* m =  (int*) calloc(c*r, sizeof(int));
+    for (int i=0; i<c*r; i++) {
+        if (map[i] == '#') m[i] = -1;
+        else if (map[i] == 'o') m[i] = 1;
+    }
+    
+    bool esplorazione = true; //continuo a controllare finché non finisco le caselle disponibili da esplorare
+    int zyzz = 0; //numero di passi, variabile più importante dell'algoritmo
+
+    while (esplorazione){
+        zyzz++;
+        for (int i=0; i<c*r; i++){
+            //controllo tutte le posizioni che hanno zyzz attuale
+            if (m[i]==zyzz){
+                
+                /**
+                 * la prima parte dell'and controlla che si stia all'interno del campo, 
+                 * la seconda controlla se ho uno spazio vuoto o un nodo che ho raggiunto con un'altra via più lunga.
+                 * (si noti che questo caso ha senso controllarlo solo se ci sono modificatori di zyzz, tipo dollari)
+                 * se le due condizioni soddisfatte, ci metto il zyzz successivo.
+                */
+                if ((i+1 < c*r) && ((m[i+1] > zyzz+1) || (m[i+1]==0 ))) m[i+1] = zyzz+1;
+                if ((i+c < c*r) && ((m[i+c] > zyzz+1) || (m[i+c]==0))) m[i+c] = zyzz+1;
+                if ((i-c > 0) && ((m[i-c] > zyzz+1) || (m[i-c]==0))) m[i-c] = zyzz+1;
+                if ((i-1 > 0) && ((m[i-1] > zyzz+1) || (m[i-1]==0))) m[i-1] = zyzz+1;
+            }
+        }
+        if (m[fine] == zyzz) esplorazione = false; //zyzz è sempre il numero di passi minore, per cui se arrivo alla fine, posso tranquillamente smettere di esplorare
+         
+    }
+    //mod_ai (map, rows, columns);
+
+    int* path = (int*) calloc(zyzz, sizeof(int));
+    size_t pat_size = zyzz;
+
+    //ovviamente, prima e ultima posizione del percorso saranno inizio e fine
+    path[0] = inizio;
+    path[pat_size-1] = fine;
+    for (int i=pat_size-2; i>0; i--){
+        int min = zyzz; //zyzz è sicuramente maggiore della cella adiacente col valore minore
+        if (m[path[i+1]+1] < min && m[path[i+1]+1] > 0) {       
+            /** chiarisco: i è l'indice attuale in path, che contiene la coordinata della cella dove devo andare.
+             * di conseguenza, path[i+1] è la coordinata della cella dove mi trovo ora.
+             * m[path[i+1]] è lo zyzz della cella dove sto ora. conseguentemente, m[path[i+1]+1] è lo zyzz della cella "sopra" a quella dove sto.
+             * controllo quindi se è uno zyzz minore di quello dove sono (e in realtà degli altri disponibili, sto cercando il minimo).
+            */
+            min = m[path[i+1]+1];
+            path[i] = path[i+1]+1;
+        }
+        if (m[path[i+1]+c]<min && m[path[i+1]+c]>0) {
+            min = m[path[i+1]+c];
+            path[i] = path[i+1]+c;
+        }
+        if (m[path[i+1]-c]<min && m[path[i+1]-c]>0) {
+            min = m[path[i+1]-c];
+            path[i] = path[i+1]-c;
+        }
+        if (m[path[i+1]-1]<min && m[path[i+1]-1]>0) {
+            min = m[path[i+1]-1];
+            path[i] = path[i+1]-1;
+        }
+    }
+    
+    char* direzioni = (char*) malloc(sizeof(char)*pat_size-1);
+    for (int i=0; i<pat_size-1; i++){
+        if (path[i+1]-path[i] == 1) direzioni[i] = 'E';
+        else if (path[i+1]-path[i] == -1) direzioni[i] = 'W';
+        else if (path[i+1]-path[i] == c) direzioni[i] = 'S';
+        else direzioni[i] = 'N';
+    }
+    for (int i=0; i<pat_size-1; i++)printf("%c", direzioni[i]);
     free(map);
+    free(direzioni);
+    free(path);
+    free(m);
+
 }
 
 
