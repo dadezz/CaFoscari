@@ -89,6 +89,7 @@ int punteggioo(char* map, int position, int fine, int c, int* npassi, int* path)
                         punteggioo(map, position-c,fine, c, npassi, path+1));
         }
     }
+    else return 0;
 }
 
 int minimo(int* a){
@@ -98,12 +99,12 @@ int minimo(int* a){
     }
     return min;
 }
+#ifdef AAA
 int punteggio(char* map, int position, int fine, int c, int* npassi, int* path){
     sleep(1);
     printf("position: %d\n", position);
     stampa(map, 10, c);
     map[position] = '+';
-    //*path = position;
     if (position == fine) return 1;
     
     int direzioni[] = {position+1, position+c, position-c, position-1};
@@ -121,6 +122,57 @@ int punteggio(char* map, int position, int fine, int c, int* npassi, int* path){
 
     return minimo(punteggi);
 }
+#endif
+bool stuck(char *map, int c, int position){
+    if ((map[position+1] == '#' || map[position+1] == '+') &&
+        (map[position+c] == '#' || map[position+c] == '+') &&
+        (map[position-1] == '#' || map[position-1] == '+') &&
+        (map[position-c] == '#' || map[position-c] == '+')) return true;
+    else return false;
+}
+int punteggio(char* map, int position, int fine, int c, int* npassi){
+    sleep(1);
+    printf("position: %d\n", position);
+    map[position] = '+';
+    stampa(map, 10, c);
+    int dx, sx, up, dw;
+    int tot = 0;
+    if (position==fine) return 1;
+    if (position != fine && stuck(map, c, position)) {
+        map[position] = '#';
+        return 0;
+    }
+    else {
+        //destra 
+        if (punto_valido(map, position+1) && punteggio(map, position+1, fine, c, npassi) != 0) {
+            
+            //dx = punteggio (map, position+1, fine, c, npassi);
+            tot++;
+        }
+        //else dx = 123456789;
+        //up
+        if (punto_valido(map, position-c) &&  punteggio(map, position-c, fine, c, npassi) != 0) {
+            
+            tot++; //up = punteggio (map, position-c, fine, c, npassi);
+        }
+        //else up = 123456789;
+        //down
+        if (punto_valido(map, position+c) &&  punteggio(map, position+c, fine, c, npassi) != 0) {
+            tot++; dw = punteggio (map, position+c, fine, c, npassi);
+        }
+        //else dw = 123456789;
+                //sinistra
+        if (punto_valido(map, position-1) &&  punteggio(map, position-1, fine, c, npassi) != 0) {
+            
+            tot++ ;//sx = punteggio (map, position-1, fine, c, npassi);
+        }
+        //else sx = 123456789;
+    }
+    int a[]={up, dw, dx, sx};
+    return tot;
+
+}
+
 
 
 
@@ -195,20 +247,20 @@ int main(){
                            '#','#','#','#','#','#','#'};
     
     stampa(default_map, default_rows, default_columns);
-    int* path = (int*) calloc(default_columns*default_rows, sizeof(int));
+    //int* path = (int*) calloc(default_columns*default_rows, sizeof(int));
     int inizio = find_char(default_map, default_columns*default_rows, 'o');
     int fine = find_char(default_map, default_columns*default_rows, '_');
     //int a = esiste_percorso(default_map, inizio, fine, default_columns, path);
-    int punt = punteggio(default_map, inizio, fine, default_columns, &npassi, path);
+    int punt = punteggio(default_map, inizio, fine, default_columns, &npassi);
     stampa(default_map, default_rows, default_columns);
 
     size_t size = 0;
-    for (int j=0; j<default_columns*default_rows; j++) if (path[j]!=0) ++size;
-    path = realloc(path, size*sizeof(int));
-    for(int i=0; i<size; i++) printf("%d -> ",path[i]);
+    //for (int j=0; j<default_columns*default_rows; j++) if (path[j]!=0) ++size;
+    //path = realloc(path, size*sizeof(int));
+    //for(int i=0; i<size; i++) printf("%d -> ",path[i]);
     printf("\npunti: %d\n", punt);
     printf("npassi: %d\n", npassi);
-    free(path);
+    //free(path);
     return 0;
     
 }
