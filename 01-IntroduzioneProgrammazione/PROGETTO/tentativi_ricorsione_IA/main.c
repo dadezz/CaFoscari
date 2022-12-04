@@ -16,10 +16,6 @@ int find_char(char* map, int size, char c_to_be_found){
 }
 
 
-bool punto_valido(char* map, int position){
-    return map[position] == ' ' || map[position] == 'o'  || map[position] == '_' || map[position] == '$' || map[position] == '!' || map[position] == 'T';
-}
-
 int resto(int* c, int* q, size_t size, int t){
     /**
      * guardo al primo taglio. quali opzioni mi apre? in questo caso ne posso prendere 0,1,2,3,4,5,6,7. 
@@ -67,6 +63,9 @@ int resto(int* c, int* q, size_t size, int t){
  * i casi base: o == _    -> ritorno 1- num.passi + 10*monete
  * se numero passi > 1000 (quindi sicuramente troppo lungo) mi arrendo (posso ritornare un numero molto basso)
 */
+bool punto_valido(char* map, int position){
+    return map[position] != '#' && map[position] != '+';
+}
 int massimo(int a, int b, int c, int d){
     int max = a;
     if (b>max) max = b;
@@ -74,24 +73,55 @@ int massimo(int a, int b, int c, int d){
     if (d>max) max = d;
     return max;
 }
-int punteggio(char* map, int position, int fine, int c, int* npassi, int* path){
+
+int punteggioo(char* map, int position, int fine, int c, int* npassi, int* path){
     if (punto_valido(map, position)){
         if (position==fine) {
             *path = position;
-            *npassi = 1;
-            return 1000 - *npassi;
+            return 1;
         }
         else {
             map[position] = '+'; //marco con un + il mio percorso
             *path = position;
-            *npassi++;
-            return massimo(punteggio(map, position+1,fine, c, npassi, path+1),
-                        punteggio(map, position+c,fine, c, npassi, path+1),
-                        punteggio(map, position-1,fine, c, npassi, path+1),
-                        punteggio(map, position-c,fine, c, npassi, path+1));
+            return 1+massimo(punteggioo(map, position+1,fine, c, npassi, path+1),
+                        punteggioo(map, position+c,fine, c, npassi, path+1),
+                        punteggioo(map, position-1,fine, c, npassi, path+1),
+                        punteggioo(map, position-c,fine, c, npassi, path+1));
         }
     }
 }
+
+int minimo(int* a){
+    int min=a[0];
+    for (int i=1; i<4; i++){
+        if (a[i]<min) min=a[i];
+    }
+    return min;
+}
+int punteggio(char* map, int position, int fine, int c, int* npassi, int* path){
+    sleep(1);
+    printf("position: %d\n", position);
+    stampa(map, 10, c);
+    map[position] = '+';
+    //*path = position;
+    if (position == fine) return 1;
+    
+    int direzioni[] = {position+1, position+c, position-c, position-1};
+    int min;
+    int punteggi[4];
+
+        
+    for (int i=0; i<4; i++){
+        
+        if (punto_valido(map, direzioni[i])){
+            punteggi[i] =  1 + punteggio(map, direzioni[i], fine, c, npassi, path+1);
+        }
+        
+    }
+
+    return minimo(punteggi);
+}
+
 
 
 
