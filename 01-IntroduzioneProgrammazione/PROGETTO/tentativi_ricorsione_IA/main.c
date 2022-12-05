@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include<stdio.h>
 #include<stdbool.h>
+#define NUOVO 1
+#define VECCHIO 0
+#define TROVA_UN_SOLO_PERCORSO 0
 
 void stampa(char* map, int r, int c){
     for (int i=0; i<r; i++){
@@ -15,7 +18,7 @@ int find_char(char* map, int size, char c_to_be_found){
     for (int i=0; i<size; i++) if (map[i]==c_to_be_found) return i;
 }
 
-
+#if VECCHIO
 int resto(int* c, int* q, size_t size, int t){
     /**
      * guardo al primo taglio. quali opzioni mi apre? in questo caso ne posso prendere 0,1,2,3,4,5,6,7. 
@@ -63,6 +66,9 @@ int resto(int* c, int* q, size_t size, int t){
  * i casi base: o == _    -> ritorno 1- num.passi + 10*monete
  * se numero passi > 1000 (quindi sicuramente troppo lungo) mi arrendo (posso ritornare un numero molto basso)
 */
+#endif
+
+
 bool punto_valido(char* map, int position){
     return map[position] != '#' && map[position] != '+';
 }
@@ -74,6 +80,8 @@ int massimo(int a, int b, int c, int d){
     return max;
 }
 
+
+#if VECCHIO
 int punteggioo(char* map, int position, int fine, int c, int* npassi, int* path){
     if (punto_valido(map, position)){
         if (position==fine) {
@@ -99,7 +107,10 @@ int minimo(int* a){
     }
     return min;
 }
-#ifdef AAA
+#endif
+
+
+#if VECCHIO
 int punteggio(char* map, int position, int fine, int c, int* npassi, int* path){
     sleep(1);
     printf("position: %d\n", position);
@@ -130,6 +141,9 @@ bool stuck(char *map, int c, int position){
         (map[position-c] == '#' || map[position-c] == '+')) return true;
     else return false;
 }
+
+
+#if VECCHIO
 int punteggio(char* map, int position, int fine, int c, int* npassi){
     sleep(1);
     printf("position: %d\n", position);
@@ -172,6 +186,44 @@ int punteggio(char* map, int position, int fine, int c, int* npassi){
     return tot;
 
 }
+#endif
+
+
+/*
+guardo al primo taglio. quali opzioni mi apre? in questo caso ne posso prendere 0,1,2,3,4,5,6,7. 
+     * se ne prendo 0, devo costruire il resto con monete da 3, 7, 12. =>  resto (c+1, q+1, t, size-1)
+     * se ne prendo 1, devo costruire il resto-1 con monete da 3, 7,12 e così via. =>  resto (c+1, q+1, t-1, size-1)
+     * se ne prendo 2, devo costruire il resto-2 con monete da 3, 7,12 e così via. =>  resto (c+1, q+1, t-2, size-1)
+
+*/
+
+#if NUOVO
+int numero_percorsi(char* map, int position, int fine, int c){
+    sleep(1);
+    printf("position: %d\n", position);
+    
+    stampa(map, 10, c);
+    if (position==fine) return 1;
+    if (position != fine && stuck(map, c, position)) {
+        //map[position] = '#';
+        return 0;
+    }
+
+
+    if (punto_valido(map, position)){
+        int tot=0;
+        int direzioni[] = {position+1, position+c, position-c, position-1};
+        map[position] = '+';
+        for (int i = 0; i<4; i++){
+            tot += numero_percorsi(map, direzioni[i], fine, c);
+            for (int i=position+1; i<10*c; i++) if (map[i] == '+') map[i] = ' ';
+        }
+        printf("percorsi trovati finora: %d\n", tot);
+        return tot;
+    }
+    else return 0;
+}
+#endif
 
 
 
@@ -186,13 +238,7 @@ int punteggio(char* map, int position, int fine, int c, int* npassi){
 
 
 
-
-
-
-
-
-
-
+#if TROVA_UN_SOLO_PERCORSO
 bool esiste_percorso(char* map, int position, int fine, int c, int* path){
     /**
      * per quanto concerne il path: 
@@ -229,29 +275,29 @@ bool esiste_percorso(char* map, int position, int fine, int c, int* path){
        return esiste;
     }
 }
-
+#endif
 
 
 int main(){
     
-    int default_rows = 10, default_columns = 7, npassi = 0;
-    char default_map[] =  {'#','#','#','#','#','#','#',
-                           'o',' ',' ','#',' ',' ','#',
-                           '#',' ',' ','#',' ',' ','#',
-                           '#',' ',' ','#',' ',' ','#',
-                           '#',' ',' ','#','#','#','#',
-                           '#',' ',' ',' ',' ',' ','#',
-                           '#',' ',' ','#',' ','#','#',
-                           '#',' ',' ','#',' ',' ','#',
-                           '#',' ',' ','#',' ',' ','_',
-                           '#','#','#','#','#','#','#'};
+    int default_rows = 10, default_columns = 6, npassi = 0;
+    char default_map[] =  {'#','#','#','#','#','#',
+                           'o',' ','#',' ',' ','#',
+                           '#',' ','#',' ',' ','#',
+                           '#',' ','#',' ',' ','#',
+                           '#',' ','#','#','#','#',
+                           '#',' ',' ',' ',' ','#',
+                           '#',' ','#',' ','#','#',
+                           '#',' ','#',' ','#','#',
+                           '#',' ','#',' ',' ','_',
+                           '#','#','#','#','#','#'};
     
     stampa(default_map, default_rows, default_columns);
     //int* path = (int*) calloc(default_columns*default_rows, sizeof(int));
     int inizio = find_char(default_map, default_columns*default_rows, 'o');
     int fine = find_char(default_map, default_columns*default_rows, '_');
     //int a = esiste_percorso(default_map, inizio, fine, default_columns, path);
-    int punt = punteggio(default_map, inizio, fine, default_columns, &npassi);
+    int punt = numero_percorsi(default_map, inizio, fine, default_columns);
     stampa(default_map, default_rows, default_columns);
 
     size_t size = 0;
