@@ -5,18 +5,7 @@
 #define VECCHIO 0
 #define TROVA_UN_SOLO_PERCORSO 0
 
-void stampa(char* map, int r, int c){
-    for (int i=0; i<r; i++){
-        for (int j=0; j<c; j++){
-        printf("%c ", map[i*c+j]);
-        }
-        printf("\n");
-    }
-}
-int find_char(char* map, int size, char c_to_be_found){
-    //trova la posizione di un carattere specifico all'interno della mappa
-    for (int i=0; i<size; i++) if (map[i]==c_to_be_found) return i;
-}
+
 
 #if VECCHIO
 int resto(int* c, int* q, size_t size, int t){
@@ -69,16 +58,7 @@ int resto(int* c, int* q, size_t size, int t){
 #endif
 
 
-bool punto_valido(char* map, int position){
-    return map[position] != '#' && map[position] != '+';
-}
-int massimo(int a, int b, int c, int d){
-    int max = a;
-    if (b>max) max = b;
-    if (c>max) max = c;
-    if (d>max) max = d;
-    return max;
-}
+
 
 
 #if VECCHIO
@@ -197,7 +177,7 @@ guardo al primo taglio. quali opzioni mi apre? in questo caso ne posso prendere 
 
 */
 
-#if NUOVO
+#if VECCHIO
 int numero_percorsi(char* map, int position, int fine, int c){
     sleep(1);
     printf("position: %d\n", position);
@@ -224,8 +204,91 @@ int numero_percorsi(char* map, int position, int fine, int c){
     else return 0;
 }
 #endif
+bool not_in(int* percorso, int position, size_t size){
+    bool a = true;
+    for (int i=0; i<size && a; i++) if (percorso[i] == position) a = false;
+    return a;
+}
+int v_size(int* percorso) {
+    bool fine = false;
+    int i;
+    for (i = 0; i<70 && !fine; i++) if (percorso[i] == 0) fine = true;
+    return i;
+}
+void stampa(char* map, int r, int c){
+    for (int i=0; i<r; i++){
+        for (int j=0; j<c; j++){
+        printf("%c ", map[i*c+j]);
+        }
+        printf("\n");
+    }
+}
+void stampa_piu(char* map, int r, int c, int* percorso, size_t s){
+    for (int i=0; i<r; i++){
+        for (int j=0; j<c; j++){
+            if (not_in(percorso, i*c+j, s)) printf("%c ", map[i*c+j]);
+            else printf("+ ");
+        }
+        printf("\n");
+    }
+}
+int find_char(char* map, int size, char c_to_be_found){
+    //trova la posizione di un carattere specifico all'interno della mappa
+    for (int i=0; i<size; i++) if (map[i]==c_to_be_found) return i;
+}
+bool punto_valido(char* map, int position, int* percorso){
+    return map[position] != '#' && not_in(percorso, position, v_size(percorso));
+}
+
+int massimo(int a, int b, int c, int d){
+    int max = a;
+    if (b>max) max = b;
+    if (c>max) max = c;
+    if (d>max) max = d;
+    return max;
+}
+void elimina_piu(int* percorso, int x){
+    int s = v_size(percorso);
+    for (int i = x+1; i<s; i++) percorso[i] = 0;
+}
+int numero_percorsi(char* map, int position, int fine, int c, int *percorso, int z){
+    
+    sleep(1);
+    stampa_piu(map, 10, c, percorso, v_size(percorso));
+    printf("position: %d\n", position);
+    printf("size vett: %d\n", v_size(percorso));
+    printf("i: %d\n", z);
+    printf("[ ");
+    for(int j=0; j<v_size(percorso); j++) printf(" %d ", percorso[j]); 
+    printf(" ]\n");
 
 
+
+    //stampa(map, 10, c);
+
+    if (position==fine) return 1;
+    if (position != fine && stuck(map, c, position)) {
+        return 0;
+    }
+
+
+
+    if (punto_valido(map, position, percorso)){
+        percorso[z] = position;
+        int tot=0;
+        int direzioni[] = {position+1, position+c, position-c, position-1};
+
+        for (int i = 0; i<4; i++){
+            //percorso[i] = position;
+            tot += numero_percorsi(map, direzioni[i], fine, c, percorso, z+1);
+            //for (int i=position+1; i<10*c; i++) if (map[i] == '+') map[i] = ' ';
+            elimina_piu(percorso, z);
+        }
+        printf("percorsi trovati finora: %d\n", tot);
+        return tot;
+    }
+    else return 0;
+}
 
 
 
@@ -293,11 +356,11 @@ int main(){
                            '#','#','#','#','#','#'};
     
     stampa(default_map, default_rows, default_columns);
-    //int* path = (int*) calloc(default_columns*default_rows, sizeof(int));
+    int* percorso = (int*) calloc(default_columns*default_rows, sizeof(int));
     int inizio = find_char(default_map, default_columns*default_rows, 'o');
     int fine = find_char(default_map, default_columns*default_rows, '_');
     //int a = esiste_percorso(default_map, inizio, fine, default_columns, path);
-    int punt = numero_percorsi(default_map, inizio, fine, default_columns);
+    int punt = numero_percorsi(default_map, inizio, fine, default_columns, percorso, 0);
     stampa(default_map, default_rows, default_columns);
 
     size_t size = 0;
@@ -306,7 +369,7 @@ int main(){
     //for(int i=0; i<size; i++) printf("%d -> ",path[i]);
     printf("\npunti: %d\n", punt);
     printf("npassi: %d\n", npassi);
-    //free(path);
+    free(percorso);
     return 0;
     
 }
