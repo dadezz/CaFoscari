@@ -122,8 +122,8 @@ void stampa_piu(board_t map, p_vec_t percorso)
 #if FLATTENED
 bool punto_valido(board_t map, position_t p, vector_t percorso, int T){
     //un punto è valido se non ci sono passato sopra prima e se non è un muro    
-    if (T==0) return map.map[p.row*map.col + p.col] != '#' && not_in(percorso, p, map);
-    else return not_in(percorso, p, map);
+    if (T==0) return map.map[p.row*map.col + p.col] != '#' && map.map[p.row*map.col + p.col] != '@' && map.map[p.row*map.col + p.col] != '3' && not_in(percorso, p, map);
+    else return map.map[p.row*map.col + p.col] != '@' && not_in(percorso, p, map);
 }
 #endif
 #if !FLATTENED
@@ -187,7 +187,7 @@ int best_percorso(board_t map, p_vec_t percorso, p_vec_t path, position_t positi
 {
     //funzione effettiva
     #if DEBUG
-    sleep(1);
+    //sleep(1);
     stampa_piu(map, percorso);
     #if FLATTENED
     printf("position: %d\n", position.row*map.col + position.col);
@@ -195,7 +195,7 @@ int best_percorso(board_t map, p_vec_t percorso, p_vec_t path, position_t positi
     #if !FLATTENED
     printf("position: (%d, %d)\n", position.row, position.col);
     #endif
-    printf("max: %d ", max_p);
+    printf("max: %d ", *max_p);
     printf("[ ");
     for(int i=0; i<path.size; i++)
         #if FLATTENED
@@ -223,6 +223,7 @@ int best_percorso(board_t map, p_vec_t percorso, p_vec_t path, position_t positi
     //Caso base
     #if FLATTENED
     if (position.col == fine.col && position.row == fine.row) return 1000-contatore+10*bonus;
+    if (contatore > map.row*map.col/2) return 0;
     #endif
     #if !FLATTENED
     if (position.col == fine.col && position.row == fine.row) return 1000-contatore+10*bonus;
@@ -255,25 +256,25 @@ int best_percorso(board_t map, p_vec_t percorso, p_vec_t path, position_t positi
          * 2: vado a sinistra(col-1)
          * 3: vado su (riga-1)
         */
-        if (++position.col >= map.col) punteggi.data[0] = 0;
+        if (++position.col >= map.col || !punto_valido(map, position, percorso, T)) punteggi.data[0] = 0;
         else punteggi.data[0] = best_percorso(map, percorso, path, position, fine, contatore+1, bonus, T, max_p);
         position.col--;
         scambia_punteggio_max(punteggi.data[0], path, percorso, max_p);
         elimina_piu(percorso, contatore);
 
-        if (++position.row >= map.row) punteggi.data[1] = 0;
+        if (++position.row >= map.row || !punto_valido(map, position, percorso, T)) punteggi.data[1] = 0;
         else punteggi.data[1] = best_percorso(map, percorso, path, position, fine, contatore+1, bonus, T, max_p);
         position.row--;
         scambia_punteggio_max(punteggi.data[1], path, percorso, max_p);
         elimina_piu(percorso, contatore);
 
-        if (--position.col < 0) punteggi.data[2] = 0;
+        if (--position.col < 0 || !punto_valido(map, position, percorso, T)) punteggi.data[2] = 0;
         else punteggi.data[1] = best_percorso(map, percorso, path, position, fine, contatore+1, bonus, T,max_p);
         position.col++;
         scambia_punteggio_max(punteggi.data[2], path, percorso, max_p);
         elimina_piu(percorso, contatore);
 
-        if (--position.row < 0) punteggi.data[3] = 0;
+        if (--position.row < 0 ||!punto_valido(map, position, percorso, T)) punteggi.data[3] = 0;
         else punteggi.data[1] = best_percorso(map, percorso, path, position, fine, contatore+1, bonus, T, max_p);
         position.row++;
         scambia_punteggio_max(punteggi.data[3], path, percorso, max_p);

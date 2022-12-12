@@ -10,26 +10,33 @@
 #include"types.h"
 #endif //_STD_LIBS_
 
+#define _EXTERN_
 #include"functs.h"
+#include"riduzione.h"
+#include <time.h>
 
 
 
 int main(){
-    char mappa_di_prova[] =  { '#','#','#','#','#','#',
-                               'o',' ','#',' ',' ','#',
-                               '#',' ','#',' ',' ','#',
-                               '#','$','#',' ',' ','#',
-                               '#',' ','#','#','#','#',
-                               '#','T','!',' ',' ','#',
-                               '#','#','#',' ','#','#',
-                               '#',' ','#',' ','#','#',
-                               '#',' ','$',' ',' ','_',
-                               '#','#','#','#','#','#'};
+    char mappa_di_prova[] =  {  '#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#',
+                                'o',' ',' ',' ',' ',' ','#',' ',' ',' ',' ',' ',' ',' ','$',' ',' ',' ','#',
+                                '#',' ',' ',' ','T',' ','#',' ',' ',' ',' ',' ',' ',' ','$',' ',' ',' ','#',
+                                '#',' ',' ',' ',' ',' ','#',' ','!',' ',' ','#',' ',' ','$',' ',' ',' ','#',
+                                '#',' ',' ',' ',' ',' ','#',' ',' ',' ',' ','#',' ',' ','$',' ',' ',' ','#',
+                                '#',' ',' ',' ',' ',' ','#',' ',' ',' ',' ','#',' ',' ',' ',' ',' ',' ','_',
+                                '#',' ',' ',' ',' ',' ','#',' ',' ',' ',' ','#',' ',' ',' ',' ',' ',' ','#',
+                                '#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' ',' ',' ',' ',' ','#',
+                                '#',' ',' ',' ',' ','$','$','$','$',' ',' ','#',' ',' ',' ',' ',' ',' ','#',
+                                '#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#'};
+    long long start, end;
+    double cpu_time_used;
+    start = clock();
+
     int max_p = 0;
     board_t default_map;
     // inizializzazione con valori di default, nel programma POSSONO essere presi in input 
     default_map.row = 10;
-    default_map.col = 6;
+    default_map.col = 19;
     #if FLATTENED
     default_map.map = (char*) malloc((sizeof(char) * default_map.row*default_map.col));
     if (default_map.map == NULL) errore();
@@ -125,11 +132,27 @@ int main(){
     if (path.row == NULL) errore ();
     #endif
 
+    #if FLATTENED
+    board_t original_map = copia_mappa(default_map);
+    for (int i=0; i<default_map.row*default_map.col; i++){
+        original_map.map[i] = default_map.map[i];
+    }
+    riduzione(default_map);
+    #endif
 
-    
+    int nochiocciole = 0;
+    int nomuri = 0;
+    for (int i=0; i<default_map.row*default_map.col; i++){
+        if (!muro(default_map, i)) nomuri++;
+        if (default_map.map[i] != '@') nochiocciole++;
+    }
+    printf("nomuri: %d\nnochiocciole: %d\n", nomuri, nochiocciole);
+
     //chiamata di funzione
     best_percorso(default_map, percorso, path, inizio, fine, 0, 0, 0, &max_p);
-    printf("\n miglior punteggio: %d\n", max_p);
+    printf("\n//////////////////////////////////////////////////////////////\n");
+    printf("\nmiglior punteggio: %d\n", max_p);
+    printf("\n//////////////////////////////////////////////////////////////");
 
     
     //libero percorso, non mi serve più
@@ -168,10 +191,11 @@ int main(){
     #endif
 
     //stampo le posizioni
-    printf("percorso:   ");
+    printf("\n");
+    printf("\npercorso:   ");
     for(int i=0; i<size; i++) {
         #if FLATTENED
-        if (i!=size-1) printf("%d -> ", path.data[i]);
+        if (i!=size-1) printf("%d-> ", path.data[i]);
         else printf("%d", path.data[i]);
         #endif
         #if !FLATTENED
@@ -182,18 +206,24 @@ int main(){
     printf("\n");
 
     //stampo le mosse
-    printf("mosse effettuate:   ");
+    printf("\n//////////////////////////////////////////////////////////////\n");
+    printf("\nmosse effettuate:   ");
     #if FLATTENED
     stampa_direzioni(path, default_map);
     #endif
     #if !FLATTENED
     stampa_direzioni(path);
     #endif
+    printf("\n\n//////////////////////////////////////////////////////////////\n");
     printf("\n");
 
 
     //stampo il labirinto
+    #if FLATTENED
+    stampa_piu(original_map, path);
+    #else
     stampa_piu(default_map, path);
+    #endif
     
     //libero il resto
     #if FLATTENED
@@ -207,5 +237,12 @@ int main(){
     }
     #endif
     free(default_map.map);
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+    printf("\n//////////////////////////////////////////////////////////////\n");
+    printf("\nnomuri: %d\nnochiocciole:%d\ntempospeso: %f secondi\n per un totale di %f secondi ogni nomuro\n", nomuri, nochiocciole, cpu_time_used, cpu_time_used/(double)nomuri);
+    printf("\n//////////////////////////////////////////////////////////////\n\n");
+
     return 0;
 }

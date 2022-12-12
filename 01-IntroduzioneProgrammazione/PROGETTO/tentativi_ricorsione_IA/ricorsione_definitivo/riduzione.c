@@ -1,13 +1,20 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<stdbool.h>
+#ifndef _STD_LIBS_
+#define _STD_LIBS_
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <unistd.h>
+#include"types.h"
+#endif //_STD_LIBS_
 
-typedef struct{
-    char* map;
-    int row;
-    int col;
-} board_t;
+#ifndef _EXTERN_
+#define _EXTERN_
+#include"functs.h"
+#endif
 
+position_t trapano;
+
+#if FLATTENED
 void stampa(board_t map) {
     //stampo il labirinto, compresi i più del percorso, senza però modificare la mappa
     for (int i=0; i<map.row; i++){
@@ -63,18 +70,81 @@ bool doppia_fila(board_t map, int i){
     else return false;
 }
 
-void isola_oggetti(board_t map){
-    for (int i=map.col; i<map.col*map.row-map.col; i++){
-        if (map.map[i] != '#' && map.map[i] != ' ' && map.map[i] != '2'){
+bool muraglia(board_t map, int i){
+    if (muro(map, i+1) && 
+        muro(map, i-1) && 
+        muro(map, i+map.col) && 
+        muro(map, i-map.col)
+        ){
+            return true;
+    }
+    else return false;
+}
 
-            if(map.map[i+1] == ' ') map.map[i+1] = '2';
-            if(map.map[i+map.col] == ' ') map.map[i+map.col] = '2';
-            if(map.map[i+1+map.col] == ' ') map.map[i+1+map.col] = '2';
-            if(map.map[i+map.col-1] == ' ') map.map[i+map.col-1] = '2';
-            if(map.map[i-1] == ' ') map.map[i-1] = '2';
-            if(map.map[i-map.col] == ' ') map.map[i-map.col] = '2';
-            if(map.map[i-1-map.col] == ' ') map.map[i-1-map.col] = '2';
-            if(map.map[i-map.col+1] == ' ') map.map[i-map.col+1] = '2';
+bool adiacente_chiocciola_tre(board_t map, int i){
+    if (map.map[i+1] == '@' && muro(map, i+map.col+1) && !muro(map, i-1) && muro(map, i-map.col+1) ||
+        muro(map, i+1+map.col) && map.map[i+map.col] == '@' && muro(map, i-1-map.col) && !muro(map, i-map.col) ||
+        !muro(map, i+1) && muro(map, i+map.col-1) &&map.map[i-1] == '@' && muro(map, i-map.col-1) ||
+        muro(map, i+1-map.col) && !muro(map, i+map.col) && muro(map, i-map.col-1) && map.map[i-map.col] == '@'){
+        return true;
+    }
+    else return false;
+
+}
+
+bool adiacente_chiocciola_muro(board_t map, int i){
+    if (map.map[i+1] == '@' && muro(map, i+map.col) && !muro(map, i-1) && muro(map, i-map.col) ||
+        muro(map, i+1) && map.map[i+map.col] == '@' && muro(map, i-1) && !muro(map, i-map.col) ||
+        !muro(map, i+1) && muro(map, i+map.col) &&map.map[i-1] == '@' && muro(map, i-map.col) ||
+        muro(map, i+1) && !muro(map, i+map.col) && muro(map, i-1) && map.map[i-map.col] == '@'){
+        return true;
+    }
+    else return false;
+
+}
+
+void isola_oggetti(board_t map){
+    printf("trapano.col: %d", trapano.col);
+    if (trapano.col == -1){
+        for (int i=0; i<map.col*map.row; i++){
+            printf("map[i] = '%c'\n", map.map[i]);
+            printf("è vero che map[i] != # e ' ' e 2? %d\n", map.map[i+1+map.col, map.map[i] != '#' && map.map[i] != ' ' && map.map[i] != '2']);
+            if (map.map[i] != '#' && map.map[i] != ' ' && map.map[i] != '2'){
+                printf("map[i+1+map.col] = '%c'\n", map.map[i+1+map.col]);
+                if(map.map[i+1] == ' ') map.map[i+1] = '2';
+                if(map.map[i+map.col] == ' ') map.map[i+map.col] = '2';
+                if(map.map[i+1+map.col] == ' ') map.map[i+1+map.col] = '2';
+                if(map.map[i+map.col-1] == ' ') map.map[i+map.col-1] = '2';
+                if(map.map[i-1] == ' ') map.map[i-1] = '2';
+                if(map.map[i-map.col] == ' ') map.map[i-map.col] = '2';
+                if(map.map[i-1-map.col] == ' ') map.map[i-1-map.col] = '2';
+                if(map.map[i-map.col+1] == ' ') map.map[i-map.col+1] = '2';
+            }
+        }
+    }
+    else {
+        for (int i=0; i<map.col*map.row; i++){
+            if (i< trapano.row*map.col+trapano.col){
+                if (map.map[i] != '#' && map.map[i] != ' ' && map.map[i] != '2'){
+
+                    if(map.map[i+1] == ' ') map.map[i+1] = '2';
+                    if(map.map[i+map.col] == ' ') map.map[i+map.col] = '2';
+                    if(map.map[i+1+map.col] == ' ') map.map[i+1+map.col] = '2';
+                    if(map.map[i+map.col-1] == ' ') map.map[i+map.col-1] = '2';
+                    if(map.map[i-1] == ' ') map.map[i-1] = '2';
+                    if(map.map[i-map.col] == ' ') map.map[i-map.col] = '2';
+                    if(map.map[i-1-map.col] == ' ') map.map[i-1-map.col] = '2';
+                    if(map.map[i-map.col+1] == ' ') map.map[i-map.col+1] = '2';
+                }
+            }
+            else {
+                if (map.map[i] != '#' && map.map[i] != ' ' && map.map[i] != '2'){
+                    if(map.map[i+1] == ' ') map.map[i+1] = '2';
+                    if(map.map[i+map.col] == ' ') map.map[i+map.col] = '2';
+                    if(map.map[i-1] == ' ') map.map[i-1] = '2';
+                    if(map.map[i-map.col] == ' ') map.map[i-map.col] = '2';
+                }
+            }
         }
     }
 }
@@ -121,33 +191,38 @@ void elimina_vicoli_ciechi(board_t map){
     }
 }
 
+void elimina_orfani(board_t map){
+    for (int i=0; i<map.col*map.row; i++){
+        if (map.map[i] == ' '){
+            if (muro(map, i+1) && muro(map, i+map.col) && muro(map, i-1) && muro(map, i-map.col))
+                map.map[i] = '3';
+        }
+    }
+}
+
 void rimetti_spazi(board_t map){
     for (int i = 0; i<map.row*map.col; i++){
         if (map.map[i] == '2') map.map[i] = ' ';
     }
 }
 
-bool muraglia(board_t map, int i){
-    if (muro(map, i+1) && 
-        muro(map, i-1) && 
-        muro(map, i+map.col) && 
-        muro(map, i-map.col) && 
-        muro(map, i+1+map.col) && 
-        muro(map, i-1-map.col) && 
-        muro(map, i+map.col-1) && 
-        muro(map, i-map.col+1)){
-            return true;
-    }
-    else return false;
-}
-
 void elimina_tre_inutili(board_t map){
     bool trovato = true;
     while(trovato){
         trovato = false;
-        for (int i = map.col; i < (map.col*map.row-map.col); i++){
-            if(map.map[i] == '3' || map.map[i] == '#'){
-                if(muraglia(map, i)){
+        for (int i = 0; i < (map.col*map.row); i++){
+            if(map.map[i] == '#'){
+                if (i<map.col || i>map.row*map.col-map.col || i%map.col == 0 || i%map.col == map.col-1){
+                    map.map[i] = '@';
+                    trovato = true;
+                }
+                if(muraglia(map, i) || adiacente_chiocciola_muro(map, i)){
+                    map.map[i] = '@';
+                    trovato = true;
+                }
+            }
+            else if(map.map[i] == '3'){
+                if(muraglia(map, i) || adiacente_chiocciola_tre(map, i)){
                     map.map[i] = '@';
                     trovato = true;
                 }
@@ -166,8 +241,8 @@ board_t copia_mappa (board_t map){
     return copia_map;
 }
 
-int riduzione(board_t map){
-    
+void riduzione(board_t map){
+    trapano = find_char(map, 'T');
     isola_oggetti(map);
     board_t copia_map = copia_mappa(map);
     do {
@@ -176,11 +251,13 @@ int riduzione(board_t map){
         }
         riduci(map);
         elimina_vicoli_ciechi(map);
-        riduci(map);
+        elimina_orfani(map);
     } while(mappe_diverse(map, copia_map));
     free(copia_map.map);
     elimina_tre_inutili(map);
     rimetti_spazi(map);
     stampa(map);
-    return 0;
+    printf("trapano: %d, %d", trapano.row, trapano.col);
 }
+
+#endif

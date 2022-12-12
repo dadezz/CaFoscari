@@ -3,7 +3,9 @@
 #endif
 
 #ifndef FLATTENED
-#define FLATTENED 0 /*PORLO = 1 PER MAPPA MONODIMENSIONALE, = 0 PER MAPPA BIDIMENSIONALE*/
+#define FLATTENED 1 /*PORLO = 1 PER MAPPA MONODIMENSIONALE, = 0 PER MAPPA BIDIMENSIONALE
+    nota: la parte "riduzione" al momento esiste solo per flattened
+*/
 #endif
 
 
