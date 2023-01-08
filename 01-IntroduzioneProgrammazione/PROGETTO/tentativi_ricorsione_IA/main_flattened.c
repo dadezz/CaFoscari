@@ -2,6 +2,8 @@
 #include<stdio.h>
 #include<stdbool.h>
 #include<unistd.h>
+#include<time.h>
+
 #define DEBUG 1
 
 int max_p = 0;//variabile globale col punteggio migliore
