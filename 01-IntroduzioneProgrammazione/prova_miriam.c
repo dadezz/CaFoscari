@@ -9,7 +9,7 @@ char* est (char* str){
 
 int main(){
     char* str1 ="ukjyvsrkjuv";
-
+    str1 = "kjsyv";
     printf("%s\n", str1);
 
     //str1[5] = 'b';
