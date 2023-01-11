@@ -181,16 +181,128 @@ char* zip(char* enc_txt, int* starts, int* lens, int size){
 }
 
 /**
- * Scrivere una funzione che, data una lista definita come segue, restituisca 1 se la lista è palindroma e 0 altri‑
+ * Scrivere una funzione che, data una lista, restituisca 1 se la lista è palindroma e 0 altri‑
  * menti
 */
-int palindrome(list_t list){
+//queste due funzioni mi servivano solo a crearmi una lista di prova e vedere la correttezza
+void printl(list_t *list){
+    printf("[ ");
+    for(; list; list = list->next) printf("%d ", list->data);
+    printf("]\n");
+}
+list_t *append (list_t *lista, int n){
+    list_t *aux = malloc(sizeof(list_t));
+    aux->data = n;
+    aux->next = lista;
+    return aux;
+}
+int palindrome(list_t *lista){
+    if (!lista) return 0; //se la lista è vuota, non ha senso dire che è palindroma
+    if (!lista->next) return 1; //se la lista ha un solo nodo, è per forza palindroma
+
+    /**
+     * l'idea è che a una lista si può appendere in coda o in testa. per cui, 
+     * se lista procede #0# -> #1# -> #2# -> #NULL#
+     * posso creare nodo #NULL# e poi aggiungerci in testa il nodo #0#
+     * e quindi diventa #0# -> #NULL#
+     * poi aggiungerci in testa il nodo #1#
+     * e quindi diventa #1# -> #0# -> NULL
+    */
     
+    list_t *rovescia;
+    rovescia = NULL;
+
+    list_t *start;
+    start = lista; //tengo traccia del primo elemento della lista
+
+    for (; lista; lista = lista->next){
+        list_t *aux = malloc(sizeof(list_t));
+        aux->data = lista->data;
+        aux->next = rovescia;
+        rovescia = aux;
+    }
+
+    printl(start);
+    printl(rovescia);
+
+    lista = start;
+    for(; lista; lista = lista->next, rovescia = rovescia->next){
+        if(lista->data != rovescia->data) return 0;
+    }
+    return 1;
+}
+
+/**
+ * La rana Fred deve percorrere esattamente 𝑛 metri (𝑛 ≥ 0) e può moversi a salti di 1, 2 o 3 metri con un vincolo:
+ * non può mai fare due salti consecutivi della stessa lunghezza. Scrivere una funzione ricorsiva che dato 𝑛
+ * calcoli il numero di modi possibili in cui è possibile percorrere esattamente gli 𝑛 metri senza superarli.
+ * Esempio:
+ * • 𝑛 = 0. Esiste un solo modo: stare fermo perché siamo già a destinazione.
+ * • 𝑛 = 2. Esiste un solo modo con un salto lungo 2. Non è possibile fare 2 salti consecutivi lunghi 1.
+ * • 𝑛 = 4. : Ci sono 3 modi: (1, 2, 1), (1, 3), (3, 1)
+*/
+/**
+ * @param n: metri da percorrere
+ * @param salto: lunghezza salto appena effettuato. alla prima chiamata inserire numero diverso da 1, 2, 3.
+*/
+int numero_modi(int n, int salto){
+    if (n<0) return 0;
+    if (n == 0) return 1;
+    if (salto == 1){
+        return numero_modi(n-2, 2) + numero_modi(n-3, 3);
+    }
+    else if (salto == 2){
+        return numero_modi(n-1, 1) + numero_modi(n-3, 3);
+    }
+    else if (salto == 3){
+        return numero_modi(n-2, 2) + numero_modi(n-1, 1);
+    }
+    else{
+        return numero_modi(n-2, 2) + numero_modi(n-3, 3) + numero_modi(n-1, 1);
+    }
+}
+
+/**
+ * Chiamiamo “x‑𝑛‑x” la stringa fatta da una “x”, 𝑛 volte “o” e di nuovo “x”. Ad esempio “x‑4‑x” è la stringa
+ * “xoooox”. Scrivere una funzione che data una stringa 𝑠 restituisca il valore di 𝑛, 𝑛 > 0, più grande per cui
+ * esiste in 𝑠 la sottostringa “x‑𝑛‑x”. La funzione restituisce 0 se la sottostringa non viene mai trovata
+*/
+int xnx (char* str){
+    int cont = 0;
+    bool o = false;
+    for(int i=1; i<strlen(str)-1; i++){
+        if(str[i] == 'o' && str[i-1] == 'x'){
+            int cont_aux = 0;
+            for (int j=i; j<strlen(str)-1; j++, i++){
+                if(str[j] == 'o'){
+                    if (j == strlen(str)-2 && str[j+1] != 'x'){
+                        cont_aux = 0;
+                    }
+                    else cont_aux++;
+                }
+                else{ 
+                    if (str[j] != 'x'){
+                        cont_aux = 0;
+                    }
+                    break;
+                }
+            }
+            if (cont_aux > cont){
+                cont = cont_aux;
+            }
+        } 
+    }
+    return cont;
 }
 
 
 
 int main(){
-    
+    printf("prova: %d\n", numero_modi(0, 0));    
+    printf("prova: %d\n", numero_modi(2, 0));    
+    printf("prova: %d\n", numero_modi(4, 0));    
+
+    printf("%d \n", xnx("oxoxoooxoxo") );
+    printf("%d \n", xnx("ooxxxxoo") );
     return 0;
 }
