@@ -2,7 +2,10 @@
 #include<stdio.h>
 #include<stdbool.h>
 #include<string.h>
- 
+
+/******************************
+ *    appello 13-01-2021      *
+******************************/
 ///////////////////////////////
 //Sezione A: voto massimo 25 //
 ///////////////////////////////
@@ -295,14 +298,145 @@ int xnx (char* str){
     return cont;
 }
 
+/******************************
+ *    appello 06-09-2022      *
+ *    da svolgersi su carta   *
+******************************/
 
+/**
+ * 4 punti:
+ * Scrivere una funzione delta che, dato un array di interi A di lunghezza diversa da zero, restituisca la dif‑
+ * ferenza tra il suo elemento massimo e il suo elemento minimo
+*/
+int delta(int *a, size_t len){
+    //trovo il minimo e il massimo:
+    int min, max;
+    min = max = a[0]; //la lunghezza è > 0 per ipotesi
+    for (int i = 1; i<len; i++){
+        if (a[i]<min){
+            min = a[i];
+        }
+        if (a[i]>max){
+            max = a[i];
+        }
+    }
+    return max-min;
+}
+
+/**
+ * 5 punti:
+ * Una matrice quadrata è detta triangolare inferiore se gli elementi al di sopra della diagonale principale sono
+ * tutti nulli. Scrivere una funzione che data una matrice quadrata di interi A restituisca uno 1 se questa è
+ * triangolare inferiore e 0 altrimenti.
+*/
+int tri_inf( int *M, int n_rows ){
+    //ncols = nrows
+    for (int i = 0; i<n_rows-1; i++){
+        for (int j=i+1; j<n_rows; j++){
+            if (M[i*n_rows + j] != 0) return 0;
+        }   
+    }
+    return 1;
+}
+
+/**
+ * 6 punti:
+ * Scrivere una funzione che data una stringa, restituisca una nuova stringa dove i caratteri tra due asterischi
+ * consecutivi sono stati rimossi assieme agli asterischi stessi. Assumiamo che la stringa in input abbia sempre
+ * un numero pari di asterischi.
+*/
+char *asterischi( char *s ){
+    char *nuova;
+    int contatore = 0;
+
+    bool asterisco = false;
+    for(int i = 0; i<strlen(s); i++){
+        if (!asterisco && s[i]!='*'){
+            contatore++;
+        }
+        if (s[i] == '*'){
+            if (asterisco == false){
+                asterisco = true;
+            }
+            else {
+                asterisco = false;
+            }
+        }
+    }
+
+    nuova = malloc(contatore+1);
+    if (!nuova) exit(EXIT_FAILURE);
+    int  j = 0;
+    for(int i = 0; i<strlen(s); i++){
+        if (!asterisco && s[i]!='*'){
+            nuova[j++] = s[i];
+        }
+        if (s[i] == '*'){
+            if (asterisco == false){
+                asterisco = true;
+            }
+            else {
+                asterisco = false;
+            }
+        }
+    }
+    nuova[j] = '\0';
+    return nuova;
+}
+
+/**
+ * 7 punti:
+ * Scrivere una funzione che data una lista di interi restituisca una nuova lista (fatta di nuovi nodi) con soli gli
+ * elementi distinti della prima (in altre parole, tolti i duplicati).
+*/
+bool unique_node(list_t *lista, int n, int position){
+    bool unq = true;
+    for (int i=0; lista && i<position && unq; i++, lista = lista->next){
+        if (lista->data == n) unq = false;
+    }
+    return unq;
+}
+list_t *unique(list_t *lista){
+    list_t *start = lista; //tengo traccia di dove inizia la lista di partenza
+    list_t *nodo = NULL;
+    
+    for(int posizione=0; lista; posizione++, lista = lista->next){
+        if (unique_node(start, lista->data, posizione)){
+            list_t *aux;
+            aux = malloc(sizeof(list_t));
+            aux->data = lista->data;
+            aux->next = nodo;
+            nodo = aux;
+        }
+    }
+    
+    return nodo;
+}
+
+/**
+ * 8 punti:
+ * Scrivere una funzione ricorsiva che dati due array di interi conteggi il numero di volte che il primo array
+ * appare nel secondo anche con sovrapposizioni.
+*/
+int count_array( int *a, int a_size, int *b, int b_size ){
+    if (b_size < a_size) return 0;
+    bool uguali = true;
+    for(int i=0; i<a_size && uguali; i++){
+        if (a[i] != b[i]) uguali = false;
+    }
+    if (uguali){
+        return 1 + count_array(a, a_size, b+1, b_size-1);
+    }
+    else {
+        return 0 + count_array(a, a_size, b+1, b_size-1);
+    }
+}
 
 int main(){
-    printf("prova: %d\n", numero_modi(0, 0));    
-    printf("prova: %d\n", numero_modi(2, 0));    
-    printf("prova: %d\n", numero_modi(4, 0));    
+    //solo verifiche di correttezza
+    int v1[] = {7, 3, 7};
+    int v2[] = {7, 3, 7, 3, 7, 7, 3, 7, 0, 7, 3, 6, 7, 3, 7};
+    printf("%d \n", count_array(v1, 3, v2, 9) );
 
-    printf("%d \n", xnx("oxoxoooxoxo") );
-    printf("%d \n", xnx("ooxxxxoo") );
     return 0;
 }
