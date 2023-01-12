@@ -432,11 +432,120 @@ int count_array( int *a, int a_size, int *b, int b_size ){
     }
 }
 
+/******************************
+ *    appello 17-06-2022      *
+ *    da svolgersi su carta   *
+******************************/
+/**
+ * 4 punti:
+ * Scrivere una funzione euclidean che, dati due array di float A e B aventi la stessa lunghezza diversa da zero,
+ * restituisca il quadrato della loro distanza euclidea
+*/
+float euclidean( float *A, int A_size, float *B, int B_size){
+    float somma = 0;
+    for(int i=0; i<A_size; i++){
+        float aux = A[i]-B[i];
+        somma += aux*aux;
+    }
+    return somma;
+}
+
+/**
+ * 5 punti:
+ * Una matrice è detta incrociata se le sue due diagonali hanno gli stessi valori nello stesso ordine. Scrivere una
+ * funzione che data una matrice quadrata di interi A restituisca uno 1 se questa è incrociata e 0 altrimenti.
+*/
+int incrociata( int *M, int n_rows, int n_cols ){
+    for(int i=0; i<n_cols; i++){
+        for(int z=0, w=n_cols-1; z<n_cols; z++, w--){
+            if(M[i*n_cols + z] != M[i*n_cols + w]){
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+/**
+ * 6 punti:
+ * Scrivere una funzione che data una stringa, restituisca una nuova stringa dove ogni spazio è stato sostituito
+ * con un doppio asterisco.
+*/
+char * asterisco( char *s ){
+    char* str;
+    int contatore = 0;
+    for(int i=0; i<strlen(s); i++){
+        if(s[i] == ' '){
+            contatore += 2;
+        }
+        else contatore+=1;
+    }
+    str = malloc(contatore+1);
+    if(!str) exit (EXIT_FAILURE);
+
+    int j=0;
+    for(int i=0; i<strlen(s); i++){
+        if (s[i] != ' '){
+            str[j++] = s[i];
+        }
+        else {
+            str[j++] = '*';
+            str[j++] = '*';
+        }
+    }
+    str[j] = '\0';
+    return str;
+}
+
+/**
+ * 7 punti:
+ * Scrivere una funzione che data una lista restituisca una nuova lista (fatta di nuovi nodi) che sia inversa
+ * rispetto alla prima.
+*/
+list_t * reverse(list_t *l){
+    if (l == NULL) return NULL;
+    list_t *nodo = NULL;
+    
+    for(; l; l = l->next){
+        list_t *aux = malloc(sizeof(list_t));
+        if (!aux) exit(EXIT_FAILURE);
+        aux->data = l->data;
+        aux->next = nodo;
+        nodo = aux;
+    }
+    return nodo;
+}
+
+/**
+ * 8 punti: 
+ * Domino Colorato. Abbiamo una scorta infinita di pedine colorate con 3 colori diversi con i quali dobbiamo
+ * costruire una sequenza composta da n pedine in totale. Dobbiamo rispettare un vincolo: due pedine dello
+ * stesso colore non possono stare vicine. Scrivere una funzione che dato n restituisca il numero di sequenze
+ * possibili di lunghezza n che rispettano questo vincolo.
+*/
+int domino_vero(int n, int prev){
+    if (n==0) return 1;
+    if (prev == 1){
+        return domino_vero(n-1, 2) + domino_vero(n-1, 3);
+    }
+    else if(prev == 2){
+        return domino_vero(n-1, 1) + domino_vero(n-1, 3);
+    }
+    else if(prev == 3){
+        return domino_vero(n-1, 2) + domino_vero(n-1, 1);
+    }
+    else {
+        return domino_vero(n-1, 1) + domino_vero(n-1, 2) + domino_vero(n-1, 3);
+    }
+}
+int domino(int n){
+    return domino_vero(n, 0);
+}
+
 int main(){
     //solo verifiche di correttezza
-    int v1[] = {7, 3, 7};
-    int v2[] = {7, 3, 7, 3, 7, 7, 3, 7, 0, 7, 3, 6, 7, 3, 7};
-    printf("%d \n", count_array(v1, 3, v2, 9) );
-
+    float A[] = { 1.0f, 2.0f, 4.0f, 8.0f };
+    float B[] = { 1.0f, 1.0f, 4.0f, 4.0f }; 
+    printf( "%f \n", euclidean(A, 4, B, 4));
     return 0;
 }
