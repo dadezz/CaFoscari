@@ -1,0 +1,172 @@
+\hypertarget{common_8c}{}\doxysection{Riferimenti per il file src/common.c}
+\label{common_8c}\index{src/common.c@{src/common.c}}
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}types.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}func.\+h\char`\"{}}\newline
+Grafo delle dipendenze di inclusione per common.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{common_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Funzioni}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{common_8c_aedb8e5af76c91063912114fb48f20979}{ask\+\_\+mod}} ()
+\item 
+int \mbox{\hyperlink{common_8c_aa24959083f44478f43cb99e9dba1a398}{ask\+\_\+default}} ()
+\item 
+void \mbox{\hyperlink{common_8c_a8b1c470a7ef75a77843b5ac73d3b98e2}{errore}} ()
+\item 
+\mbox{\hyperlink{structboard__t}{board\+\_\+t}} \mbox{\hyperlink{common_8c_aba6723e66a44da69200eb1f7d0ff519c}{copia\+\_\+mappa}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} $\ast$map)
+\item 
+\mbox{\hyperlink{structposition__t}{position\+\_\+t}} \mbox{\hyperlink{common_8c_abeaab1e7bdc9b3702ea0bd2133a52f56}{find\+\_\+char}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} $\ast$map, char c)
+\item 
+void \mbox{\hyperlink{common_8c_aa108ea0788d9fbb4bea963323b216737}{map\+\_\+scan\+\_\+from\+\_\+input}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} $\ast$map)
+\item 
+void \mbox{\hyperlink{common_8c_a563c3efc1c5a39993e0fbdb33681ab81}{stampa\+\_\+direzioni}} (\mbox{\hyperlink{structvector__t}{vector\+\_\+t}} p, \mbox{\hyperlink{structboard__t}{board\+\_\+t}} map)
+\item 
+bool \mbox{\hyperlink{common_8c_aecf4fabd338098d2d32a36f9908015fa}{not\+\_\+in}} (\mbox{\hyperlink{structvector__t}{vector\+\_\+t}} percorso, \mbox{\hyperlink{structposition__t}{position\+\_\+t}} pos, \mbox{\hyperlink{structboard__t}{board\+\_\+t}} map)
+\item 
+void \mbox{\hyperlink{common_8c_a27dc8b83bce1a7fe46c41af6c1aef083}{stampa\+\_\+piu}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} map, \mbox{\hyperlink{structvector__t}{vector\+\_\+t}} percorso)
+\item 
+\mbox{\hyperlink{structboard__t}{board\+\_\+t}} $\ast$ \mbox{\hyperlink{common_8c_a4060b163a846aa2fa1efd37c225a0ebc}{map\+\_\+input\+\_\+creation}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} $\ast$map)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Descrizione dettagliata}
+\begin{DoxyAuthor}{Autori}
+Gabriele Cusano (897835), Davide Zambon (898103) 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Data}
+02 feb 2023 
+\end{DoxyDate}
+\hypertarget{common_8c_Funzioni}{}\doxysubsection{comuni}\label{common_8c_Funzioni}
+Funzioni che sono utilizzate sia nella modalità IA che in quella interattiva 
+
+\doxysubsection{Documentazione delle funzioni}
+\mbox{\Hypertarget{common_8c_aa24959083f44478f43cb99e9dba1a398}\label{common_8c_aa24959083f44478f43cb99e9dba1a398}} 
+\index{common.c@{common.c}!ask\_default@{ask\_default}}
+\index{ask\_default@{ask\_default}!common.c@{common.c}}
+\doxysubsubsection{\texorpdfstring{ask\_default()}{ask\_default()}}
+{\footnotesize\ttfamily int ask\+\_\+default (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+chiedo all\textquotesingle{}utente se vuole giocare con la mappa sua o con una di default \begin{DoxyReturn}{Restituisce}
+1 se sceglie modalità interattiva, 2 se sceglie modalità IA 
+\end{DoxyReturn}
+\mbox{\Hypertarget{common_8c_aedb8e5af76c91063912114fb48f20979}\label{common_8c_aedb8e5af76c91063912114fb48f20979}} 
+\index{common.c@{common.c}!ask\_mod@{ask\_mod}}
+\index{ask\_mod@{ask\_mod}!common.c@{common.c}}
+\doxysubsubsection{\texorpdfstring{ask\_mod()}{ask\_mod()}}
+{\footnotesize\ttfamily int ask\+\_\+mod (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+chiedo all\textquotesingle{}utente se vuole giocare in modalità interattiva o in modalità IA \begin{DoxyReturn}{Restituisce}
+1 se sceglie modalità interattiva, 2 se sceglie modalità IA 
+\end{DoxyReturn}
+\mbox{\Hypertarget{common_8c_aba6723e66a44da69200eb1f7d0ff519c}\label{common_8c_aba6723e66a44da69200eb1f7d0ff519c}} 
+\index{common.c@{common.c}!copia\_mappa@{copia\_mappa}}
+\index{copia\_mappa@{copia\_mappa}!common.c@{common.c}}
+\doxysubsubsection{\texorpdfstring{copia\_mappa()}{copia\_mappa()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structboard__t}{board\+\_\+t}} copia\+\_\+mappa (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}} $\ast$}]{map }\end{DoxyParamCaption})}
+
+faccio una copia della mappa 
+\begin{DoxyParams}{Parametri}
+{\em map} & mappa originale da copiare \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Restituisce}
+la copia, con tipo \mbox{\hyperlink{structboard__t}{board\+\_\+t}} (non puntatore) 
+\end{DoxyReturn}
+\mbox{\Hypertarget{common_8c_a8b1c470a7ef75a77843b5ac73d3b98e2}\label{common_8c_a8b1c470a7ef75a77843b5ac73d3b98e2}} 
+\index{common.c@{common.c}!errore@{errore}}
+\index{errore@{errore}!common.c@{common.c}}
+\doxysubsubsection{\texorpdfstring{errore()}{errore()}}
+{\footnotesize\ttfamily void errore (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+esco dal programma in caso di problemi con malloc \mbox{\Hypertarget{common_8c_abeaab1e7bdc9b3702ea0bd2133a52f56}\label{common_8c_abeaab1e7bdc9b3702ea0bd2133a52f56}} 
+\index{common.c@{common.c}!find\_char@{find\_char}}
+\index{find\_char@{find\_char}!common.c@{common.c}}
+\doxysubsubsection{\texorpdfstring{find\_char()}{find\_char()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structposition__t}{position\+\_\+t}} find\+\_\+char (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}} $\ast$}]{map,  }\item[{char}]{c }\end{DoxyParamCaption})}
+
+trova la posizione di un dato carattere all\textquotesingle{}interno del labirinto. 
+\begin{DoxyParams}{Parametri}
+{\em map} & mappa dentro la quale cercare \\
+\hline
+{\em c} & carattere da cercare \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Restituisce}
+la posizione del carattere nella mappa. se non viene, restituisce -\/1 (in tutti i campi di \mbox{\hyperlink{structposition__t}{position\+\_\+t}}) 
+\end{DoxyReturn}
+\mbox{\Hypertarget{common_8c_a4060b163a846aa2fa1efd37c225a0ebc}\label{common_8c_a4060b163a846aa2fa1efd37c225a0ebc}} 
+\index{common.c@{common.c}!map\_input\_creation@{map\_input\_creation}}
+\index{map\_input\_creation@{map\_input\_creation}!common.c@{common.c}}
+\doxysubsubsection{\texorpdfstring{map\_input\_creation()}{map\_input\_creation()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structboard__t}{board\+\_\+t}}$\ast$ map\+\_\+input\+\_\+creation (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}} $\ast$}]{map }\end{DoxyParamCaption})}
+
+prendo in input le dimensioni della mappa e la mappa stessa 
+\begin{DoxyParams}{Parametri}
+{\em map} & puntatore alla mappa. deve essere già allocata memoria sufficiente per i campi, mentre la memoria per i caratteri viene allocata qui \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{common_8c_aa108ea0788d9fbb4bea963323b216737}\label{common_8c_aa108ea0788d9fbb4bea963323b216737}} 
+\index{common.c@{common.c}!map\_scan\_from\_input@{map\_scan\_from\_input}}
+\index{map\_scan\_from\_input@{map\_scan\_from\_input}!common.c@{common.c}}
+\doxysubsubsection{\texorpdfstring{map\_scan\_from\_input()}{map\_scan\_from\_input()}}
+{\footnotesize\ttfamily void map\+\_\+scan\+\_\+from\+\_\+input (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}} $\ast$}]{map }\end{DoxyParamCaption})}
+
+prendo in input i singoli caratteri della mappa 
+\begin{DoxyParams}{Parametri}
+{\em map} & puntatore alla mappa (memoria già allocata) su cui salvare ciò che si prende in internet \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{common_8c_aecf4fabd338098d2d32a36f9908015fa}\label{common_8c_aecf4fabd338098d2d32a36f9908015fa}} 
+\index{common.c@{common.c}!not\_in@{not\_in}}
+\index{not\_in@{not\_in}!common.c@{common.c}}
+\doxysubsubsection{\texorpdfstring{not\_in()}{not\_in()}}
+{\footnotesize\ttfamily bool not\+\_\+in (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structvector__t}{vector\+\_\+t}}}]{percorso,  }\item[{\mbox{\hyperlink{structposition__t}{position\+\_\+t}}}]{pos,  }\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map }\end{DoxyParamCaption})}
+
+controllo se sono già passato sull\textquotesingle{}attuale posizione, per evitare loop infiniti 
+\begin{DoxyParams}{Parametri}
+{\em percorso} & vettore col percorso esplorato finora \\
+\hline
+{\em pos} & attuale posizione \\
+\hline
+{\em map} & labirinto che sto usando \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Restituisce}
+true se non sono già passato, false altrimenti 
+\end{DoxyReturn}
+\mbox{\Hypertarget{common_8c_a563c3efc1c5a39993e0fbdb33681ab81}\label{common_8c_a563c3efc1c5a39993e0fbdb33681ab81}} 
+\index{common.c@{common.c}!stampa\_direzioni@{stampa\_direzioni}}
+\index{stampa\_direzioni@{stampa\_direzioni}!common.c@{common.c}}
+\doxysubsubsection{\texorpdfstring{stampa\_direzioni()}{stampa\_direzioni()}}
+{\footnotesize\ttfamily void stampa\+\_\+direzioni (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structvector__t}{vector\+\_\+t}}}]{p,  }\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map }\end{DoxyParamCaption})}
+
+stampo il risultato finale\+: mosse effettuate (cioè, la direzione di ogni passo). 
+\begin{DoxyParams}{Parametri}
+{\em p} & vettore del percorso \\
+\hline
+{\em map} & mappa (mi serve solo per il campo \char`\"{}col\char`\"{}) \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{common_8c_a27dc8b83bce1a7fe46c41af6c1aef083}\label{common_8c_a27dc8b83bce1a7fe46c41af6c1aef083}} 
+\index{common.c@{common.c}!stampa\_piu@{stampa\_piu}}
+\index{stampa\_piu@{stampa\_piu}!common.c@{common.c}}
+\doxysubsubsection{\texorpdfstring{stampa\_piu()}{stampa\_piu()}}
+{\footnotesize\ttfamily void stampa\+\_\+piu (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map,  }\item[{\mbox{\hyperlink{structvector__t}{vector\+\_\+t}}}]{percorso }\end{DoxyParamCaption})}
+
+stampo il labirinto, compresi i più del percorso, senza però modificare la mappa 
+\begin{DoxyParams}{Parametri}
+{\em map} & labirinto \\
+\hline
+{\em percorso} & vettore col percorso \\
+\hline
+\end{DoxyParams}

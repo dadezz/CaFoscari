@@ -1,0 +1,57 @@
+\hypertarget{types_8h}{}\doxysection{Riferimenti per il file src/types.h}
+\label{types_8h}\index{src/types.h@{src/types.h}}
+Questo grafo mostra quali altri file includono direttamente o indirettamente questo file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{types_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Strutture dati}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structvector__t}{vector\+\_\+t}}
+\item 
+struct \mbox{\hyperlink{structvector}{vector}}
+\item 
+struct \mbox{\hyperlink{structposition__t}{position\+\_\+t}}
+\item 
+struct \mbox{\hyperlink{structboard__t}{board\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Ridefinizioni di tipo (typedef)}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \mbox{\hyperlink{structvector}{vector}} \mbox{\hyperlink{types_8h_a4ed259c0f8822e33f15405412dd8884c}{snake}}
+\item 
+\mbox{\Hypertarget{types_8h_abade3c2d6d852e88bc888e11ba76a48e}\label{types_8h_abade3c2d6d852e88bc888e11ba76a48e}} 
+typedef int {\bfseries vdata\+\_\+t}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Descrizione dettagliata}
+\begin{DoxyAuthor}{Autori}
+Gabriele Cusano (897835), Davide Zambon (898103) 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Data}
+02 feb 2023 
+\end{DoxyDate}
+\hypertarget{types_8h_TIPI}{}\doxysubsection{TIPI}\label{types_8h_TIPI}
+file header che contiene la dichiarazione dei tipi, condivisa da tutti i sorgenti. 
+
+\doxysubsection{Documentazione delle ridefinizioni di tipo (typedef)}
+\mbox{\Hypertarget{types_8h_a4ed259c0f8822e33f15405412dd8884c}\label{types_8h_a4ed259c0f8822e33f15405412dd8884c}} 
+\index{types.h@{types.h}!snake@{snake}}
+\index{snake@{snake}!types.h@{types.h}}
+\doxysubsubsection{\texorpdfstring{snake}{snake}}
+{\footnotesize\ttfamily typedef struct \mbox{\hyperlink{structvector}{vector}} \mbox{\hyperlink{types_8h_a4ed259c0f8822e33f15405412dd8884c}{snake}}}
+
+vettore che porta con sé anche l\textquotesingle{}informazione sulla lunghezza utilizzata e disponibile. Viene usato per memorizzare il corpo dello snake. 
+\begin{DoxyParams}{Parametri}
+{\em body} & array delle posizioni \\
+\hline
+{\em size} & lunghezza dell\textquotesingle{}array utilizzata \\
+\hline
+{\em capacity} & lunghezza massima dell\textquotesingle{}array \\
+\hline
+\end{DoxyParams}

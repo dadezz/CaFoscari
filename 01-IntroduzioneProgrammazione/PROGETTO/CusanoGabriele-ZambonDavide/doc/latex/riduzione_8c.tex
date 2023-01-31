@@ -1,0 +1,208 @@
+\hypertarget{riduzione_8c}{}\doxysection{Riferimenti per il file src/riduzione.c}
+\label{riduzione_8c}\index{src/riduzione.c@{src/riduzione.c}}
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}types.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}func.\+h\char`\"{}}\newline
+Grafo delle dipendenze di inclusione per riduzione.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{riduzione_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Funzioni}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{riduzione_8c_afe5ad64207122a5a194f8235a882a7ae}{mappe\+\_\+diverse}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} map1, \mbox{\hyperlink{structboard__t}{board\+\_\+t}} map2)
+\item 
+bool \mbox{\hyperlink{riduzione_8c_a2bddc165b57a8036bcf357992f65db89}{muro}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} map, int p)
+\item 
+bool \mbox{\hyperlink{riduzione_8c_aecb8fdd24cdba8317de2145c552d2f98}{vicolo\+\_\+cieco}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} map, int i)
+\item 
+bool \mbox{\hyperlink{riduzione_8c_a37fbcbec216d8f45553825c85ab9ef50}{angolo\+\_\+libero}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} map, int i)
+\item 
+bool \mbox{\hyperlink{riduzione_8c_a903f54885c7d12f7487ab7db68d2b968}{doppia\+\_\+fila}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} map, int i)
+\item 
+bool \mbox{\hyperlink{riduzione_8c_ac08a05834d4e27d100937d62f9bd0658}{muraglia}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} map, int i)
+\item 
+bool \mbox{\hyperlink{riduzione_8c_a093779ec27f1cbf58904acd558897776}{adiacente\+\_\+chiocciola\+\_\+tre}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} map, int i)
+\item 
+bool \mbox{\hyperlink{riduzione_8c_ae3c06ef83ec744b2161304e08cda1c38}{adiacente\+\_\+chiocciola\+\_\+muro}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} map, int i)
+\item 
+void \mbox{\hyperlink{riduzione_8c_a51635fae68ff3b7973c41dd778449181}{isola\+\_\+oggetti}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} map)
+\item 
+void \mbox{\hyperlink{riduzione_8c_afe4cf457ea2be3af892a74b71ebbc462}{riduci}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} map)
+\item 
+void \mbox{\hyperlink{riduzione_8c_a5a04a505b431869b1822e68e38fce067}{elimina\+\_\+vicoli\+\_\+ciechi}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} map)
+\item 
+void \mbox{\hyperlink{riduzione_8c_a97c371fa66285e235afd5bd9cf4ccb49}{elimina\+\_\+orfani}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} map)
+\item 
+void \mbox{\hyperlink{riduzione_8c_ad3be4345b1db33502ea48faec6430b79}{rimetti\+\_\+spazi}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} map)
+\item 
+void \mbox{\hyperlink{riduzione_8c_a919156af869504bedefe64a5ec8b852b}{elimina\+\_\+tre\+\_\+inutili}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} map)
+\item 
+void \mbox{\hyperlink{riduzione_8c_a398aea24ee5edcb8c59069bb478385a9}{riduzione}} (\mbox{\hyperlink{structboard__t}{board\+\_\+t}} map)
+\end{DoxyCompactItemize}
+\doxysubsection*{Variabili}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{riduzione_8c_a268cf8cbe78dd189b732efbb970aa16b}\label{riduzione_8c_a268cf8cbe78dd189b732efbb970aa16b}} 
+\mbox{\hyperlink{structposition__t}{position\+\_\+t}} {\bfseries trapano}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Descrizione dettagliata}
+\begin{DoxyAuthor}{Autori}
+Gabriele Cusano (897835), Davide Zambon (898103) 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Data}
+02 feb 2023 
+\end{DoxyDate}
+\hypertarget{riduzione_8c_FUNZIONI}{}\doxysubsection{DI RIDUZIONE}\label{riduzione_8c_FUNZIONI}
+Il labirinto viene ridotto di dimensioni tramite euristiche, per esempio riempiendo di muri i vicoli ciechi o i passaggi di lunghezza maggiore di 2 viene tenuto conto in parte della funzione del trapano, infatti esistono 3 tipologie di muri\+: \textquotesingle{}3\textquotesingle{}, \textquotesingle{}\#\textquotesingle{}, \textquotesingle{}@\textquotesingle{} il primo è un muro attraversabile in presenza del trapano, ma che non toglie trapani disponibili il secondo è un muro normale, il terzo è un muro in nessun caso attraversabile.
+
+A seconda della situazione, viene assegnata alla cella un tipo differente di muro. 
+
+\doxysubsection{Documentazione delle funzioni}
+\mbox{\Hypertarget{riduzione_8c_ae3c06ef83ec744b2161304e08cda1c38}\label{riduzione_8c_ae3c06ef83ec744b2161304e08cda1c38}} 
+\index{riduzione.c@{riduzione.c}!adiacente\_chiocciola\_muro@{adiacente\_chiocciola\_muro}}
+\index{adiacente\_chiocciola\_muro@{adiacente\_chiocciola\_muro}!riduzione.c@{riduzione.c}}
+\doxysubsubsection{\texorpdfstring{adiacente\_chiocciola\_muro()}{adiacente\_chiocciola\_muro()}}
+{\footnotesize\ttfamily bool adiacente\+\_\+chiocciola\+\_\+muro (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map,  }\item[{int}]{i }\end{DoxyParamCaption})}
+
+se un muro è adiacente a una chiocciola, e la chiocciola ha muri attorno, ritorno true \# \#@ \#\mbox{\Hypertarget{riduzione_8c_a093779ec27f1cbf58904acd558897776}\label{riduzione_8c_a093779ec27f1cbf58904acd558897776}} 
+\index{riduzione.c@{riduzione.c}!adiacente\_chiocciola\_tre@{adiacente\_chiocciola\_tre}}
+\index{adiacente\_chiocciola\_tre@{adiacente\_chiocciola\_tre}!riduzione.c@{riduzione.c}}
+\doxysubsubsection{\texorpdfstring{adiacente\_chiocciola\_tre()}{adiacente\_chiocciola\_tre()}}
+{\footnotesize\ttfamily bool adiacente\+\_\+chiocciola\+\_\+tre (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map,  }\item[{int}]{i }\end{DoxyParamCaption})}
+
+se un muro è adiacente a una chiocciola, e la chiocciola ha muri attorno, ritorno true \# 3@ \#\mbox{\Hypertarget{riduzione_8c_a37fbcbec216d8f45553825c85ab9ef50}\label{riduzione_8c_a37fbcbec216d8f45553825c85ab9ef50}} 
+\index{riduzione.c@{riduzione.c}!angolo\_libero@{angolo\_libero}}
+\index{angolo\_libero@{angolo\_libero}!riduzione.c@{riduzione.c}}
+\doxysubsubsection{\texorpdfstring{angolo\_libero()}{angolo\_libero()}}
+{\footnotesize\ttfamily bool angolo\+\_\+libero (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map,  }\item[{int}]{i }\end{DoxyParamCaption})}
+
+Angolo libero\+: \label{riduzione.c_autotoc_md0}%
+\Hypertarget{riduzione.c_autotoc_md0}%
+ \doxysubparagraph*{}\hypertarget{riduzione.c_autotoc_md1}{}\doxysubsection{diventa     3\# perché non ha senso esplorare quella cella}\label{riduzione.c_autotoc_md1}
+\hypertarget{riduzione.c_autotoc_md2}{}\doxysubsection{autotoc\+\_\+md2}\label{riduzione.c_autotoc_md2}
+
+\begin{DoxyParams}{Parametri}
+{\em i} & posizione da controllare\\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{riduzione_8c_a903f54885c7d12f7487ab7db68d2b968}\label{riduzione_8c_a903f54885c7d12f7487ab7db68d2b968}} 
+\index{riduzione.c@{riduzione.c}!doppia\_fila@{doppia\_fila}}
+\index{doppia\_fila@{doppia\_fila}!riduzione.c@{riduzione.c}}
+\doxysubsubsection{\texorpdfstring{doppia\_fila()}{doppia\_fila()}}
+{\footnotesize\ttfamily bool doppia\+\_\+fila (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map,  }\item[{int}]{i }\end{DoxyParamCaption})}
+
+elimina una fila di celle vuote nel caso ce ne siano di adiacenti (corridoi a due celle di larghezza, diventano corridoi a una cella) 
+\begin{DoxyParams}{Parametri}
+{\em i} & posizione da controllare\\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{riduzione_8c_a97c371fa66285e235afd5bd9cf4ccb49}\label{riduzione_8c_a97c371fa66285e235afd5bd9cf4ccb49}} 
+\index{riduzione.c@{riduzione.c}!elimina\_orfani@{elimina\_orfani}}
+\index{elimina\_orfani@{elimina\_orfani}!riduzione.c@{riduzione.c}}
+\doxysubsubsection{\texorpdfstring{elimina\_orfani()}{elimina\_orfani()}}
+{\footnotesize\ttfamily void elimina\+\_\+orfani (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map }\end{DoxyParamCaption})}
+
+controlla ogni cella della mappa. se trova celle calpestabili non raggiungibili (circondate da muri) le sostituisce con un 3\mbox{\Hypertarget{riduzione_8c_a919156af869504bedefe64a5ec8b852b}\label{riduzione_8c_a919156af869504bedefe64a5ec8b852b}} 
+\index{riduzione.c@{riduzione.c}!elimina\_tre\_inutili@{elimina\_tre\_inutili}}
+\index{elimina\_tre\_inutili@{elimina\_tre\_inutili}!riduzione.c@{riduzione.c}}
+\doxysubsubsection{\texorpdfstring{elimina\_tre\_inutili()}{elimina\_tre\_inutili()}}
+{\footnotesize\ttfamily void elimina\+\_\+tre\+\_\+inutili (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map }\end{DoxyParamCaption})}
+
+elimina \textquotesingle{}3\textquotesingle{} e muri che sono adiacenti a chiocciole, e in quanto tali con molta probabilità possono diventare chiocciole anche quelli. un muro cosi fatto\+:
+
+\# 3@ \#
+
+nel 90\% dei casi, non ha senso attraversarlo (sono euristiche, non certezze matematiche) si potrebbe pensare che invece sia necessario attraversarlo per evitare di aggirarlo, ma ancora, nel 90\% dei casi, per via di quali sono le altre euristiche, una situazione del genere non si viene a formare. in alcuni casi sì, servirebbe, ma sono statisticamente minoritari\mbox{\Hypertarget{riduzione_8c_a5a04a505b431869b1822e68e38fce067}\label{riduzione_8c_a5a04a505b431869b1822e68e38fce067}} 
+\index{riduzione.c@{riduzione.c}!elimina\_vicoli\_ciechi@{elimina\_vicoli\_ciechi}}
+\index{elimina\_vicoli\_ciechi@{elimina\_vicoli\_ciechi}!riduzione.c@{riduzione.c}}
+\doxysubsubsection{\texorpdfstring{elimina\_vicoli\_ciechi()}{elimina\_vicoli\_ciechi()}}
+{\footnotesize\ttfamily void elimina\+\_\+vicoli\+\_\+ciechi (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map }\end{DoxyParamCaption})}
+
+controlla ripetutamente la mappa finché vede la presenza di vicoli ciechi, e li elimina. il controllo di cosa è un vicolo cieco è demandato alla funzione apposita\mbox{\Hypertarget{riduzione_8c_a51635fae68ff3b7973c41dd778449181}\label{riduzione_8c_a51635fae68ff3b7973c41dd778449181}} 
+\index{riduzione.c@{riduzione.c}!isola\_oggetti@{isola\_oggetti}}
+\index{isola\_oggetti@{isola\_oggetti}!riduzione.c@{riduzione.c}}
+\doxysubsubsection{\texorpdfstring{isola\_oggetti()}{isola\_oggetti()}}
+{\footnotesize\ttfamily void isola\+\_\+oggetti (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map }\end{DoxyParamCaption})}
+
+funzione che mi serve per lasciare camminabili le celle adiacenti agli oggetti speciali, perché possono servirmi per raggiungerli (\$, T) o evitarli (!)\mbox{\Hypertarget{riduzione_8c_afe5ad64207122a5a194f8235a882a7ae}\label{riduzione_8c_afe5ad64207122a5a194f8235a882a7ae}} 
+\index{riduzione.c@{riduzione.c}!mappe\_diverse@{mappe\_diverse}}
+\index{mappe\_diverse@{mappe\_diverse}!riduzione.c@{riduzione.c}}
+\doxysubsubsection{\texorpdfstring{mappe\_diverse()}{mappe\_diverse()}}
+{\footnotesize\ttfamily bool mappe\+\_\+diverse (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map1,  }\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map2 }\end{DoxyParamCaption})}
+
+controlla semplicemente se le due mappe sono uguali tra loro, cella per cella\mbox{\Hypertarget{riduzione_8c_ac08a05834d4e27d100937d62f9bd0658}\label{riduzione_8c_ac08a05834d4e27d100937d62f9bd0658}} 
+\index{riduzione.c@{riduzione.c}!muraglia@{muraglia}}
+\index{muraglia@{muraglia}!riduzione.c@{riduzione.c}}
+\doxysubsubsection{\texorpdfstring{muraglia()}{muraglia()}}
+{\footnotesize\ttfamily bool muraglia (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map,  }\item[{int}]{i }\end{DoxyParamCaption})}
+
+se un muro in posizione i è circondato da altri muri, definisco che è in una muragia, e ritorno true 
+\begin{DoxyParams}{Parametri}
+{\em i} & posizione da controllare\\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{riduzione_8c_a2bddc165b57a8036bcf357992f65db89}\label{riduzione_8c_a2bddc165b57a8036bcf357992f65db89}} 
+\index{riduzione.c@{riduzione.c}!muro@{muro}}
+\index{muro@{muro}!riduzione.c@{riduzione.c}}
+\doxysubsubsection{\texorpdfstring{muro()}{muro()}}
+{\footnotesize\ttfamily bool muro (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map,  }\item[{int}]{p }\end{DoxyParamCaption})}
+
+al posto di fare ogni volta l\textquotesingle{}if con i 2 OR, basta chiamare questa funzione, che ritorna true se la cella in questione è un qualche tipo di muro (\#, 3, @) 
+\begin{DoxyParams}{Parametri}
+{\em p} & posizione da controllare\\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{riduzione_8c_afe4cf457ea2be3af892a74b71ebbc462}\label{riduzione_8c_afe4cf457ea2be3af892a74b71ebbc462}} 
+\index{riduzione.c@{riduzione.c}!riduci@{riduci}}
+\index{riduci@{riduci}!riduzione.c@{riduzione.c}}
+\doxysubsubsection{\texorpdfstring{riduci()}{riduci()}}
+{\footnotesize\ttfamily void riduci (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map }\end{DoxyParamCaption})}
+
+Se trovo degli angoli liberi o delle doppie file, li rendo muri. Uso dei \textquotesingle{}3\textquotesingle{}\+: mi serve differenziarli dai muri normali perché il passaggio non toglie \char`\"{}trapani\char`\"{}, ma è comunque vietato nel caso in cui non ci siano trapani disponibili.
+
+Angolo libero\+: \label{riduzione.c_autotoc_md3}%
+\Hypertarget{riduzione.c_autotoc_md3}%
+ \doxysubparagraph*{}\hypertarget{riduzione.c_autotoc_md4}{}\doxysubsection{diventa     3\# perché non ha senso esplorare quella cella}\label{riduzione.c_autotoc_md4}
+\hypertarget{riduzione.c_autotoc_md5}{}\doxysubsection{autotoc\+\_\+md5}\label{riduzione.c_autotoc_md5}
+Doppia fila\+: \hypertarget{riduzione.c_autotoc_md6}{}\doxysubparagraph{autotoc\+\_\+md6}\label{riduzione.c_autotoc_md6}
+\hypertarget{riduzione.c_autotoc_md7}{}\doxysubsection{3}\label{riduzione.c_autotoc_md7}
+\hypertarget{riduzione.c_autotoc_md8}{}\doxysubsection{\#  diventa    \# 3\#  perché non ha senso esplorare il percorso parallelo}\label{riduzione.c_autotoc_md8}
+\hypertarget{riduzione.c_autotoc_md9}{}\doxysubsection{\#             \# 3}\label{riduzione.c_autotoc_md9}
+\mbox{\Hypertarget{riduzione_8c_a398aea24ee5edcb8c59069bb478385a9}\label{riduzione_8c_a398aea24ee5edcb8c59069bb478385a9}} 
+\index{riduzione.c@{riduzione.c}!riduzione@{riduzione}}
+\index{riduzione@{riduzione}!riduzione.c@{riduzione.c}}
+\doxysubsubsection{\texorpdfstring{riduzione()}{riduzione()}}
+{\footnotesize\ttfamily void riduzione (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map }\end{DoxyParamCaption})}
+
+piccolo metodo che, attraverso euristiche, riduce la quantità di posti da esplorare per trovare il percorso migliore (se c\textquotesingle{}è un canale di larghezza due, lo mette di larghezza uno, se c\textquotesingle{}è un vicolo cieco, lo riempie di muri etc.)
+
+un muro \# è attraversabile solo se si possiede il trapano, e si perde un utilizzo quando lo si supera un muro 3 è attraversabile solo se si possiede il trapano, ma non se ne perde l\textquotesingle{}utilizzo un muro @ non è mai attraversabile.\mbox{\Hypertarget{riduzione_8c_ad3be4345b1db33502ea48faec6430b79}\label{riduzione_8c_ad3be4345b1db33502ea48faec6430b79}} 
+\index{riduzione.c@{riduzione.c}!rimetti\_spazi@{rimetti\_spazi}}
+\index{rimetti\_spazi@{rimetti\_spazi}!riduzione.c@{riduzione.c}}
+\doxysubsubsection{\texorpdfstring{rimetti\_spazi()}{rimetti\_spazi()}}
+{\footnotesize\ttfamily void rimetti\+\_\+spazi (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map }\end{DoxyParamCaption})}
+
+sostituisce i 2 con gli spazi, per poi ritornare la mappa ridotta e pronta per essere data in pasto alla ricorsione\mbox{\Hypertarget{riduzione_8c_aecb8fdd24cdba8317de2145c552d2f98}\label{riduzione_8c_aecb8fdd24cdba8317de2145c552d2f98}} 
+\index{riduzione.c@{riduzione.c}!vicolo\_cieco@{vicolo\_cieco}}
+\index{vicolo\_cieco@{vicolo\_cieco}!riduzione.c@{riduzione.c}}
+\doxysubsubsection{\texorpdfstring{vicolo\_cieco()}{vicolo\_cieco()}}
+{\footnotesize\ttfamily bool vicolo\+\_\+cieco (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboard__t}{board\+\_\+t}}}]{map,  }\item[{int}]{i }\end{DoxyParamCaption})}
+
+se una data posizione è circondata da muri, tranne che da un solo lato, allora questa è un vicolo cieco, e si può tranquillamente evitare di prendere in considerazione nell\textquotesingle{}esploraizione. la funzione ritorna proprio questo\+: \begin{DoxyReturn}{Restituisce}
+true se è un vicolo cieco, false altrimenti 
+\end{DoxyReturn}
+
+\begin{DoxyParams}{Parametri}
+{\em i} & posizione da controllare\\
+\hline
+\end{DoxyParams}

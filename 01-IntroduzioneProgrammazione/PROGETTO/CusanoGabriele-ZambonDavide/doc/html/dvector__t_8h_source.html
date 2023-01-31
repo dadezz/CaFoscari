@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Snake Labyrinth:  File sorgente src/dvector_t.h</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">Snake Labyrinth
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generato da Doxygen 1.9.1 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'Cerca','.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',true,false,'search.php','Cerca');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="headertitle">
+<div class="title">dvector_t.h</div>  </div>
+</div><!--header-->
+<div class="contents">
+<a href="dvector__t_8h.html">Vai alla documentazione di questo file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160; </div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef  _HEADERS_</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define  _HEADERS_</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;stdlib.h&gt;</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;string.h&gt;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;stdbool.h&gt;</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &lt;stdio.h&gt;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;time.h&gt;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include&quot;<a class="code" href="types_8h.html">types.h</a>&quot;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _HEADERS_</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keywordtype">void</span> <a class="code" href="dvector__t_8h.html#a352ae8a47460c389223ca3dc4840eeb8">_v_check_extend</a>(<a class="code" href="structvector.html">snake</a> *v);</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keywordtype">void</span> <a class="code" href="dvector__t_8h.html#aede6d40d3866a806a9d03b53d2619d41">_v_check_shrink</a>(<a class="code" href="structvector.html">snake</a> *v);</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keywordtype">void</span> <a class="code" href="dvector__t_8h.html#adf8ddf95c86eeac11d9339abf1459256">_v_check_index</a>(<span class="keyword">const</span> <a class="code" href="structvector.html">snake</a>* v, <span class="keywordtype">size_t</span> index);</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keywordtype">void</span> <a class="code" href="dvector__t_8h.html#af845300974eba87d519f7e9b565b31b4">_v_check_non_empty</a>(<span class="keyword">const</span> <a class="code" href="structvector.html">snake</a>* v);</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<a class="code" href="structvector.html">snake</a>* <a class="code" href="dvector__t_8h.html#aff078316d1196f8ddf865c7eaec2c8d5">v_create</a>();</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<a class="code" href="structvector.html">snake</a>* <a class="code" href="dvector__t_8h.html#a239190b7d04b73b02019a6fe26f4bc7f">v_clone</a>(<span class="keyword">const</span> <a class="code" href="structvector.html">snake</a> *v);</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keywordtype">void</span> <a class="code" href="dvector__t_8h.html#aa5dc997ba4e134398cccf3fc13bcf6a5">v_free</a>(<a class="code" href="structvector.html">snake</a> *v);</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keywordtype">void</span> <a class="code" href="dvector__t_8h.html#a188cfa57b8eaea8160178e3e1cee5063">v_print</a>(<span class="keyword">const</span> <a class="code" href="structvector.html">snake</a> *v);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keywordtype">int</span> <a class="code" href="dvector__t_8h.html#a57f80391ba3f265bd2cf19070001492a">v_is_empty</a>(<span class="keyword">const</span> <a class="code" href="structvector.html">snake</a> *v);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keywordtype">size_t</span> <a class="code" href="dvector__t_8h.html#ab91e1473e86b81a84767942dc7da43d8">v_size</a>(<span class="keyword">const</span> <a class="code" href="structvector.html">snake</a> *v);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<a class="code" href="structposition__t.html">position_t</a> *<a class="code" href="dvector__t_8h.html#acbbf4c68565b4b3cc274a2de51568ad7">v_get</a>(<span class="keyword">const</span> <a class="code" href="structvector.html">snake</a> *v, <span class="keywordtype">size_t</span> index);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keywordtype">void</span> <a class="code" href="dvector__t_8h.html#a591d8a59467cfe00aafd2e45f24dc104">v_push_back</a>(<a class="code" href="structvector.html">snake</a> *v, vdata_t valueX);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keywordtype">void</span> <a class="code" href="dvector__t_8h.html#a82dd933175edf1cdcec7c4458e81dfae">v_pop_back</a>(<a class="code" href="structvector.html">snake</a> *v);</div>
+<div class="ttc" id="advector__t_8h_html_a188cfa57b8eaea8160178e3e1cee5063"><div class="ttname"><a href="dvector__t_8h.html#a188cfa57b8eaea8160178e3e1cee5063">v_print</a></div><div class="ttdeci">void v_print(const snake *v)</div><div class="ttdef"><b>Definition:</b> dvector.c:156</div></div>
+<div class="ttc" id="advector__t_8h_html_a239190b7d04b73b02019a6fe26f4bc7f"><div class="ttname"><a href="dvector__t_8h.html#a239190b7d04b73b02019a6fe26f4bc7f">v_clone</a></div><div class="ttdeci">snake * v_clone(const snake *v)</div><div class="ttdef"><b>Definition:</b> dvector.c:138</div></div>
+<div class="ttc" id="advector__t_8h_html_a352ae8a47460c389223ca3dc4840eeb8"><div class="ttname"><a href="dvector__t_8h.html#a352ae8a47460c389223ca3dc4840eeb8">_v_check_extend</a></div><div class="ttdeci">void _v_check_extend(snake *v)</div><div class="ttdef"><b>Definition:</b> dvector.c:86</div></div>
+<div class="ttc" id="advector__t_8h_html_a57f80391ba3f265bd2cf19070001492a"><div class="ttname"><a href="dvector__t_8h.html#a57f80391ba3f265bd2cf19070001492a">v_is_empty</a></div><div class="ttdeci">int v_is_empty(const snake *v)</div><div class="ttdef"><b>Definition:</b> dvector.c:47</div></div>
+<div class="ttc" id="advector__t_8h_html_a591d8a59467cfe00aafd2e45f24dc104"><div class="ttname"><a href="dvector__t_8h.html#a591d8a59467cfe00aafd2e45f24dc104">v_push_back</a></div><div class="ttdeci">void v_push_back(snake *v, vdata_t valueX)</div><div class="ttdef"><b>Definition:</b> dvector.c:171</div></div>
+<div class="ttc" id="advector__t_8h_html_a82dd933175edf1cdcec7c4458e81dfae"><div class="ttname"><a href="dvector__t_8h.html#a82dd933175edf1cdcec7c4458e81dfae">v_pop_back</a></div><div class="ttdeci">void v_pop_back(snake *v)</div><div class="ttdef"><b>Definition:</b> dvector.c:182</div></div>
+<div class="ttc" id="advector__t_8h_html_aa5dc997ba4e134398cccf3fc13bcf6a5"><div class="ttname"><a href="dvector__t_8h.html#aa5dc997ba4e134398cccf3fc13bcf6a5">v_free</a></div><div class="ttdeci">void v_free(snake *v)</div><div class="ttdef"><b>Definition:</b> dvector.c:24</div></div>
+<div class="ttc" id="advector__t_8h_html_ab91e1473e86b81a84767942dc7da43d8"><div class="ttname"><a href="dvector__t_8h.html#ab91e1473e86b81a84767942dc7da43d8">v_size</a></div><div class="ttdeci">size_t v_size(const snake *v)</div><div class="ttdef"><b>Definition:</b> dvector.c:66</div></div>
+<div class="ttc" id="advector__t_8h_html_acbbf4c68565b4b3cc274a2de51568ad7"><div class="ttname"><a href="dvector__t_8h.html#acbbf4c68565b4b3cc274a2de51568ad7">v_get</a></div><div class="ttdeci">position_t * v_get(const snake *v, size_t index)</div><div class="ttdef"><b>Definition:</b> dvector.c:75</div></div>
+<div class="ttc" id="advector__t_8h_html_adf8ddf95c86eeac11d9339abf1459256"><div class="ttname"><a href="dvector__t_8h.html#adf8ddf95c86eeac11d9339abf1459256">_v_check_index</a></div><div class="ttdeci">void _v_check_index(const snake *v, size_t index)</div><div class="ttdef"><b>Definition:</b> dvector.c:35</div></div>
+<div class="ttc" id="advector__t_8h_html_aede6d40d3866a806a9d03b53d2619d41"><div class="ttname"><a href="dvector__t_8h.html#aede6d40d3866a806a9d03b53d2619d41">_v_check_shrink</a></div><div class="ttdeci">void _v_check_shrink(snake *v)</div><div class="ttdef"><b>Definition:</b> dvector.c:103</div></div>
+<div class="ttc" id="advector__t_8h_html_af845300974eba87d519f7e9b565b31b4"><div class="ttname"><a href="dvector__t_8h.html#af845300974eba87d519f7e9b565b31b4">_v_check_non_empty</a></div><div class="ttdeci">void _v_check_non_empty(const snake *v)</div><div class="ttdef"><b>Definition:</b> dvector.c:55</div></div>
+<div class="ttc" id="advector__t_8h_html_aff078316d1196f8ddf865c7eaec2c8d5"><div class="ttname"><a href="dvector__t_8h.html#aff078316d1196f8ddf865c7eaec2c8d5">v_create</a></div><div class="ttdeci">snake * v_create()</div><div class="ttdef"><b>Definition:</b> dvector.c:120</div></div>
+<div class="ttc" id="astructposition__t_html"><div class="ttname"><a href="structposition__t.html">position_t</a></div><div class="ttdef"><b>Definition:</b> types.h:40</div></div>
+<div class="ttc" id="astructvector_html"><div class="ttname"><a href="structvector.html">vector</a></div><div class="ttdef"><b>Definition:</b> types.h:27</div></div>
+<div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Generato da&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+</small></address>
+</body>
+</html>
