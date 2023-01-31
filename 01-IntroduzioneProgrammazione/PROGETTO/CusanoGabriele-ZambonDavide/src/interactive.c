@@ -223,7 +223,7 @@ void input_effect(char x, board_t *grid, snake *player, int *bonus, int *taxes, 
                     if(grid->map[player->body->data[0]+1] == '!'){
                         *taxes+=1;
                         *bonus/=2;
-                        delete_el(player,(player->size/2)-1); 
+                        delete_el(player,(player->size/2)); 
                     }
                     grid->map[player->body->data[0]] = ' ';
                     player->body->data[0]++;
