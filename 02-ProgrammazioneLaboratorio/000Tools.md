@@ -35,7 +35,7 @@ The object files (.o) defining the function’s body have to be linked at compil
 
 ---
 
-###Make
+##Make
 https://www.gnu.org/software/make/manual/make.html
 
 • The program make can be used to automatize a pipeline of tasks, each of which may
@@ -98,3 +98,55 @@ acyclic graphs.
 ---
 ##Setting-up a project step-by-step
 ###Example step-by-step
+1. In your home folder, create a folder power-root-example-project/ and enter it.
+2. Create the project directory layout (sub-directories: include/, src/, tools/, build/).
+3. Create a header include/myfunctions.hpp declaring the prototypes of these functions:
+>     int power(int, int);
+>     int root(int, int);
+4. Create a source code file src/power.cpp defining the body of int power(int x, int y), which returns (use a for loop).
+5. Create a source code file src/root.cpp defining the body of int root(int x, int y) which returns the largest integer
+such that (use function power(int,int) and a while loop).
+6. Create a source code file tools/main.cpp containing the main function which computes the 3-rd root of 74088. The result
+has to be printed on the screen as “The answer is” followed by the result of root(74088,3).
+7. Create a Makefile that compiles everything in an executable called theanswer:
+     + Specify the path of the includes using g++’s option –I.
+     + Use optimization level 3.
+     + Create a separate object file and a separate Makefile’s  target for each cpp file.
+     + Add also a clean target that removes all object files.
+     + Optional: add other targets (e.g., debug) to compile with different options.
+8. Compile and run the project.
+
+There's a very similar example in "prova_makefile", without subfolders for the code.
+
+--- 
+# Asserts and Valgrind
+What kind of errors can we run into when programming?
+1. Linking-Time errors
+2. Compilation-time errors
+3. Run-time 
+  
+Some possible solutions are debugging, pre/post conditions (asserts), exceptions
+
+### Debugging
+Debugging means finding logical errors in your program.
+• Sometimes very hard to find: the program links, compiles, and runs but the output is
+wrong!
+• Even worse, on some inputs the program works but on other input it does not work:
+hard to reproduce the bug.
+• To find bugs, we need to inspect the program at run-time (while it is executing).
+##### How? Options:
+• Plan you algorithms carefully :D
+• Ensure pre/post conditions (asserts)
+• Throw exceptions (next lectures)
+• Use a debugger (Linux has gdb; but we will not cover this)
+
+--- 
+##### minimalist example - asserts
+>     #include <cassert>
+>     int main() {
+>       /* throws a failed assertion */
+>       assert(3 != 3);
+>     }
+
+Assert is a function that takes as input a boolean condition (actually, an int: it fails when the input is 0) and halts the program when the condition is not satisfied. It is somehow the best way to document your code. 
+Compile with g++’s -DNDEBUG (gcc’s option -D, argument NDEBUG) to disable asserts (they are enabled by default): this way, they do not affect performance! Good idea is to leave them enabled only in debug mode
