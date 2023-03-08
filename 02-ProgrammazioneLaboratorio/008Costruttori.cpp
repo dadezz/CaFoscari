@@ -141,3 +141,16 @@ int main(){
     string_pascal u = jy; //mi richiama il costruttore con parametro
  
 }
+
+/**
+ * riassuntazzo:
+ * ho delle struct/classi. se uso la semantica di C, lo stato non viene inizializzato alla dichiarazione, e 
+ * la copia è bit a bit di tutto lo stato. 
+ * Mi va sempre bene? no, voglio che se dichiaro qualcosa, sia vuoto o comunque abbia qualcosa di definito, e non siano valori random.
+ * posso usare il concetto di costruttore. definisco uno o più metodi, chiamati automaticamente ogni volta che istanzio un oggetto della
+ * classe: dichiarazione, passaggio dei parametri formali per copia, new. 
+ * Il costruttore garantisce uno stato dell'oggetto leggibile, coerente e significativo.
+ * Il costruttore di default non richiede parametri, viene chiamato alla dichiarazione in modo automatico.
+ * Posso farne di più sofisticati. per esempio, il copy constructor, o altri costruttori che prendono in input qualcosa, in modo
+ * da fare un assegnamento al momento della dichiarazione, col classico metodo dell'uguale.
+*/
