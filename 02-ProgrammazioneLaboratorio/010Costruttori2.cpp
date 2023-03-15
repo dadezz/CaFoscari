@@ -154,3 +154,49 @@ class StrPascal_distruttore{
  * 
  * se ci sono più oggetti da distruggere, prima distruggo la più recente e poi man mano quelli più vecchi
 */
+
+
+//////////////////////////////////////////////////////////
+// ridefinisco 
+
+class StrPascal5{
+    public:
+        StrPascal5();    //Default constructor
+        StrPascal5(char*);
+        StrPascal5(const StrPascal &);   //Copy constructor
+        ~StrPascal5();   //Destructor
+        void print() const;
+    private:
+        unsigned char* buff;
+        int size;   //lunghezza della stringa, al posto di metterla al primo carattere
+};
+
+StrPascal5::StrPascal5(){
+    buff = new unsigned char[255]; //creo la stringa vuota
+        //genero garbage se non la elimino. nel distruttore devo quindi aggiungere una delete
+    size = 0; 
+    cout<<"chiamato costruttore di default"<<endl;
+}
+
+StrPascal5::~StrPascal5(){
+    delete[] buff;
+    cout<<"chiamato distruttore di classe"<<endl; 
+}
+
+
+int main(){
+    StrPascal s; //alloca memoria dinamica, che viene deallocata in automatico col distruttore.
+}
+
+/**
+ * Il programma usa i puntatori? si, ma chi usa il main se ne accorge rispetto a prima che non li usavo?
+ * no.
+ * POsso nascondere i puntatori, chi usa la classe ne è inaftti completamente inconsapevole. 
+ * su C# la classe sarebbe codice unsafe, il main e relative funzioni, sarebbe safe. Se garantisci una libreria/classe fatta bene, il programmatore non
+ * si deve curare dell'allocazione di memoria.
+ * Si risolve il problema di responsabilità dei puntatori. in C capita spesso che la libreria malloca e il main deve freeare. Con c++, la ownership rimane
+ * tutta in libreria. per ogni costruttore c'è un distruttore
+ * 
+ * organizzare un codice di centinaia di migliaia di righe di codice senza OOP sarebbe improponibile. C++ cerca semplicità d'uso (organizzazione del codice) 
+ * con la stessa efficienza di C
+*/
