@@ -64,9 +64,6 @@ void List_int::ribalta_rec(Pcella & h){
         h->next = nullptr;
         h = supporto;
     }
-    /**
-     * fatti lo schemino del prof con la lista e capisci xk il supporto
-    */
 }
 
 void List_int::ribalta(){
