@@ -3,7 +3,7 @@
 class List_int{
     public: 
         int elimina_fondo(int n); //voglio eliminare le ultime n celle
-        void List_int::ribalta();
+        void List_int::ribalta(); //voglio invertire il verso della lista
     private:
         struct cella{
             int info;
@@ -15,6 +15,7 @@ class List_int{
         void List_int::ribalta_rec(Pcella & h);
 };
 
+////////////////////////// primo problema /////////////////////////
 
 int List_int::elimina_fondo_rec(Pcella & h, int n){
     if (h == nullptr) return 0;
@@ -42,7 +43,7 @@ int List_int::elimina_fondo(int n){
      * soluzione con complessità k: due puntatori fratelli, distanti n, quando il primo arriva alla fine, il secondo inizia a eliminare
      * 
      * SOLUZIONERICORSIVA:
-     * implemento.
+     * implemento sotto.
      * so cancellare quando la lista è lunga k-1. 
      * la chiamata ricorsiva mi ritorna quanti elementi ha cancellato. se ne ha cancellati meno di n bon non faccio nulla, 
      * altrimenti se ne ha eliminati meno di n, eliminpo quello il cui sono e dico di averne cancellarti ricorsione più uno.
@@ -52,6 +53,8 @@ int List_int::elimina_fondo(int n){
     */
     return elimina_fondo_rec(l, n);
 }
+
+//////////////////////////////////// SECONDO PROBLEMA ///////////////////////////
 
 void List_int::ribalta_rec(Pcella & h){
     if (l != nullptr and h->next != nullptr){
@@ -80,4 +83,12 @@ void List_int::ribalta(){
  * 1. tolgo
  * 2. ribalto k-1
  * 3. appendo in coda
+ * 
+ * difficoltà k
+*/
+
+/**
+ * domanda: esiste algoritmo non ricorsivo con complessità uguale?
+ * sicuramente si può fare con una copia: copio la prima cella, poi copio la seconda e la aggiungo in testa etc.
+ * ma senza copie?
 */
