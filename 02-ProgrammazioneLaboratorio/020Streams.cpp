@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
 /**
  * RECAP DEGLI STREAMS
  * 
@@ -45,6 +46,8 @@
  * std::getline estrae una stringa fino al raggiungimento  di un carattere delimitatore 
  * istream& getline(istream& is, string& str, char delim);
  * 
+ * se ho un formato gg/mm/aa, e facessi per esempio getline (, , '/'), il carattere /
+ * viene comunque consumata, anche se non viene inserita nel giorno/mese/anno
  * 
 */
 
@@ -59,4 +62,39 @@ int main1(){
 
 /**
  * per scrivere dati non formattati, std::ostream::write()
+ * salva dati tali e quali. prende in input un array di char e una lunghezza dello stream.
+ * 
+*/
+
+int main2(){
+    std::vector<int> v{23,145,12,89};
+    size_t size = v.size();
+    //std::ostream f//("myfile", std::ios::binary);     //importante il flag binary: byte spuri (non devono essere umanamente leggibili)
+    //f.write(reinterpret_cast<char const*>(&size), sizeof(size));
+        /**
+         * sto prendendo l'intero e lo converto in un puntatore a interi.
+         * poi lo reinterpreto, da int* a char const*
+         * 
+         * quindi sul fiile f devo salvare questo array di 8 byte(un intero) e la lunghezza dell'array è 8
+        */
+   // f.write(reinterpret_cast<char const*>(v.data()), size * sizeof(v.front()));
+        /**
+         * v.data() restituisce un puntatore ai dati sottostanti del vettore (in sto caso int*).
+         * quanto è lungo? size * la lunghezza del primo elemento del vettore
+        */
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * uno stream può essere chiuso con .close(), utile se devo usarli successivamente come se non li avessi usati
+ * alla fine di uno scope, viene comunque chiamato il distruttore, quindi il close non è strettamente necessaria
+ * 
+ * per leggere uno stream non formattato, c'è read (char* s, streamsize n); mi raccomando preallocare s, segmentation fault altrimenti
+ * 
+ * 
+ * EREDITARIETÀ
+ * c++ usa una gerarchia di classi
+ * tutti gli stream vengono derivati da istream e ostream. cin, istringstream e ifstream, per esempio, possono essere passati alla classe superiore.
+ * Non c'è un mismatch di tipi, perché sono tutti sottotipi della stessa classe
 */
