@@ -121,3 +121,22 @@ int main(){
     x.print();
     return 0;
 }
+
+/**
+ * TEMPLATE NONTYPE
+*/
+
+template<typename T = double, int N = 100>
+//è parametrizzata in base a un tipo e a un numero (conosciuto in fase di compilazione)
+// se non viene passato tipo o N, viene automaticamente interpretato come duble e 100
+struct myseq{
+    private:
+        T vec[N];
+    public:
+        void set(int i, T value){
+            vec[i] = value;
+        }
+        T get(int i){
+            return vec[i];
+        }
+};
