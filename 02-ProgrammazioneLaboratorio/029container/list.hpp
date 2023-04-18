@@ -33,7 +33,8 @@ class list{
         list<Val>& operator+=(list<Val> const& rhs); // list += list : append rhs to *this, without modifying rhs
         list<Val>& operator+=(Val const& rhs); // list += Val : append rhs to *this, without modifying rhs. equals to push_back
         Val& operator[](uint64_t i); // list[i]: Val reference in i position (not const: list[i] = x allowed)
-        Val const& operator[](uint64_t i); // list[i]: Val reference in i position, const.
+        Val const& operator[](uint64_t i) const; // list[i]: Val reference in i position, const.
         list<Val>& operator--(); // PREFIX removes first element (equals to pop-front)
         list<Val>& operator--(int); // POSTFIX removes first element (equals to pop-front)
+
 };
