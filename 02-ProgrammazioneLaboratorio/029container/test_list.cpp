@@ -2,13 +2,13 @@
 #include "list.cpp"
 
 int main(){
-    list<double> l1;
-    //read_list<double>(l1);
+    list<double> x1;
 
-    list<double> l2;
+    x1 += 5;
+    x1 += 6.2;
+    x1 += 12;
 
-    std::cout<<"liste uguali? "<<(l1==l2)<<std::endl;
-    std::cout<<l1<<std::endl;
-    l1.push_back(8.3);
+    list<double> x2; 
+    x2 = x1;
 
 }

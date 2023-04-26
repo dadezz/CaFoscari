@@ -28,6 +28,33 @@ list<Val>::list(Val v) : list() {
     // sostituibile con push_front(v);
 };
 
+
+//move assigment
+template<typename Val>
+list<Val>& list<Val>::operator=(list<Val> && rhs){
+    if (this != &rhs){
+        //free all memory allocated to this
+        while(not empty()) pop_front();
+        m_front = rhs.m_front;
+        m_back = rhs.m_back;
+
+        rhs.m_front = rhs.m_back = nullptr; //fondamentale, percHé poi viene chiamato il distruttore, rischio di distruggere il mio oggetto
+    }
+    return *this;
+}
+
+//move constructor
+template<typename Val>
+list<Val>::list(list<Val>&& rhs){
+    //posso sfruttare il move assigment
+    /**
+     * *this = rhs;   se lasciassi così, rhs è lvalue, chiamerebbe il copy assignment
+     *                devo convertirlo in rvalue
+    */
+
+    *this = std::move(rhs); //move è una funzione della std lib che fa un cast fra i due tipi
+}
+
 template<typename Val>
 list<Val>::~list(){
     while (not empty()) pop_front();    

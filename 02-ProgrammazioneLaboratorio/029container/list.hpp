@@ -15,8 +15,10 @@ class list{
         list(); // default constructor
         list(Val v); // list of one element
         ~list(); // destructor
+        list(list<Val>&&) //move constructor
 
         node const* front() const; // return pointer to const first cell
+
         node const* back() const; // return pointer to const last cell
 
         void push_front(Val v); // adds v at the beginning of the list
@@ -36,5 +38,8 @@ class list{
         Val const& operator[](uint64_t i) const; // list[i]: Val reference in i position, const.
         list<Val>& operator--(); // PREFIX removes first element (equals to pop-front)
         list<Val>& operator--(int); // POSTFIX removes first element (equals to pop-front)
+        list<Val>& operator=(list<Val> && rhs); //move assigment: steal resources from rhs and assign them to the left operand
+        list<Val>& operator=(list<Val> & rhs); //move assigment: steal resources from rhs and assign them to the left operand
+
 
 };
