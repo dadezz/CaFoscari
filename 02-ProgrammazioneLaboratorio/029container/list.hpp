@@ -1,4 +1,4 @@
-#include <iostream>;
+#include <iostream>
 #pragma once
 
 
@@ -6,7 +6,7 @@ template<typename Val>
 class list{
     private:
         struct node{
-            Val val;
+            Val val;    
             node* next;
         };
         node* m_front;
@@ -14,8 +14,9 @@ class list{
     public:
         list(); // default constructor
         list(Val v); // list of one element
+	    list(list<Val> const&); //copy constructor //const lvalue reference
         ~list(); // destructor
-        list(list<Val>&&) //move constructor
+        list(list<Val>&&); //move constructor
 
         node const* front() const; // return pointer to const first cell
 
@@ -41,5 +42,43 @@ class list{
         list<Val>& operator=(list<Val> && rhs); //move assigment: steal resources from rhs and assign them to the left operand
         list<Val>& operator=(list<Val> & rhs); //move assigment: steal resources from rhs and assign them to the left operand
 
+        //copy assignment
+        //x = y;
+        //l1 = l2 = l3 = l4
+        //l1 = (l2 = (l3 = l4))
+        list<Val>& operator=(list<Val>const&);
 
+        //move assignment
+        //x = get_some();
+        //semantics: steal resources from rhs and assign them
+        //to the left operand (after freeing x)
+        list<Val>& operator=(list<Val>&& rhs); //input: rvalue reference
+
+        struct iterator{
+            public:
+                //tipi pubblici di list<Val>::iterator
+                using iterator_category = std::forward_iterator_tag;
+                using value_type = Val;
+                using pointer = Val*;
+                using reference = Val&;
+
+                iterator(node*);//costruttore (serve a list<Val>::begin() e list<Val>::end())
+                reference operator*() const; //*it
+                //list<std::pair<int,int>> l;
+                //l += std::pair<int,int> {1,2};
+                //auto it = l.begin();
+                //it->first;
+                pointer operator->() const;
+                iterator& operator++();//prefix increment   ++it
+                iterator operator++(int);//postfix increment   it++
+
+                bool operator==(iterator const&) const; //it1 == it2
+                bool operator!=(iterator const&) const; //it1 != it2
+                operator bool() const; //if(it)    è la sintassi così, definisco il casting
+
+            private:
+                node* m_ptr;
+        };
+        iterator begin();
+	    iterator end();
 };

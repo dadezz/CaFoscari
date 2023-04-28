@@ -8,6 +8,8 @@
  * ++ templates
  * ++ copy constructor
  * ++ move constructor
+ * 
+ * ++ iteratori
 */
 
 /**
@@ -19,15 +21,22 @@
 
 #include "list.hpp"
 
+//default constructor
 template<typename Val>
 list<Val>::list() : m_front(nullptr), m_back(nullptr){};
 
+//costruttore di lista con una sola cella
 template<typename Val>
 list<Val>::list(Val v) : list() {
     m_back = m_front = new node {v, nullptr};
     // sostituibile con push_front(v);
-};
+}
 
+//distruttore
+template<typename Val>
+list<Val>::~list(){
+    while (not empty()) pop_front();    
+}
 
 //move assigment
 template<typename Val>
@@ -55,13 +64,45 @@ list<Val>::list(list<Val>&& rhs){
     *this = std::move(rhs); //move è una funzione della std lib che fa un cast fra i due tipi
 }
 
+//copy constructor:
+//list<Val> l1 {l2};
+//list<Val> l1 = l2;
+//list<Val> l1(l2);
 template<typename Val>
-list<Val>::~list(){
-    while (not empty()) pop_front();    
-};
+list<Val>::list(list<Val> const& rhs) : list() {
+	//*this += rhs; //alternativa: uso operator+=
+	std::cout << "copy constructor called" << std::endl;
+	*this = rhs; //copy assignment
+}
+
+
+//copy assignment
+template<typename Val>
+list<Val>& list<Val>::operator=(list<Val>const& rhs){
+	std::cout << "copy assignment called" << std::endl;
+	if(this != &rhs){
+		while(not empty()) pop_front();
+		*this += rhs;
+	}
+	return *this;
+}
+
+//move assignment
+template<typename Val>
+list<Val>& list<Val>::operator=(list<Val>&& rhs){
+	std::cout << "move assignment called" << std::endl;
+	if(this != &rhs){
+		//free all memory allocated to this
+		while(not empty()) pop_front();
+		m_front = rhs.m_front;
+		m_back = rhs.m_back;
+		rhs.m_front = rhs.m_back = nullptr;
+	}
+	return *this;
+}
 
 template<typename Val>
-typename list<Val>::node const* list<Val>::front() const {
+typename list<Val>::node const * list<Val>::front() const {
     return m_front;
 };
 
@@ -191,4 +232,131 @@ list<Val>& list<Val>::operator--(int){
     //prefix. rimuovo prima cella lista
     pop_back();
     return *this;
+}
+
+template <typename Val>
+void read_list(list<Val>& list) {
+    uint64_t list_size = 0;
+    Val v;
+    std::cin >> list_size;                       // first read list_size
+    for (uint64_t i = 0; i != list_size; ++i) {  // then value by value
+        std::cin >> v;
+        list.push_back(v);
+    }
+}
+
+template <typename Val>
+std::ostream& operator<<(std::ostream& os, list<Val> const& list) {
+    if (list.empty()) return os;
+    for (auto ptr = list.front(); ptr != nullptr; ptr = ptr->next) {
+        os << ptr->val;
+        if (ptr->next) os << " -> ";
+    }
+    return os;
+}
+
+
+//prefix decrement:  --l1
+template<typename Val>
+list<Val>& list<Val>::operator--(){
+	//semantica: rimuovo la prima cella della lista e restituisco
+	//un reference alla lista
+	pop_front();
+	return *this;
+}
+
+//postfix decrement:  l1--
+template<typename Val>
+list<Val>& list<Val>::operator--(int){
+	//semantica: rimuovo l'ultima cella della lista e restituisco
+	//un reference alla lista corrente
+	pop_back();
+	return *this;
+}
+
+// -------- implementazione di iterator :
+
+
+template<typename Val>
+list<Val>::iterator::iterator(node* p) : m_ptr(p) {}
+
+
+//*it = 5
+template<typename Val>
+typename list<Val>::iterator::reference 
+list<Val>::iterator::operator*() const{
+	//restituire reference al Val contenuto nella cella 
+	//puntata da m_ptr
+	return m_ptr->val;
+}
+
+//nota: su list<int> l; l'operatore -> non ha senso (int è primitivo)
+template<typename Val>
+typename list<Val>::iterator::pointer 
+list<Val>::iterator::operator->() const{
+	//restituire un puntatore al Val contenuto nella cella 
+	//puntata da m_ptr
+	return &(m_ptr->val);
+}
+
+
+//prefix increment: ++it
+//semantica: incrementa it (cella successiva) e restituisci it
+template<typename Val>
+typename list<Val>::iterator& 
+list<Val>::iterator::operator++(){
+	m_ptr = m_ptr->next;
+	return *this;
+}
+
+
+//postfix increment: it++
+//semantica: restituisci it e poi incrementalo
+template<typename Val>
+typename list<Val>::iterator 
+list<Val>::iterator::operator++(int){
+	iterator it = {m_ptr};
+	++(*this);
+	return it;
+}
+
+
+template<typename Val>
+bool list<Val>::iterator::operator==(typename list<Val>::iterator const& rhs) const{
+	//it1 == it2
+	//true se e solo se it1 e it2 puntano alla stessa area di memoria 
+	//dentro il container
+	return m_ptr == rhs.m_ptr;
+}
+
+template<typename Val>
+bool list<Val>::iterator::operator!=(typename list<Val>::iterator const& rhs) const{
+	//it1 != it2
+	//true se e solo se it1 e it2 puntano a due celle diverse 
+	//dentro il container
+	return m_ptr != rhs.m_ptr;
+}
+
+//cast da iterator a bool
+//usati per esempio in guardie booleane: if(it)
+template<typename Val>
+list<Val>::iterator::operator bool() const {
+	//true se e solo se l'iteratore punta ad una cella
+	//non nullptr della lista
+	return m_ptr != nullptr;
+}
+
+
+template<typename Val>
+typename list<Val>::iterator 
+list<Val>::begin(){
+	//restituisco un nuovo iterator alla prima cella della lista
+	return {m_front};
+}
+
+template<typename Val>
+typename list<Val>::iterator 
+list<Val>::end(){
+	//restituisco un nuovo iterator alla cella nullptr
+	return {nullptr};
 }
