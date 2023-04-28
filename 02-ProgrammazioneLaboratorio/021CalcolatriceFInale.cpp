@@ -19,7 +19,7 @@
  * F -> [0-9] | [0-9]F 
 */
 
-double vars[256];
+double vars[255];
 
 struct token{
     public:
@@ -62,13 +62,17 @@ struct token{
 double E(const std::vector<token>&, int&);
 
 double T( const std::vector<token>& tokens, int& i){
+    // T -> double | (E) | var
     double res = 0;
     if(tokens.at(i).is_double()){
+        // T -> double
         res = tokens.at(i).get_value();
         ++i;
     }
     else if(tokens[i].is_var()){
+        // T -> var
         res = vars[tokens[i].get_var_name()]; //extracts value of variable with name tokens[i]
+        i++;
     }
     else{
         ++i;
@@ -80,6 +84,7 @@ double T( const std::vector<token>& tokens, int& i){
 }
 
 void S (const std::vector<token>& v, int& i){
+    // S -> var = E | p(E)
     if(v[i].is_var()){
         char c = v[i].get_var_name();
         i += 2; //consume token "var" and "="
@@ -88,13 +93,13 @@ void S (const std::vector<token>& v, int& i){
     }
     else {
         i += 2; //consume "p("
-        double res = E(v, i);
-        i++; //consumo la parentesi di chiusura ')'
-        std::cout<<res<<std::endl;
+        std::cout<<E(v, i)<<std::endl;
+        i+=1; //consumo la parentesi di chiusura ')'
     }
 }
 
 double P( const std::vector<token>& tokens, int& i){
+    // P -> T | P*T | P/T               T */ T */ T .... */ T
     double res = T(tokens,i);
     token t = tokens.at(i);
     while ( t.is_mult() or t.is_div()){
@@ -120,6 +125,7 @@ double E(const std::vector<token>& tokens, int& i){ //E -> P |E + P | E - P, bas
 
 // lista di statements, che in pratica racchiude il programma
 void L(const std::vector<token>&v, int& i){
+    // L -> S. | S;L 
     S(v, i);    //consume first statements;
     if (v[i].is_dot()){
         // devo consumare il punto (fine programma)
@@ -127,7 +133,7 @@ void L(const std::vector<token>&v, int& i){
         return;
     }
     else {
-        i++; //consumo il punto e virgola alla fine di ogni statements
+        i+=1; //consumo il punto e virgola alla fine di ogni statements
         L(v, i);
     }
 }
