@@ -72,7 +72,12 @@ bool is_list(); bool is_dictionary(); // etc, come is null. SOLO UNO di questi m
  * prima fare grammatica context free, poi fare una funzione per ogni non terminale, poi ogni funzione deve restituire un jsonz
 */
 
-
+/**
+ * consegna: non includere main. non si possono includere altre librerie.
+ * includere il file.cpp nel main per evitare problemi di compilazione
+ * valutazione: viene valutato ogni metodo. l'output deve essere esattamente quello del github.
+ * se il codice va in segmentation fault, il metodo viene valutato 0 punti.
+*/
 
 
 
