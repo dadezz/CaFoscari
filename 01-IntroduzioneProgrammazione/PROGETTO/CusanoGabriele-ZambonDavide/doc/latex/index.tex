@@ -1,7 +1,0 @@
-\hypertarget{index_Introduzione}{}\doxysection{Introduzione}\label{index_Introduzione}
-Implementazione di un gioco il cui scopo è risolvere un labirinto trovandone l’uscita. sono previste 2 modalità\+: (1) Modalità interattiva \+: L’utente che si approccia al gioco ha il compito di risolvere egli stesso il labirinto, muovendosi al suo interno e cercando di ottenere il punteggio migliore (2) Modalità AI (intelligenza artificiale) \+: il programma stesso ha il compito di trovare un percorso valido che risolva il labirinto e che possibilmente sia il percorso migliore, ovvero quello che restituisce il punteggio finale più elevato.
-
-Il programma inizia con la scelta della modalità. L’utente può decidere se utilizzare una mappa predefinita oppure una personalizzata.
-
-Il punteggio si calcola come 1000 -\/ \#passi\+\_\+eseguiti + 10 $\ast$ \#bonus\+\_\+raccolti\hypertarget{index_Struttura}{}\doxysection{Struttura}\label{index_Struttura}
-I tipi di maggior rilevanza sono le struct del campo (\mbox{\hyperlink{structboard__t}{board\+\_\+t}}) e quella che gestisce gli array (\mbox{\hyperlink{structvector__t}{vector\+\_\+t}}). La prima ha come campi due variabili di tipo size\+\_\+t che rappresentano rispettivamente il numero di righe e di colonne e un vettore di tipo char che memorizza la mappa. La seconda ha come campi un vettore di int, la variabile size che rappresenta la lunghezza del vettore stesso e la variabile capacity che contiene la lunghezza massima del vettore. 
