@@ -1,3 +1,5 @@
+package PrimoProgetto_DnD_PrimeLezioni;
+
 public class fighter {
     int experience_point = 0;
     int life_points = 100;
