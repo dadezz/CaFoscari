@@ -53,7 +53,7 @@ Se fosse relativo a un oggetto, verrebbe eliminato ogni fine vita (scope) -> var
 Posso scrivere un pezzo di codice così: 
 ```
 static{
-    Fighter.number_of_instatntiated_fighters = new Random().nextInt(10);
+    PrimoProgetto_DnD_PrimeLezioni.Fighter.number_of_instatntiated_fighters = new Random().nextInt(10);
 }
 ```
 Questo costruttore statico viene eseguito all'inizio dell'esecuzione (o meglio, quando la classe viene caricata
