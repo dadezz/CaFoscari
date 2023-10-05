@@ -15,6 +15,7 @@ public class fighter {
                 life_points = life_points - OverallDamage;
             }
             else life_points = 0;
+
         }
     }
 }
