@@ -1,8 +1,6 @@
 package PrimoProgetto_DnD_PrimeLezioni;
 import java.util.Random;
 public class Runner {
-    int i;
-
     public static void main(String[] args) {
         Weapon w1 = new Weapon(10);
         Armor a1 = new Armor(2);
