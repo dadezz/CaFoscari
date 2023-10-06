@@ -118,5 +118,7 @@ proteggendo i campi.
 * `public` tutti lo vedono
 * `se non scrivo nulla` -> la visibilità di default è del package. le classi nello stesso package lo possono vedere
 * `protected` è visibile nella classe, nell package e anche nelle sottoclassi, ma non ovunque. Finché non parliamo di 
-ereditarietà, è del tutto equivalente a `default`
+ereditarietà, è del tutto equivalente a `default`.
+
+Con lo `static`, non cambia la visibilità, va specificata oppure rimane quella di default
 
