@@ -122,3 +122,46 @@ ereditarietà, è del tutto equivalente a `default`.
 
 Con lo `static`, non cambia la visibilità, va specificata oppure rimane quella di default
 
+***
+# Appunti 11/10/2023
+***
+
+In base a dove mi trovo, ho delle cosidette "views" sulla visibilita. l'idea è di ridurre al minimo indispensabile la
+visibilità pubblica degli elementi.
+Anche se c'è gerarchia dei packages, non cambia nulla,sempre packages diversi sono.
+In JAVA, quando dichiaro qualcosa di privato, è privato a livello di classe.. POsso accedere a un livello privato di un altro
+oggetto se esso fa parte della mia stessa classe.
+Ogni gruppo di classi simili va contenuto in uno specifico package. In particolare, 
+è una buona idea mettere Runner nel package principale di dnd, e mettere il resto in sottopackages, 
+"armors", "characters", "fight", "weapons". In questo modo non solo aumento la consistenza e la leggibilità della
+struttura del codice, ma ho anche una migliore gestione della visibilità degli elementi.
+Facciamo un esempio di cosa vuol dire nascondere gli elementi. Se "weapon" è pubblico, uno che ha accesso al mio
+gioco -libreria- avrebbe la facoltà di creare armi a piacimento, andando a rompere il funzionamento. 
+Più subdolo è il caso di `is_alive()` : quel che fa è ritornare solo un booleano a seconda dei punti vita, 
+ches ono privati. ma se essi fossero pubblici, un utente potrebbe cheatare, andando a modificare direttamente il campo,
+facendo personaggi che non muoiono, che risorgono, etc. non solo, se un utente costruisse un metodo che fa il check 
+dei punteggi per vedere se un personaggio è morto, si troverebbe a non poter fare pià nulla nell'eventialita io cambiassi
+la mia implementazione, mentre se faccio il metodo e cambio l'implementazione, la cosa è del tutto trasparente all'utilizzatore
+del mio codice, permettendo cosi una buona mantenibilità e modularità.
+Se voglio quindi che qualcuno possa accedere a un campo in lettura, cosa faccio? 
+se mi serve`weapon.damage` , al posto di lasciare weapon pubblico, faccio campo `int get_weapon_damage()` e ho risolto
+il problema. mi basta un `return this.weapon.damage` e per l'utente finale ho tolto l'accesso al campo, 
+lasciando però inalterate le funzionalità progettate.
+Dal punto di vista di codice conciso e di performaces, non ha alcun senso, ma è lo standars in programmazione a oggetti, 
+la prassi si chiama `getters`, ed è buona prassi non esporre MAI i campi. non è neanche detto che ci siano solo i campi, 
+potrebbe essere anche risultato di una computazione. Un get ci da un info sullo stato di un oggetto, ma non è per forza
+un campo, può essere anche un'operazione o un numero fisso. 
+Ho anche la necessità però di modificare lo stato di un oggetto. Detto fatto, l'equivalente di `get()` è `set()`.
+È prolisso da impolementare, per ogni campo c'è almeno uno o due metodi, ma è una pratica essenziale per avere un codice 
+robusto e leggibile.
+
+### Documentazioni - API
+
+la build java è un file jar, contiene tutto il bytecode con le gerarchie corrette.
+Contiene classi e manifesto, con le info principali. da tante entità atomiche, si fa il pacchetto con tutto il bytecode
+e la documentazione. Ma come si commenta?
+i commenti servono per spiegare cosa sto facendo. I commenti interni, da standard, sono esclusivamente per il
+programmatore, non per chi lo usa. 
+Il Javadoc è la documentazione pubblica. Quando creo il jar, posso "compilare" anche i commnti e creare
+una documentazione esterna, tipo con doxyfile - anche perché la struttura è quella che uso di base: `/** ... */` 
+
