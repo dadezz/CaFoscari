@@ -164,4 +164,64 @@ i commenti servono per spiegare cosa sto facendo. I commenti interni, da standar
 programmatore, non per chi lo usa. 
 Il Javadoc è la documentazione pubblica. Quando creo il jar, posso "compilare" anche i commnti e creare
 una documentazione esterna, tipo con doxyfile - anche perché la struttura è quella che uso di base: `/** ... */` 
+***
+# Appunti 13/10/2023
+***
+## Encapsulation, Documentazione e Javadoc
+Una capsula è un pezzo di codice, chiuso con gli access modifier. La capsula ci vede con l'interfaccia. A livello 
+sintattico sono le firme, per sapere cosa fanno le firme si aggiungono i commenti. Al pubblico diamo il jar col 
+bytecode e il manifesto.
+La sintassi dei commenti è come quella di c++. la doppia `//` è commento per i programmatori, idem `/* ... */`, non viene 
+nella documentazione. Lo standard JAVA per la documentazione è `/** ...*/`.
+Il commento può essere strutturato: il tag @ ci permette di scrivere informazioni specifiche, per esempio:
+- @param: parametri della funzione (argomenti)
+- @return: cosa viene ritornato dalla funzione
+- @throws: che eccezione viene lanciata in caso di errore
+- @since: da che versione esiste il metodo in questione
+- @author: autore
+- @deprecated: il metodo esiste per retrocompatibilità, ma non si dovrebbe utilizzare e un domani potrebbe essere
+anche rimosso
+
+Cosa fare ora che abbiamo dei commenti javadoc? `javac` compila, `java` esegue, `javadoc` genera la documentazione.
+Regola importante è mettere la documentazione in una cartella (`doc`) separata da quella del codice (`src`). Cosa viene 
+generato? Un file html. Si può generare anche altro, ma HTML è la scelta migliore per come è strutturata e navigabile.
+Si può creare anche la doc del package invece che solo della classe.
+Solo i campi pubblici compaiono. Tutto ciò che è privato di default non viene generato (ci sono delle configurazioni 
+booleane per overwriteare sta cosa). Nella documentazione della classe ci sono:
+- Campi
+- Costruttori
+- Metodi: dei metodi, c'è prima un sommario col testo libero, la documentazione vera e propria con tutti i @ è più in
+basso. Buona norma è ripetersi, e fare sommario anche del return sul testo libero.
+
+L'IDE spesso permette di generare javadoc in modo facile a interfaccia grafica, con una marea di opzioni, tra cui la 
+visiblità (public, package etc).
+Se una funzione non è commentata, ho un warning in fase di creazione. Se ho caratteri speciali in html, ho errori:
+in Javadoc infatti si può scrivere vero e proprio html. Esempio di html puro in javadoc: 
+```
+/**
+ * <a "github.com/dadezz>github dell'autore</a> 
+*/
+```
+Ci sono altri tag interni molto importanti a riguardo, degli shortcut:
+* @see: link nella sezione "see also"
+* @literal: scrive come codice, non interpreta come fosse html (per esempio per espressioni speciali)
+* un fottio di altre robe, guardare la... documentazione xD
+
+C++ doc usa doxygen, non ci sono particolari differenze con javadoc, è lo standard per c++, supporta comunque i commenti
+javadoc, ma produce la documentazione esternamente rispetto al codice sorgente, ovvero non è integrato con gli IDE.
+Quando javadoc documenta un metodo, sull'IDE sfiorando il metodo viene mostrata la documentazione, con doxygen no.
+(Utile x es l'autocompletamento).
+
+Qual è il problema dei commenti? sono informali, non verificati, ambigui. Come posso risolvere?
+### -> design by contracts
+Diritti e doveri delle due parti: chi sviluppa la libreria offre dei servizi, con un agreement su come sono usate le
+librerie etc. Il contratto contiene le firme (basico) e i commenti + precodindizioni, postcondizioni e invarianti
+
+
+
+
+
+
+
+
 
