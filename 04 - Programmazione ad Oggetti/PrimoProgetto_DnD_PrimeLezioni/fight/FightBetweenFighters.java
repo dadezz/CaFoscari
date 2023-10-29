@@ -4,10 +4,10 @@ import java.util.Random;
 
 import PrimoProgetto_DnD_PrimeLezioni.characters.Fighter;
 
-public class Fight {
+public class FightBetweenFighters {
     private Fighter f1, f2;
 
-    public Fight(Fighter f1, Fighter f2) {
+    public FightBetweenFighters(Fighter f1, Fighter f2) {
         this.f1 = f1;
         this.f2 = f2;
     }

@@ -13,7 +13,7 @@ public class Fighter {
     private static final int MAX_ID = 100;
 
     private final int id;
-    private int experience_points;
+    int experience_points;
     private Weapon weapon;
     private Armor armor;
     private int life_points;

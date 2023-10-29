@@ -216,8 +216,35 @@ Qual è il problema dei commenti? sono informali, non verificati, ambigui. Come 
 ### -> design by contracts
 Diritti e doveri delle due parti: chi sviluppa la libreria offre dei servizi, con un agreement su come sono usate le
 librerie etc. Il contratto contiene le firme (basico) e i commenti + precodindizioni, postcondizioni e invarianti
-
-
+***
+# Appunti 27/10/2023
+## Design by contracts
+Il commento diviene a tutti gli effetti parte dell'interfaccia pubblica. Questo approccio by contracts non è ampiamente 
+diffuso a livello commerciale. Il contratto più standard è: tu mi dai un servizio e io pago, spesso è molto leggero come
+conseguenze da parte del software: aggiornamenti per ban funzionali gratuiti è lo standard, difficile sia altro. Doveri 
+per l'utente? Usare il codice come fa documentazione: rispettare la sintassi (il codice non compila, lol) e la semantica.
+gli argomenti delle funzioni per esempio devono rispondere a dei prerequisiti (precondizioni) and so on [madonna che
+palle ste robe]. Le precondizioni si scrivono in javadoc con `@requires`, tipo `@requires i > 0`. Postcondizione:  ti
+garantisco che dopo avermi usato lascio l'oggetto in uno specifico stato. Si indica con `@ensures`. Se il contratto è
+rispettato in ogni caso, ovvero non ci sono precondizioni, si usa `@requires true`.Il problema di `@ensures` è che 
+praticamente esplode subito. Tutti i casi vanno riportati e difatti è una quasi riscrittura del codice. Ultima 
+roba su cui ragionare sono i campi. In particolare, gli invarianti: `@invariant experience_point >= 0 && 
+experience_point >= pre(experience_point)`. Si possono usare gli invarianti anche come check per capire se il codice che 
+stiamo scrivendo ha senso. Ogni volta che invoco il metodo, l'invariante è vero prima, durante e dopo l'esecuzione.
+Permette in qualche modo di ragionare in maniera modulare e "matematica" sul nostro codice. Sti @tag non sono parte del 
+core di javadoc, ma sono parte di JML: Java Modeling Language. Problema successivo per la verifica della correttezza dei
+programmi: un invariante di ciclo per ogni loop
+## Ereditarietà
+Un fighter è uno degli Nmila personaggi a cui si può pensare. Prendiamo un wizard. Non c'è una weapon, c'è la magia,
+il get_damage è diverso, è uno dei personaggi più distanti.
+Notiamo subito però che `private int experience_point;` va copincollato da fighter. Idem altre cose. Poi ci sono alcune 
+cose da aggiungere su wizard che non ci sono su fighter, come ad esempio tutta la parte magica. Poi ci sono alcune
+robe che non tornano. Per esempio, `defeated` in un fighter presuppone che sia stato un altro fighter a sconfiggerlo.
+Ci serve una cosa che, al posto di prendere ogni singola combinazione tra tutti i tipi di personaggi, permetta di
+racchiudere tutti i casi in un colpo.
+Ed ecco che sorge un altro problema. Anche il package Weapon non è adatto, è da aggiungere un altro package: Magic, 
+pure questa con moltissime robe identiche a Weapon, ma altre diverse. 
+Stiamo riscrivendo un fottio di codice come copincolla, nammerda.
 
 
 

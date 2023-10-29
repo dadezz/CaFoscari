@@ -1,13 +1,12 @@
 package PrimoProgetto_DnD_PrimeLezioni;
 import PrimoProgetto_DnD_PrimeLezioni.armors.Armor;
 import PrimoProgetto_DnD_PrimeLezioni.characters.Fighter;
-import PrimoProgetto_DnD_PrimeLezioni.fight.Fight;
+import PrimoProgetto_DnD_PrimeLezioni.fight.FightBetweenFighters;
 import PrimoProgetto_DnD_PrimeLezioni.weapons.Weapon;
 
 import java.util.Arrays;
-import java.util.Random;
 
-public class Runner {
+public class RunnerFighter {
     int i;
 
     public static void main(String[] args) {
@@ -26,7 +25,7 @@ public class Runner {
         for (int j = 0; j < 3; j++) {
 
             for (int i = 0; i < 150; i++) {
-                int winner = new Fight(f1, f2).fight();
+                int winner = new FightBetweenFighters(f1, f2).fight();
                 switch (winner) {
                     case 1:
                         System.out.println("The fighter " + f1.getId() + " won!");
