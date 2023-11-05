@@ -245,10 +245,49 @@ racchiudere tutti i casi in un colpo.
 Ed ecco che sorge un altro problema. Anche il package Weapon non è adatto, è da aggiungere un altro package: Magic, 
 pure questa con moltissime robe identiche a Weapon, ma altre diverse. 
 Stiamo riscrivendo un fottio di codice come copincolla, nammerda.
+***
+# Appunti 3/11/2023
+## ereditarietà e polimorfismo
+Fighter e wizard hanno cose in comune e alcune differenze. Si può pensare di fare un personaggio base e poi specializzarlo
+Sta roba ci perterà al principio di sostituzione: se ho un oggett di una classe, posso sostituirlo con un oggetto di un
+altra classe, a patto che essa mi dia tutte le stesse caratteristiche della classe originale. È la base del 
+polimorfismo. 
+### aggregazione
+Verbo avere. Ho qualcosa: un oggetto ha un riferimento ad un altro oggetto. può essere in condivisione con altri. Per esempio, un 
+fighter ha un weapon e un armor. 
+### ereditarietà
+Verbo essere. un oggetto estende le funzionalità di un altro. riusa il codice specializzandolo, aggiunge funzionalità 
+a una classe già definita. Un fighter **è** un personaggio. Un wizard **è** un personaggio. 
+La macchina è un veicolo -> estende le informazioni del veicolo. La sintassi che si usa è:
+`class Fighter extends Figure`.
+Tutti i metodi come `getID` e gli attributi come `NumberOfIStanciedCharacters` posso metterli nella classe esterna.
+Parlando di danno e difesa, lo abbiamo fatto in termini specifici per le varie armi. Voglio avere invece un concetto generico
+In generale, le classi sono estendibili quanto si vuole, anche svariate volte.
+Abbiamo in JAVA ereditarietà singola, ovvero una classe ne può estendere solo una. La classe generale si chiama superclasse.
+Costruttori: nella classe, ho un puntatore alla superclasse, `super`, ovvero un modo per interfacciarmi solo con la superclasse.
+In particolare, nel costruttore, come prima cosa devo invocare il costruttore della superclasse. 
+Per esempio, per il costruttore di wizard:
+```java
+class Wizard {
+    Wizard (int exp, int life, Weapon w1, armor a1) {
+        super(exp, life);   //costruttore superclasse
+        this.weapon = w1;
+        this.armor = a1;
+    }
+}
+```
+Come `this`, anche `super.` mi permette di interfacciarmi con la superclasse (metodi e attributi). 
+#### Access Modifiers: protected
+protected è visibile dal package, dalle sottoclassi, ma non da ovunque.
+È il livello più vicino al public. Nel progetto mi aspetto che altri user estendano la mia classe? sì -> lo includo nel 
+javadoc come intefaccia pubblica; no -> non lo metto come interfaccia, dipende quindi da scopo e struttura di 
+ciò che stiamo facendo.
 
-
-
-
-
+Importante: `abstract` : la classe non può essere istanziata. Si può anche mettere relativo al metodo, e va a sigificare
+che il metodo esiste ma non è definita un'implementazione. Il metodo abstract deve appartenere per forza a una classe 
+abstract (altrimenti posso istanziare la classe, e con essa posso invocare il metodo, senza però che esso sia definito).
+Il viceversa non è vero. Posso infatti avere una classe abstract con dei metodi implementati all'interno. Perché dò piene
+funzionalità ma non voglio che la superclasse possa essee istanziata. Nel momento in cui eredito un metodo astratto, 
+eredito l'obbligo di implementarlo, altrimenti devo anche io mettere la mia classe come abstract. 
 
 
