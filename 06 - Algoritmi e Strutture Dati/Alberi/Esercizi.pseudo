@@ -1,0 +1,111 @@
+/////////////////////////////////   ESERCIZIO 1 ////////////////////////////
+/* Un nodo di un albero binario è detto intermedio se la somma delle chiavi contenute nei nodi del sottoalbero di cui u è radice è uguale 
+alla somma delle chiabi contenute nei ndi sul percorso che collega u alla radice ( u escluso )
+1: Scrivere una funzione efficiente che restituisca il numero di nodi intermedi
+2: Analizzarne la complessità
+3: Se volessi restituire la lista dei odi intermedi, che tipo di struttura dati mi converrebbe utilizzare?
+*/
+
+function intermedi (r) {
+    <ris, sum_c> = intermedi_aux(r, 0)
+    // ris: numero nodi intermedi, sum_c: somma chiavi sottoalbero
+    return ris
+}
+function intermedi_aux(u, sum_p){
+    if u == NIL 
+        return 0
+    else 
+        <ris_sx, sum_c_sx> = intermedi_aux(u.left, sum_p + u.key)
+        <ris_dx, sum_c_dx> = intermedi_aux(u.right, sum_p + u.key)
+        if (sum_c_sx + sum_c_dx + u.key) == sum_p
+            return <(ris_sx + ris_dx +1), (sum_c_sx + sum_c_dx + u.key)>
+        else 
+            return <(ris_sx + ris_dx), (sum_c_sx + sum_c_dx + u.key)>
+}
+
+T_aux(N) = {
+    c   if n==0:
+    T_aux(k) + T(n-k-1) + d     if n>0
+} => T_aux(N) = Theta(n)
+
+/* per la risposta 3, mi basta una lista semplice con un puntatore alla testa e uno alla coda */
+//////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+    REGOLA GENERALE
+    Algoritmo ricorsibo per risolvere un problema decomponibile su alberi binari:
+*/
+//////////////////////////////////////////////////////////////////////////////////////////////////
+function Decomponibile(u) {
+    if u == NIL 
+        risolvi_direttamente()
+    else 
+        risultato_sx = Decomponibile(u.left)
+        risultato_dx = Decomponibile(u.right)
+        return ricombina(risultato_dx, risultato_sx)
+}
+
+/* ogni nodi viene attraversato un numero costante di volte, Se il costo del caso base e ricombina è O(n),
+allora l'esecuzione di Decomponibile() richiese T = O(n).
+///////////////////////////////////       ESERCIZIO 2       ////////////////////////////////////
+/* Un albero binario si dice t_bilanciato se per ogni nodo vale che le altezze dei sottoalberi radicati nei due figli differiscono
+per al più t unità. Scrivere una funzione che restituisca in minimo t per cui l'albero risulti t_bilanciato*/
+
+function t_bilanciato(u) {
+    if u == NIL
+        return <0, -1>
+    else 
+        <ris_sx, h_sx> = t_bilanciato(u.left)
+        <ris_dx, h_dx> = t_bilanciato(u.right)
+        h = MAX(h_dx, h_sx) +1
+        diff = ABS(h_dx - h_sx)
+        t = MAX(diff, MAX(ris_sx, ris_dx))
+        return <t, h>
+}
+///////////////////////////////////       ESERCIZIO 3       ////////////////////////////////////
+/* Sia T un albero binario. Si dice livello la distanza di un nodo u appartente a T dalla radice. Scrivere un algoritmo che, preso T e
+un k appartente all'insieme dei numeri interi, stampi le chiavi dei nodi a livello k, procedento da SX a DX*/
+
+function stampa_livello(u, k){
+    if u != NIL 
+        if k == 0
+            print u.key
+        else 
+            stampa_livello(u.left, k-1)
+            stampa_livello(u.right, k-1)
+}
+
+T(n) = {
+    c   if n==0
+    T(m) + T(n-m-1)+d   if n>0
+} => T(n) = O(n)
+
+T(k) = {
+    c   if k==0
+    2T(k-1)+d   if k>0
+} => Theta(2^k)
+// non si può usare il master theorem, ma si usa l'albero di ricorsione
+
+///////////////////////////////////       ESERCIZIO 4       ////////////////////////////////////
+/*Dato un albero, verificare che sia k-ario completo*/
+function k_ario(u, k){
+    <ris, h> = k_ario_aux(u, k)
+    return ris
+}
+function k_ario_aux(u, k){
+    if u == NIL
+        return <TRUE, -1>
+    else
+        hf = -1
+        f = u.leftchild
+        grado = 0
+        ris = TRUE
+        while (f != NIL && ris) {
+            grado++
+            <ris_f, temp> = k_ario_aux(f, k)
+            if hf == -1
+                hf = temp
+            ris = ris && ris_f && grado<=k && temp==hf 
+            f = f-rightsibiling
+       }
+       return <ris && (grado==k or grado==0), hf+1>
+}
