@@ -109,3 +109,58 @@ function k_ario_aux(u, k){
        }
        return <ris && (grado==k or grado==0), hf+1>
 }
+///////////////////////////////////       ESERCIZIO 5       ////////////////////////////////////
+/*Dato un albero generale T i cui nodi hanno chiavi intere, scrivere una procedura ricorsiva che trasformi
+T dimezzandi i valori di tutte le chiavi sui livelli pari dell'albero. Non usare funzioni ausiliarie*/
+function Trasforma (T) {
+    //risolvo saltando completamente il livello dispari
+    if u != NIL
+        u.key = u.key/2     // so di essere in un livello pari
+        Trasforma(u.rightsibiling)
+        iter = u.leftchild
+        while iter != NIL
+            Trasforma(iter.leftchild)
+            iter = iter,rightsibiling
+}
+T(n) => Theta(n)
+///////////////////////////////////       ESERCIZIO 6       ////////////////////////////////////
+/*Dato un albero binario T, scrivere function efficiente che restituisca una copia t' dell'albero T
+che contenga anche in ogni nodo la sua profondità*/
+
+function alberoprof(T) {
+    return alberoprofaux(T, NIL /*padre*/, 0/*radice*/)
+}
+function alberoprofaux(T, padre, prof){
+    if u == NIL 
+        return NIL
+    else    
+        root.key = u.key
+        root.p = padre
+        root.left = alberoprofaux(u.left, root, prof+1)
+        root.right = alberoprofaux(u.right, root, prof+1)
+        root.prof = prof
+        return root
+}
+T(n) = {
+    c           //if n = 0
+    T(k) + T(n-k-1) + d // else
+} => Theta(n) 
+///////////////////////////////////       ESERCIZIO 7       ////////////////////////////////////
+/*Dati due nodi u e v (contenti informazione sulla profondità), il minimo antenato comune è l'antenato comune di entrambi che si trova
+più  lontano dalla radice*/
+
+function AntenatoComune(u, v){
+    // li faccio arrivare alla stessa profondità
+    while u.prof != v.prof
+        if u.prof >v.prof 
+            u = u.padre
+        else 
+            v = v.padre
+    if u == v
+        return u 
+    else 
+        while u.padre != v.padre
+            u = u.padre
+            v = v.padre
+        return u.padre
+}
