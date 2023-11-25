@@ -288,7 +288,9 @@ che il metodo esiste ma non è definita un'implementazione. Il metodo abstract d
 abstract (altrimenti posso istanziare la classe, e con essa posso invocare il metodo, senza però che esso sia definito).
 Il viceversa non è vero. Posso infatti avere una classe abstract con dei metodi implementati all'interno. Perché dò piene
 funzionalità ma non voglio che la superclasse possa essee istanziata. Nel momento in cui eredito un metodo astratto, 
-eredito l'obbligo di implementarlo, altrimenti devo anche io mettere la mia classe come abstract.
+eredito l'obbligo di implementarlo, altrimenti devo anche io mettere la mia classe come abstract. 
+
+
 ***
 #### mancano le interfacce, ma vabbe
 # Appunti 25/11/2023 (Lecture 14 + 15)
