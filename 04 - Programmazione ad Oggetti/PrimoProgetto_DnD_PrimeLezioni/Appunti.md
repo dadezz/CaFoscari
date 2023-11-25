@@ -321,3 +321,4 @@ L'esistenza di due firme del genere, non viene permessa, il codice non compila, 
 ### Tipi come argomenti
 
 A una vista esterna, i tipi generici di Java sono esattamente identici a i templates di c++. Questi ultimi però duplicano il codice per ogni tipo su cui sono definiti. In Java sta cosa non accade, in quanto esistono realmente tipi "generici".
+
