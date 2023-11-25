@@ -288,6 +288,34 @@ che il metodo esiste ma non è definita un'implementazione. Il metodo abstract d
 abstract (altrimenti posso istanziare la classe, e con essa posso invocare il metodo, senza però che esso sia definito).
 Il viceversa non è vero. Posso infatti avere una classe abstract con dei metodi implementati all'interno. Perché dò piene
 funzionalità ma non voglio che la superclasse possa essee istanziata. Nel momento in cui eredito un metodo astratto, 
-eredito l'obbligo di implementarlo, altrimenti devo anche io mettere la mia classe come abstract. 
+eredito l'obbligo di implementarlo, altrimenti devo anche io mettere la mia classe come abstract.
+***
+#### mancano le interfacce, ma vabbe
+# Appunti 25/11/2023 (Lecture 14 + 15)
 
+## Fine polimorfismo
+Come vengono considerati i tipi delle variabili nelle chiamate delle funzioni?
+* Metodi degli oggetti:
+    * il tipo dell'oggetto ricevente viene calcolato a runtime, per garantire polimorfismo.
+      Non c'è quindi necessità di castare esplicitamente l'oggetto:
+      ```Java
+      Figure f1 = new Wizard;
+      ((Wizard) f1).metodo(); // non è necessario.
+      ```
+    * il tipo degli argomenti di funzione viene calcolato a compilation time, quindi se si vuole specificamente chiamare un metodo più preciso, c'è bisogno di cast esplicito.
+* Metodi Statici:
+    * L'oggetto ricevente deve essere una classe, cioè, può essere anche un oggetto, ma non sarebbe proprio proprio corretto. Oltretutto, il tipo del ricevente viene calcolato a compilation time (da qui "tipo statico"),  quindi non c'è polimorfismo, e si rischiano atteggiamenti inaspettati qualora si chiamasse una funzione statica su un oggetto con tipo dinamico, in quanto verrebbe eseguita la funzione della superclasse.
+    * statici, a compilation time.
 
+Cosa significa che il tipo degli argomenti, nel caso dei metodi, viene calcolato staticamente?
+QUando il metodo viene chiamato, comincia dalla classe dell'oggetto (dinamico) ricevente, per poi salire di superclasse in superclasse finché non trova un metodo con la firma che combaci con quello che serve. Anche i tipi degli argomenti vengono estesi verso l'esterno, ciò però comporta un vincolo di ambiguità:
+```Java
+public void foo (Wizard f1, Figure f2);
+public void foo (Figure f1, Fighter f2);
+```
+L'esistenza di due firme del genere, non viene permessa, il codice non compila, ciò perché la distanza delle due funzioni dalla superclasse è uguale, quindi se in runtime si trovasse a "salire di un livello" e chiamare la funzione su due figure, non saprebbe quale dei due invocare.
+
+## Templates e tipi generici
+### Tipi come argomenti
+
+A una vista esterna, i tipi generici di Java sono esattamente identici a i templates di c++. Questi ultimi però duplicano il codice per ogni tipo su cui sono definiti. In Java sta cosa non accade, in quanto esistono realmente tipi "generici".
