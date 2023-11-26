@@ -322,3 +322,70 @@ L'esistenza di due firme del genere, non viene permessa, il codice non compila, 
 
 A una vista esterna, i tipi generici di Java sono esattamente identici a i templates di c++. Questi ultimi però duplicano il codice per ogni tipo su cui sono definiti. In Java sta cosa non accade, in quanto esistono realmente tipi "generici".
 
+Ho una classe che riceve come parametri dei tipi. I tipi generici sono stati introdotti in Java 1.5, molto dopo i template di c++. Il tipo generico può essere messo come classe o nei singoli metodi
+
+```Java
+public class AlmostEmpty{
+    public <T> identity(T param){
+        return param;
+    }
+    public void foo(){
+        AlmostEmpty obj = new AlmostEmpty();
+        AlmostEmpty obj2 = obj.<AlmostEmpty>identity(new AlmostEmpty());
+    }
+}
+```
+
+Come viene compilato in bytecode? identity ha un tipo generico, ma non esistono a livello di bytecode. Prendo un `Object` e ritorno un Object. (Quest'ultimo è l'istanza della classe che sta sopra a tutte). Viene poi fatto un cast dinamico del tipo, da object al tipo passato come parametro. Dicevamo, si può parametrizzare la classe intera, tipo le liste:
+```Java
+public class List<T> {
+    private T[] elements = null;
+        // non posso fare new T[], tipo new String[]
+        // perché obv non si sa la memoria da allocare. va quindi messo a null e creato in un altro modo (sotto, in add)
+    public T get (int inde){
+        return elements[index];
+    }
+    public int lenght(){
+        return elements.length;
+    }
+    public void add(T el){
+        if (elements == null){
+            // spiegheremo più avanti
+            ArrayList<T> list = new Arraylist<>();
+            list.add(el);
+            elements = list.toArray(elements);
+        }
+        elements = Arrays.copyOf(elements, newLength: elements.length +1);
+        elements[elements.length-1] = el;
+    }
+}
+```
+Quando estendiamo la classe che prende un generico, possiamo estenderla passando tipi specifici. I tipi generici sono invarianti però. A una lista di `Figures` posso assegnare o dei `Figures` o dei `Wizard` (sottotipo), ma non entrambi. Negli array sta roba si può fare e causa problemi in runtime: se il tipo non è dinamicamente compatibile, crasha. 
+
+### Bounded generics
+voglio una classe che non riceve qualsiasi tipo, ma solo per esempio dei sottotipi di qualcosa.
+```Java
+public class ListFigure<T extends Figure> extends List <t>{
+}
+ListFigure<Wizard> = new ListFigure<>; // works
+ListFigure<String> = new ListFigure<>; // doesn't work
+```
+
+### Wildcards
+
+Solo accennata, in quanto soluzione sbagliata a problema giusto:
+
+passare <?> invece di un generico type
+`List<?>` supertype of `List<T>` for any T
+
+```Java
+    List<Figure> f = new List<Figure>();
+    List<?> listBoh = f;
+    String s1 = listBoh.get(0); //non compila perché non èuna stringa
+    Figure s2 = listBoh.get(0); // non compila uguale
+    Object s3 = listBoh.get(0); // unica roba che compila
+    listBoh.add("pippo"); // per lo stesso motivo, non funziona
+```
+Stimao definiendo una lista che è supertipo di qualisiasi altra lista, non possiamo farci praticamente nulla. Possiamo però aggiungerci dei bounds, da `extend`. La wildcard funziona bene lì dove la covarianza funziona bene, sul tipo di ritorno. Con i Wildcard, i genereici non sono più covarianti.La variabile con la wildcard però diventa un po' inutilizzabile percHé non definita correttamente al passaggio del valore.
+
+In definitva, Java è tra i linguaggi OOP mainstream che gestisce nel modo pggiore i tipi generici.
