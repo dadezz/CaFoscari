@@ -1,4 +1,5 @@
 #include <vector>
+#include <algorithm>
 /////////////////////////////////
     // ESERCIZIO 1
 /////////////////////////////////
@@ -182,4 +183,92 @@ infatti, il quarto elemento è R, lo alloco come figlio dx. Il sottinsieme (ELR)
 E   R
 
 con lo stesso procedimento risolvo il ramo destro
+*/
+
+
+PNode ricostruisci(const std::vector<int>& va, const std::vector<int>& vs){
+    //caso base
+    if (va.size() == 0 || vs.size() == 0) return nullptr;
+
+    //creo nodo radice
+    PNode node = new Node;
+    node->key = va[0];
+
+    // trovo il nodo nel vettore simmetrico
+    auto indice = find(vs.begin(), vs.end(), node->key);
+    int lunghezza_sinistra = std::distance(vs.begin(), indice);
+
+    // faccio le due chiamate ricorsive (destra e sinistra):
+    // devo splittare i due array, in destro e sinistro. uso l'indice trovato sopra come segnaposto
+    node->left = ricostruisci(std::vector<int>(va.begin()+1, va.begin()+1+lunghezza_sinistra), std::vector<int>(vs.begin(), indice));
+    node->right = ricostruisci(std::vector<int>(va.begin()+1+lunghezza_sinistra, va.end()), std::vector<int>(indice+1, vs.end()));
+
+    return node;
+}
+//////////////////////////////////
+    // ESERCIZIO 3
+/////////////////////////////////
+/*
+Dato un albero binario, scrivere una funzione che costruisce un array bidimensionale mat tale che, per ogni coppia di nodi u e v, 
+l’elemento mat[u][v] sia il minimo antenato comune di u e v. La funzione deve richiedere tempo O(n^2) e il suo prototipo è:
+*/
+void minAntCom(PNode r, std::vector<std::vector<int>>& mat){
+
+}
+/*
+Per semplicità si assuma che i nodi abbiano chiavi numerate da 0 a n-1 e che queste chiavi identifichino il nodo. 
+Di conseguenza gli indici della matrice rappresentano i nodi e in posizione mat[u][v] c'è la chiave del nodo che è il minimo antenato comune di u e v.
+
+[Il minimo antenato comune di due nodi u e v è  l’antenato comune  di u e v che si trova più lontano dalla radice dell’albero.]
+
+Analizzare e motivare in modo chiaro, preciso ed approfondito la complessità della funzione.
+*/
+//soluzione
+/*
+Non devo prendere una coppia di nodi e trovare l'antenato comune, perché avrebbe complessita n^3 (nodi*nodi*trova_antenato, che nel peggiore dei casi è n).
+Meglio sicuramente fare un ragionamento al contrario. la radice è sicuramente MAC di tutti i nodi successivi tra quelli sempre a destra e quelli sempre a sinistra.
+ugualmente, radice->left è il MAC di tutti i nodi tra quelli sempre a sx e sempre a dx del suo ramo.
+
+                 10
+               /    \
+             5       15
+           /  \    /    \
+          2    8  12    17
+         / \  / \   \   /  \
+        1   4 7  9   13 16  19
+       /     /         /
+      0     6         14
+           / \      /
+          18  3    11
+
+prima chiamata: 10 è radice di 
+    1) sé stessa con gli altri nodi:
+        m[10][5], m[10][15], m[10][2], m[5][tutti i nodi sotto di essa]
+    2) i nodi alla sua sinistra con i nodi alla sua destra:
+        m[5][15], m[5][12], m[5][17], m[5][tutti i numeri a destra]
+        m[2][15], m[2][12], m[2][17], m[2][tutti i numeri a destra]
+        .
+        .  per ogni nodo a sinistra della radice
+        .
+        m[3][15], m[3][12], m[3][17], m[3][tutti i numeri a destra].
+
+seconda chiamata: 5 è radice di
+    1) sé stessa con gli altri nodi:
+        m[5][2], m[5][8], m[5][1], m[5][tutti i nodi sotto di essa]
+    2) i nodi alla sua sinistra con i nodi alla sua destra:
+        m[2][8], m[2][7], m[2][9], m[2][tutti i numeri a destra]
+        m[1][8], m[1][7], m[1][9], m[1][tutti i numeri a destra]
+        .
+        .  per ogni nodo a sinistra della radice
+        .
+        m[0][8], m[0][7], m[0][9], m[0][tutti i numeri a destra]
+
+
+e così via, per ogni nodo a sotto la radice. Bisogna fare sempre sia destra che sinistra, perché facendo solo quelli a sinistra e calcolando i simmetrici, non avrei mai 
+il MAC di [12][17]. 
+Bisogna invece scrvere il simmetrico quando il nodo trova il MAC tra sé stesso e tutti gli altri nodi. Così facendo, 
+per ogni nodo visitato, c'è una relazione tra lui come indice primario e tutti i nodi dell'albero come indice secondario, definendo così complessità asintotica di O(n^2).
+
+Si noti che non è che ogni nodo viene visitato una volta e si relaziona con tutti in una volta sola, ma a ogni visita si relaziona con nodi diversi dell'albero
+                  
 */
