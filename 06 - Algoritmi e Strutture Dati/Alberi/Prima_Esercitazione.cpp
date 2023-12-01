@@ -287,8 +287,8 @@ void minAntCom(PNode r, std::vector<std::vector<int>>& mat){
 
     // populates mat
     mat[r->key][r->key] = r->key;
-    minAntCom_aux(r, r, r->left, mat);
-    minAntCom_aux(r, r, r->right, mat);
+    minAntCom_aux(r, r, r, mat);
+    minAntCom_aux(r, r, r, mat);
 
     //recursion
     minAntCom(r->left, mat);
