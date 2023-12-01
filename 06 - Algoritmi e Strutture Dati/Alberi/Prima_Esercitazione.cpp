@@ -271,28 +271,28 @@ per ogni nodo visitato, c'è una relazione tra lui come indice primario e tutti 
 Si noti che non è che ogni nodo viene visitato una volta e si relaziona con tutti in una volta sola, ma a ogni visita si relaziona con nodi diversi dell'albero
                   
 */
-void minAntCom_aux(const PNode root, const PNode v, const PNode u, std::vector<std::vector<int>>& mat){
-    if (u == nullptr) return;
-    mat[v->key][u->key] = root->key;
-    mat[u->key][v->key] = root->key;
-    minAntCom_aux(root, v, u->left, mat);
-    minAntCom_aux(root, v, u->right, mat);
-
-    if (v->left) minAntCom_aux(root, v->left, u, mat);
-    if (v->right) minAntCom_aux(root, v->right, u, mat);
-
+void minAntleftu(const PNode root, const PNode v, const PNode u, std::vector<std::vector<int>>& mat, int & i){
+    if (u == nullptr || v == nullptr) return;
+    // (debug)) std::cout<<"minAntleftu su root: "<<root->key<<", v: "<<v->key<<" e u: "<<u->key<<"; iterazione: "<<i++<<std::endl;
+    mat[u->key][v->key] = mat[v->key][u->key] = root->key;
+    minAntleftu(root, v, u->left, mat, i);
+    minAntleftu(root, v, u->right, mat, i);
+    minAntleftu(root, v->left, u, mat, i);
+    minAntleftu(root, v->right, u, mat, i);
 }
-void minAntCom(PNode r, std::vector<std::vector<int>>& mat){
-    if (r == nullptr) return;
-
-    // populates mat
-    mat[r->key][r->key] = r->key;
-    minAntCom_aux(r, r, r, mat);
-    minAntCom_aux(r, r, r, mat);
-
-    //recursion
-    minAntCom(r->left, mat);
-    minAntCom(r->right, mat);    
+void minAntru(PNode root ,PNode u, std::vector<std::vector<int>>& mat, int& i){
+    if (u==nullptr) return;
+    // (debug)) std::cout<<"minAntru su root: "<<root->key<<" e u: "<<u->key<<"; iterazione: "<<i++<<std::endl;
+    mat[root->key][u->key] = mat[u->key][root->key] = root->key;
+    minAntru(root, u->left, mat, i);
+    minAntru(root, u->right, mat, i);
+}
+void minAntCom(PNode r, std::vector<std::vector<int>>& mat, int& i){
+    if (r==nullptr) return;
+    minAntru(r, r, mat, i);
+    minAntleftu(r, r->left, r->right, mat, i);
+    minAntCom(r->left, mat, i);
+    minAntCom(r->right, mat, i);
 }
 
 int main() {
@@ -306,37 +306,53 @@ int main() {
     
     */
     PNode root = new Node {
-        3, 
+        0, 
         new Node{
             1,
             new Node{
-                2, 
+                3, 
                 nullptr, 
                 nullptr
             },
             new Node{
-                0, 
+                4, 
                 nullptr, 
                 nullptr
             }
         },
-        nullptr
+        new Node {
+            2,
+            new Node{
+                6, 
+                nullptr,
+                nullptr
+            },
+            new Node{
+                5, 
+                nullptr,
+                nullptr
+            }
+        }
     };
     
     // Dimensione dell'albero
-    const int treeSize = 4;
+    const int treeSize = 7;
 
     // Inizializza la matrice con dimensione treeSize x treeSize
     std::vector<std::vector<int>> matrix {
-        std::vector<int> {0, 0, 0, 0},
-        std::vector<int> {0, 0, 0, 0},
-        std::vector<int> {0, 0, 0, 0},
-        std::vector<int> {0, 0, 0, 0}
+        std::vector<int> {0, 0, 0, 0, 0, 0, 0},
+        std::vector<int> {0, 0, 0, 0, 0, 0, 0},
+        std::vector<int> {0, 0, 0, 0, 0, 0, 0},
+        std::vector<int> {0, 0, 0, 0, 0, 0, 0},
+        std::vector<int> {0, 0, 0, 0, 0, 0, 0},
+        std::vector<int> {0, 0, 0, 0, 0, 0, 0},
+        std::vector<int> {0, 0, 0, 0, 0, 0, 0}
     };
+    int i = 1;
 
     // Chiama la tua funzione
-    minAntCom(root, matrix);
-
+    minAntCom(root, matrix, i);
+    std::cout<<"iterazioni totali: "<<i<<std::endl;
     // Stampa la matrice risultante
     std::cout << "Matrice dei minimi antenati comuni:" << std::endl;
     for (int i = 0; i < treeSize; ++i) {
