@@ -207,7 +207,7 @@ PNode ricostruisci(const std::vector<int>& va, const std::vector<int>& vs){
     return node;
 }
 //////////////////////////////////
-    // ESERCIZIO 3
+    // ESERCIZIO 4
 /////////////////////////////////
 /*
 Dato un albero binario, scrivere una funzione che costruisce un array bidimensionale mat tale che, per ogni coppia di nodi u e v, 
@@ -367,3 +367,34 @@ int main() {
 
     return 0;
 }
+//////////////////////////////////
+    // ESERCIZIO 4
+/////////////////////////////////
+/*
+Nel centro di Preparazione Olimpica Acqua Acetosa "Giulio Onesti" si allenano la nazionale maschile e femminile di sollevamento pesi. Purtroppo, anche qui può accadere che i pesi vengano rimessi nei posti sbagliati.
+Date n coppie di manubri con pesi distinti, i manubri sono posizionati senza un ordine particolare su due rastrelliere. Inizialmente ogni fila ha un numero uguale di manubri. Trattandosi di una palestra professionale ben finanziata, c'è spazio infinito alle due estremità di ciascuna rastrelliera per sostenere eventuali pesi aggiuntivi.
+Per spostare un manubrio, si può farlo rotolare in uno spazio vicino libero sulla stessa rastrelliera quasi senza sforzo, oppure si può prenderlo, sollevarlo e posizionarlo in un altro posto libero; questo richiede forza proporzionale al suo peso.
+Qual è il peso più pesante che si deve sollevare per poter mettere pesi identici uno accanto all'altro? Si tenga presente che su ciascuna rastrelliera dopo la riorganizzazione potrebbe esserci sistemato un numero diverso di pesi; questo è consentito.
+
+Il prototipo della funzione è:
+*/
+int PesoMinimo(std::vector<int> pesi_1, std::vector<int> pesi_2);
+/*
+Analizzare e motivare in modo chiaro, preciso ed approfondito la complessità della funzione.
+
+Esempio:
+input:                       output:
+5
+2 1 8 2 8                   2
+9 9 4 1 4
+
+input:                       output:
+
+8
+7 7 15 15 2 2 4 4      0
+5 5 3 3 9 9 1 1
+*/
+/*
+SOLUZIONE
+orcoddemonio che cazzo è non ho manco capito la richiesta
+*/

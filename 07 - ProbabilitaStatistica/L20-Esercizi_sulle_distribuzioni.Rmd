@@ -1,0 +1,61 @@
+---
+title: "Esercizi sulle distribuzioni"
+author: Isadora
+date: "29/11/2023"
+output: html_document
+---
+
+## Esercizio 1
+Un'urna contiene $23$ palline tra cui $7$ bianche e $12$ nere. Si estraggono, in modo sequenziale e senza reinserimento, $4$ palline 
+dall'urna. Qual è la probabilità che fra le palline estratte ve ne siano almeno $2$ bianche?
+
+#### Soluzione: sia $x$ il numero di palline bianche estratte (su quelle 4).
+Allora $X\sim Iper(N=23, K=7, n=4)$
+
+La probabilità richiesta è: 
+$$\mathbb{P} [X \ge 2]=1-\mathbb{P}[X \le 1] = 1-phyper(1, 7, 23-7, 4)$$
+```{r}
+1-phyper(1, 7, 23-7, 4)
+```
+
+## Esercizio 2
+Un gruppo di ricercatori sta monitorando il livello di mercurio inorganico nella laguna di Venezia. Si sa che nel periodo estivo la concentrazione media di mercurio inorganico è pari a $8 \mu g$/litro e la probabilità di superare i $6.5 \mu g$/litro è pari a 0.7734. suponendo che la concentrazione di mercurio si distribuisca come una variabile casuale norale, si chiede di calcolare:
+
+a. il valore di $\sigma$
+**Soluzione: ** sia $x$ la concentrazione di Hg. Allora $X\sim N(\mu=8, \sigma^2)$
+Si sa, inoltre, che $\mathbb{P}[X>6.5] = 0.7734=mathbb{P}[z>\frac{6.5-8}{\sigma}] = 0.7734$. Da cui $\sigma = (6.5-8)/z$.
+Si sa che $\mathbb{P}[Z\le z] = 1- 0.7734$, allora la funzione inversa è $z$. L'inversa della ripartizione è il quantile.
+```{r}
+z = qnorm(1-0.7734)
+print(z)
+(6.5-8)/z
+```
+b. la probabilità di registrare valori superiori a $11.92 \mu g$/litro
+
+```{r}
+
+```
+
+## Esercizio 3
+
+Una sorgente binaria genera le cifre $0$ e $1$ in modo casuale, con probabilità respettrivamente $0.4$ e $0.6$
+
+a. Qual è la probabilitè che due $1$ o tre $0$ si verifichino in una sequenza di cinque cifre?
+
+```{r}
+
+```
+
+b. Qual è la probabilitè che almeno tre $1$ si verifichino in una sequenza di cinque cifre?
+
+```{r}
+
+```
+
+c. Qual è il numero di $1$ che ci si aspetta di osservare in una sequenza di duecento cifre?
+
+
+```{r}
+
+```
+
