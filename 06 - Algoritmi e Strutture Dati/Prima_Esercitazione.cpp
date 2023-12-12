@@ -57,6 +57,15 @@ int tBil(PNode u){
     tBil_Aux(u, risultato);
     return risultato;
 }
+/*
+ANALISI COMPLESSITÀ
+L'algoritmo in questione è una visita all'albero, cioè visita tutti i nodi dell'albero, solo una volta ognuno. 
+Ha complessità temporale asintotica Theta(n).
+Questo perché:
+Il caso base è u==nullptr, ovvero n=0, la cui complessità è costante (una operazione di return). Nel caso N>0, l'algoritmo esegue due chiamate ricorsive, una per ogni sottoalbero, più una serie di confronti e assegnamenti con complessità costante. Ciò si traduce in T(n) = T(k) + T(n-k-1) + d, dove k è il numero di nodi del sottoablero dx (0<=k<=n-1) e d è il tempo costante di ogni visita del nodo. 
+Siccome se n=1, k deve essere 0, abbiamo che T(1) = T(0) + T(0) + d. T(0) per definizione è costante, quindi T(1) è costante, da cui si evince che la complessità per la visita del singolo nodo è costante.
+Passando alla ricorrenza, notiamo subito che (k + (n-k-1)) equivale a n-1, da cui si può semplificare la ricorrenza in T(n) = T(n-1) + d. Sviluppando la ricorsione, si arriva alla forma T(n) = T(1) + T(1) + ... n volte, da cui T(n) = nT(1), da cui, infine, T(n) = Theta(n).
+*/
 
 //////////////////////////////////
     // ESERCIZIO 2
@@ -101,6 +110,16 @@ bool isNonDec(PNodeG r){
     }
     return decrescente;
 }
+
+/*
+ANALISI COMPLESSITÀ
+La complessità dell'algoritmo in questione si può analizzare in modo analogo a quella dell'esercizio 1. 
+Il caso base ha sempre complessità costante. Per quanto concerne invece la parte ricorsiva del problema, va analizzato il caso peggiore, quello cioè in cui la guardia del ciclo while è sempre vera (la verifica di quest'utlima ha complessità costante). Il ciclo while itera su ogni "fratello" del nodo in analisi, quindi m iterazioni. Ogni iterazione, oltre a una serie di operazioni ha complessità costante, ha una chiamata ricorsiva, sull'intero sottoalbero del nodo visitato in quella iterazione del ciclo. 
+Dalla definizione della struttura dati, ogni nodo di un sottoalbero non può avere come antenato un nodo di un altro sottoalbero, di conseguenza, i sottoalberi di ogni "fratello" non hanno nodi in comune. Dal momento che vengono lo stesso visitati tutti (sempre nel caso di guardia vera) si può assumere, per semplicità di calcolo, che, se ci sono k sottonodi, essi sono equamente divisi nei vari sottoalberi. La somma infatti è sempre la medesima, a prescindere dalla distribuzione dei nodi, si potrebbe proseguire il calcolo con k1 + k2 + ... + km, e imporre la somma = k, oppure con k/m e va da sé che k/m * m = k. 
+Si ottiene quindi che per ogni passo ricorsivo la complessità diventa
+T(n) = d + mT(k), con k = (n-1)/m, da cui si ottiene, come nell'esercizio precedente, T(n) = Theta(n). Questo nel caso peggiore. Considerando che il ciclo while contiene una guardia che non per forza è vera, non è detto che tutta la serie di visite venga portata a termine, da cui la complessità si riduce a O(n).
+*/
+
 //////////////////////////////////
     // ESERCIZIO 3
 /////////////////////////////////
@@ -184,28 +203,64 @@ infatti, il quarto elemento è R, lo alloco come figlio dx. Il sottinsieme (ELR)
 E   R
 
 con lo stesso procedimento risolvo il ramo destro
+
+Nell'analisi della complessità alcune considerazioni sulla mia scelta implementativa (unordered map)
 */
 
 
-PNode ricostruisci(const std::vector<int>& va, const std::vector<int>& vs){
+PNode ricostruisci_aux(const std::vector<int>& va, const std::vector<int>& vs, int va_start, int va_end, int vs_start, int vs_end, unordered_map<int, int>& map){
     //caso base
-    if (va.size() == 0 || vs.size() == 0) return nullptr;
+    if (va_start >= va_end || vs_start >= vs_end) return nullptr;
 
     //creo nodo radice
     PNode node = new Node;
-    node->key = va[0];
+    node->key = va[va_start];
 
     // trovo il nodo nel vettore simmetrico
-    auto indice = find(vs.begin(), vs.end(), node->key);
-    int lunghezza_sinistra = std::distance(vs.begin(), indice);
+    auto indice = map[node->key];
+    int lunghezza_sinistra = indice - vs_start;
 
     // faccio le due chiamate ricorsive (destra e sinistra):
     // devo splittare i due array, in destro e sinistro. uso l'indice trovato sopra come segnaposto
-    node->left = ricostruisci(std::vector<int>(va.begin()+1, va.begin()+1+lunghezza_sinistra), std::vector<int>(vs.begin(), indice));
-    node->right = ricostruisci(std::vector<int>(va.begin()+1+lunghezza_sinistra, va.end()), std::vector<int>(indice+1, vs.end()));
+    node->left  = ricostruisci_aux(va, vs, va_start + 1, va_start + 1 + lunghezza_sinistra, vs_start, indice, map);
+    node->right = ricostruisci_aux(va, vs, va_start + 1 + lunghezza_sinistra, va_end, indice + 1, vs_end, map);
 
     return node;
 }
+
+PNode ricostruisci(const std::vector<int>& va, const std::vector<int>& vs){
+    std::unordered_map<int, int> map;
+    for (int i = 0; i < vs.size(); ++i) {
+        map[vs[i]] = i;
+    }
+
+    return ricostruisci_aux(va, vs, 0, va.size(), 0, vs.size(), map);
+}
+
+/*
+Per le stesse considerazioni fatte nell'esercizio 2, per calcolare la complessità si può supporre l'albero come bilanciato (o più correttamente che abbia lo stesso numero di nodi nei due sottoalberi), in quanto a ogni chiamata ricorsiva vengono analizzate 2 partizioni (quindi distinte e la cui somma è il numero totale) dei nodi dei sottoalberi.
+
+considerazione sull'implementazione: inizialmente avevo pensato a una ricerca sul vettore vs per l'indice di split, poi però ho notato che quell'informazione sarebbe stata ricalcolata ad ogni chiamata di funzione, e ha complessità O(n). non solo, anche la chiamata ricorsiva in sé richiedeva (o almeno io avevo risolto in questo modo) di copiare la metà del vettore (usando gli iteratori per allocare la memoria correttamente). 
+in questo primo caso avremmo avuto quindi:
+
+caso base: costante
+funzione ricorsiva: "find" ha complessità lineare O(n), distance è O(1) in quanto i vector sono ad accesso diretto, la chiamata ricorsiva, per i motivi di cui sopra, si può ridurre a 
+ricostruisci (vector(n/2), vector(n/2)), per entrambe le chiamate.
+Abbiamo quindi una struttura del tipo
+T(n) {
+    costante            if n==0
+    O(n) + d + 2T(n/2)  altrimenti
+}
+Si può risolvere con il master theorem. O(n) + d si può semplificare direttamente in O(n).
+f(n) = O(n), a=2, b=2. d = log2(2) = 1. Le condzioni di applicabilità sono rispettate.
+f(n) = Theta(n^1), siamo nel secondo caso, la complessità è Theta(nlogn)
+
+Con l'implementazione attuale della funzione, invece, c'è un Theta(n) nella funzione principale, che è il popolamento dell'unordered map, poi però nella ausiliaria ogni espressione ha complessità costante, rimane la chiamata ricorsiva, 
+che è Theta(n).
+Con l'aggiunta quindi di un fattore n nella complessità spaziale, si riesce a ridurre il problema a complessità Theta(n), che per essere precisi è formato da quello iniziale in "ricostruisci" e dalla chiamata ricorsiva che ha forma 2T(n/2).
+*/
+
+
 //////////////////////////////////
     // ESERCIZIO 4
 /////////////////////////////////
@@ -270,105 +325,110 @@ per ogni nodo visitato, c'è una relazione tra lui come indice primario e tutti 
 
 Si noti che non è che ogni nodo viene visitato una volta e si relaziona con tutti in una volta sola, ma a ogni visita si relaziona con nodi diversi dell'albero
                   
-*/
-void minAntleftu(const PNode root, const PNode v, const PNode u, std::vector<std::vector<int>>& mat, int & i){
-    if (u == nullptr || v == nullptr) return;
-    // (debug)) std::cout<<"minAntleftu su root: "<<root->key<<", v: "<<v->key<<" e u: "<<u->key<<"; iterazione: "<<i++<<std::endl;
-    mat[u->key][v->key] = mat[v->key][u->key] = root->key;
-    minAntleftu(root, v, u->left, mat, i);
-    minAntleftu(root, v, u->right, mat, i);
-    minAntleftu(root, v->left, u, mat, i);
-    minAntleftu(root, v->right, u, mat, i);
+*/// (debug) int i =1;
+
+void aux1 (int root, int key1, const PNode nodo_destro_variabile, std::vector<std::vector<int>>& mat){
+    if (nodo_destro_variabile == nullptr) return;
+    // (debug) std::cout<<"aux1 su root: "<<root<<"key: "<<key1<<" e u: "<<nodo_destro_variabile->key<<"; iterazione: "<<i++<<std::endl;
+    mat[key1][nodo_destro_variabile->key] = mat[nodo_destro_variabile->key][key1] = root;
+    aux1(root, key1, nodo_destro_variabile->left, mat);
+    aux1(root, key1, nodo_destro_variabile->right, mat);
 }
-void minAntru(PNode root ,PNode u, std::vector<std::vector<int>>& mat, int& i){
+void minAntleftu (int root, const PNode sx, const PNode dx, std::vector<std::vector<int>>& mat){
+    if (sx == nullptr) return;
+    aux1(root,  sx->key, dx, mat);
+    minAntleftu(root, sx->left, dx, mat);
+    minAntleftu(root, sx->right, dx, mat);
+}
+
+void minAntru(PNode root ,PNode u, std::vector<std::vector<int>>& mat){
     if (u==nullptr) return;
-    // (debug)) std::cout<<"minAntru su root: "<<root->key<<" e u: "<<u->key<<"; iterazione: "<<i++<<std::endl;
+    // (debug) std::cout<<"minAntru su root: "<<root->key<<" e u: "<<u->key<<"; iterazione: "<<i++<<std::endl;
     mat[root->key][u->key] = mat[u->key][root->key] = root->key;
-    minAntru(root, u->left, mat, i);
-    minAntru(root, u->right, mat, i);
+    minAntru(root, u->left, mat);
+    minAntru(root, u->right, mat);
 }
-void minAntCom(PNode r, std::vector<std::vector<int>>& mat, int& i){
+void minAntCom(PNode r, std::vector<std::vector<int>>& mat){
     if (r==nullptr) return;
-    minAntru(r, r, mat, i);
-    minAntleftu(r, r->left, r->right, mat, i);
-    minAntCom(r->left, mat, i);
-    minAntCom(r->right, mat, i);
+    minAntru(r, r, mat);
+    minAntleftu(r->key, r->left, r->right, mat);
+    minAntCom(r->left, mat);
+    minAntCom(r->right, mat);
 }
 
-int main1() {
-    // Crea un semplice albero binario per il test:
-    /*
-              3
-            /   \
-          1       4
-        /  \       \
-      2     0       5
-    
-    */
-    PNode root = new Node {
-        0, 
-        new Node{
-            1,
-            new Node{
-                3, 
-                nullptr, 
-                nullptr
-            },
-            new Node{
-                4, 
-                nullptr, 
-                nullptr
-            }
-        },
-        new Node {
-            2,
-            new Node{
-                6, 
-                nullptr,
-                nullptr
-            },
-            new Node{
-                5, 
-                nullptr,
-                nullptr
-            }
-        }
-    };
-    
-    // Dimensione dell'albero
-    const int treeSize = 7;
+/*
+ANALISI COMPLESSITÀ.
+sia n il numero dei nodi dell'albero.
 
-    // Inizializza la matrice con dimensione treeSize x treeSize
-    std::vector<std::vector<int>> matrix {
-        std::vector<int> {0, 0, 0, 0, 0, 0, 0},
-        std::vector<int> {0, 0, 0, 0, 0, 0, 0},
-        std::vector<int> {0, 0, 0, 0, 0, 0, 0},
-        std::vector<int> {0, 0, 0, 0, 0, 0, 0},
-        std::vector<int> {0, 0, 0, 0, 0, 0, 0},
-        std::vector<int> {0, 0, 0, 0, 0, 0, 0},
-        std::vector<int> {0, 0, 0, 0, 0, 0, 0}
-    };
-    int i = 1;
+minAntCom:
+caso base costante; la funzione poi ha una chiamata a minAntru su n e una chiamata a minAntleftu su n-1. Chiama poi sé stessa distintamente sui sottoalberi, effettuando di fatto una visita. La complessità della visita si dimostra, in modo analogo alla dimostrazione dell'esercizio 1, essere Theta(n). 
+La complessità della funzione sarà quindi data da:
+Theta(n) * (T(minantru) + T(minantleftu)).
 
-    // Chiama la tua funzione
-    minAntCom(root, matrix, i);
-    std::cout<<"iterazioni totali: "<<i<<std::endl;
-    // Stampa la matrice risultante
-    std::cout << "Matrice dei minimi antenati comuni:" << std::endl;
-    for (int i = 0; i < treeSize; ++i) {
-        for (int j = 0; j < treeSize; ++j) {
-            std::cout << "Radice tra" << i << " e " << j << ": " << matrix[i][j] << " ";
-            std::cout << std::endl;
-        }
-    }
+MinAntru:
+caso base costante; la funzione effetta un assegnamento costante e poi due chiamate ricorsive a sé stessa e, con la medesima dimostrazione, si calcola la complessità Theta(n).
 
-    // Deallocazione della memoria dell'albero
-    // TODO: Aggiungi una funzione per la deallocazione della memoria degli elementi dell'albero
+Aux1:
+Anch'esso è una visita, solo di un sottoalbero però. Sempre per le stesse considerazioni su albero partizionato degli esercizi precedenti, si può considerare Theta(n/2).
 
-    return 0;
-}
+MinAntleftu:
+caso base costante. la funzione effettua un assegnamento costante, chiama aux e visita il suo sottoalbero. Notare sempre che sia aux1 che minantleftu "lavorano" sui sottoalberi indipendenti del nodo visitato dalla funzione madre, non sullo stesso.
+
+Possiamo arrivare a un'equazione del tipo:
+T(n) = [minantru] + [Minantleftu] + T(k) + T(n-k-1) + d
+da cui:
+T(n) = n + k*(n-k-1) + T(k) + T(n-k-1) + d
+
+Sempre per le stesse considerazioni su albero partizionato degli esercizi precedenti, si può considerare la complessità come visita su metà albero (meno il nodo iniziale)
+Si può assumere k = n/2, così da semplificare, a meno di costanti, in
+
+T(n) = n + (n/2)*(n-n/2) + 2T(n/2) + d
+T(n) = n + n^2/2 - n^2/4 +2T(n/2) + d
+T(n) = n^2 + 2T(n/2).
+
+Applicando il master theorem, a=2, b=2, f(n) = Omega(n^(1+0.5)) e 2(n^2/2) <= 0.5*n^2. Siamo nel terzo caso, ecco che 
+T(n) = Theta(n^2)
+
+Si può fare una visione generale di tutte le ricorrenze:
+poniamo di avere l'albero qui rappresentato:
+
+        n1
+      /    \
+    n2       n3
+  /  \    /    \
+n4    n5  n6    n7
+
+Si inizia dalla visita di n1. le coppie di nodi sono gli assegnamenti che vengono fatti (speculari sottintesi).
+
+n1  -> (minantru)   (n1, n2)
+                    (n1, n4)
+                    (n1, n5)
+                    (n1, n3)
+                    (n1, n7)
+    -> (minantleftu) n2     (n2, n3)
+                            (n2, n6)
+                            (n2, n7)
+                        -> n4   (n4, n3)
+                                (n4, n6)
+                                (n4, n7)
+                        -> n5     (n5, n3)
+                                (n5, n6)
+                                (n5, n7)
+    -> n2   -> (minantru)   (n2, n4)
+                            (n2, n5)
+            -> (minantleftu) n4     (n4, n5)
+        -> n4   nulla
+        -> n5   nulla
+    -> n3   -> (minantru)   (n3, n6)
+                            (n3, n7)
+            -> (minantleftu) n6     (n6, n7)
+        -> n6 nulla
+        -> n7 nulla
+
+È facile quindi notare che ogni coppia di nodi viene visitata una sola volta, senza neppure passare per la coppia speculare, determinando così una complessità totale di O(n^2). non theta proprio perché si evita di ripassare su una coppia già visitata
+*/
 //////////////////////////////////
-    // ESERCIZIO 4
+    // ESERCIZIO 5
 /////////////////////////////////
 /*
 Nel centro di Preparazione Olimpica Acqua Acetosa "Giulio Onesti" si allenano la nazionale maschile e femminile di sollevamento pesi. Purtroppo, anche qui può accadere che i pesi vengano rimessi nei posti sbagliati.
@@ -450,6 +510,11 @@ int PesoMinimo(std::vector<int> pesi_1, std::vector<int> pesi_2){
     }
     return result;
 }
+
+/*
+ANALISI COMPLESSITÀ
+La creazione della unordered map richide Theta(n), lo stesso richiede la ricerca del max elemento disaccoppiato, poi 2 cicli iterano fino ad n, risultando complessivamente in 4*Theta(n), da cui Theta(n). La complessità spaziale è dominata dall'unordered map, che ha n come ordine di grandezza, è quindi anch'essa lineare
+*/
 
 int main(){
     int n;
