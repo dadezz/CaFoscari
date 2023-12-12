@@ -295,7 +295,7 @@ void minAntCom(PNode r, std::vector<std::vector<int>>& mat, int& i){
     minAntCom(r->right, mat, i);
 }
 
-int main() {
+int main1() {
     // Crea un semplice albero binario per il test:
     /*
               3
@@ -398,3 +398,69 @@ input:                       output:
 SOLUZIONE
 orcoddemonio che cazzo è non ho manco capito la richiesta
 */
+#include <unordered_map>
+
+using namespace std;
+
+int PesoMinimo(std::vector<int> pesi_1, std::vector<int> pesi_2){
+    unordered_map<int, int> index_map_1;
+    if (pesi_1.size() == 0) return 0;
+    // prima iterazione: Theta(N)
+    // popolamento dell'unordered map
+    for(int i=0; i<pesi_1.size(); i++){
+        index_map_1[pesi_1[i]]++;
+    }
+    
+    int result = 0;  //valore di ritorno finale
+
+    // max elemento disaccoppiato (per forza di cose devo spostarlo)
+    for (int i = 0; i<pesi_1.size(); i++)
+        if(index_map_1[pesi_1[i]] %2 == 1)
+            result = result > pesi_1[i] ? result : pesi_1[i];
+
+
+    int guardia;
+    // ora scorro tutto il vettore, mi sposto di uno in uno in cerca di coppie.
+    /**
+     * 28218
+     * 
+     * popolo la map e scopro che 1 è disaccoppiato. result = 1
+     * 
+     * guardia 2. devo scorrere finché non trovo un altro 2.
+     * se trovo un numero maggiore di result (in sto caso 8), sposto la guardia all'elemento trovato, 
+     * e aggiorno result con max(result, 2). 
+     * poi scorro con guardia 8, e vedo se dentro c'è qualche numero maggiore di result. in sto caso non trovo nulla fino al 
+     * prossimo 8. assegno guardia al numero successivo. non lo trovo, in sto caso allora result è 2 e finisce ciclo
+    */
+    guardia = pesi_1[0];
+    for (int i = 1; i<pesi_1.size(); i++){
+        if (pesi_1[i] == guardia) guardia = pesi_1[++i];
+        else if (pesi_1[i] > result){
+            result = result > guardia ? result : guardia;
+            guardia = pesi_1[i];
+        }
+    }
+    guardia = pesi_2[0];
+    for (int i = 1; i<pesi_2.size(); i++){
+        if (pesi_2[i] == guardia) guardia = pesi_2[++i];
+        else if (pesi_2[i] > result){
+            result = result > guardia ? result : guardia;
+            guardia = pesi_2[i];
+        }
+    }
+    return result;
+}
+
+int main(){
+    int n;
+    cin>>n;
+    vector<int> v1 (n);
+    vector<int> v2 (n);
+    for (int i=0; i<n; i++){
+        cin>>v1[i];
+    }
+    for (int i=0; i<n; i++){
+        cin>>v2[i];
+    }
+    cout<<endl<<PesoMinimo(v1, v2);
+}
