@@ -455,3 +455,55 @@ Altra caratteristica è un'eccezione sugli operatori. il `+` concatena due strin
 ### ToString (classe object)
 Mostra l'oggetto in forma di stringa. Il default richiama un po' i file json, ma si può modificare a piacimento. A livello di debug, è utile perché è il meotodo usato per mostrare dinamicamente le info dell'oggetto a runtime.Altra funzione utile è per il logging. QUando si concatena una stringa con un oggetto, sullìoggeto viene inovocato a sua volta il ToString().
 
+# Appunti 27/12/2023 (Lecture 18)
+
+Nelle gerarchie delle strutture dati, la root è interafccia iterable, che fornisce iteratori, sotto c'è uinterfaccia Collection. da qui si estendono tre interdfacce: set, List e Queue e una classe Astratta: Abstract Collection.
+Quest a sono la base su cui si bassano tutte le altre.
+
+## Set
+
+Interfaccia che eestende l'interfaccia `Collection`. È un insieme matematico. Tanti elementi delo stesso tipo, ogni elemento può coparire al più una volta. Vediamo subito qualche roba ereditata da Object. Per esermpio `equals`. Per come è definito, dati due oggetti del set,`obj1.equals(obj2)` ritorna falso per ogi obj1 e obj2.
+
+Un Hashset è una classe che implementa Set e estende HashTable.
+
+Si può iterare nella forma 
+```JAVA
+iterator<T> it  = this.iterator();
+while(it.HasNext()){
+    T current = it.next();
+    if (current.getInfoDamage() > result.getInfoDamage()){
+        result = current;
+    }
+    return result.
+}
+```
+
+Oppure, Java offre i cicli for-each:
+```JAVA
+iterator<T> it  = this.iterator();
+T result = null;
+for (T el : this){
+    /* if ... */
+}
+```
+Come viene compilato il ciclo foreach? esattamente come sopra. prende l'iterator, guarda se has next etc. Meglio la seconda versione convenzionalmente.
+Quando itero non ho garanzie in un hashset sull'ordine ritornato. L'hashtable non ci dà garanzie sull'ordine degli elementi. Un codice deve essere deterministico. Il `TreeSet` invece è un implementazione di `Set` che dà questa garanzia. Il treeset richiede l'implementazione del metodo `compareTo()`. Più si va avanti con classi e strutture dati, più i problemi di ereditarietà multipla si fanno sentire. 
+Una cosa molto noiosa è fare una serie immensa di `if ... istanecof ...`. Nelle ultimissime versioni di Java si possono fare dei switch-case statement con espressioni invecedi costanti, tra cui anche dei switch sui tipi. Non vedremo sta cosa xk troppo recente (madonna che reottua di coglioni).
+
+## Tipi Primitivi
+`int, double, float, char, long...` etc. Abbiamo visto che Object è il supertipo di tutti i tipi, tranne i tipi primitivi. Per esempio non esiste non esiste la List<int>. i tipi generici non possono essere tipi primitivi. Però esistono una serie di classi che estendono object che rappresentano i tipi primitivi.
+Per esempio, posso creare qualcosa del tipo 
+```JAVA
+int i = 12;
+Object o = i;
+```
+Creo un oggetto, in particolare di tipo `Integer` (la maiuscola lo differenzia dal tipo primitivo), che rappresenta sotto forma di oggetto il tipo primitivo intero.
+
+Il cast contrario è qualcosa del tipo:
+```JAVA
+Object obj = 5; // obj is an Integer object
+
+    // Cast obj to an int using the intValue() method
+    int x = ((Integer) obj).intValue();
+    System.out.println(x); // prints 5
+```
