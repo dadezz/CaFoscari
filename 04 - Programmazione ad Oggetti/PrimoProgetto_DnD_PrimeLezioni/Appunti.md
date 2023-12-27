@@ -386,6 +386,72 @@ passare <?> invece di un generico type
     Object s3 = listBoh.get(0); // unica roba che compila
     listBoh.add("pippo"); // per lo stesso motivo, non funziona
 ```
-Stimao definiendo una lista che è supertipo di qualisiasi altra lista, non possiamo farci praticamente nulla. Possiamo però aggiungerci dei bounds, da `extend`. La wildcard funziona bene lì dove la covarianza funziona bene, sul tipo di ritorno. Con i Wildcard, i genereici non sono più covarianti.La variabile con la wildcard però diventa un po' inutilizzabile percHé non definita correttamente al passaggio del valore.
+Stiamo definendo una lista che è supertipo di qualsiasi altra lista, non possiamo farci praticamente nulla. Possiamo però aggiungerci dei bounds, da `extend`. La wildcard funziona bene lì dove la covarianza funziona bene, sul tipo di ritorno. Con i Wildcard, i genereici non sono più covarianti.La variabile con la wildcard però diventa un po' inutilizzabile percHé non definita correttamente al passaggio del valore.
 
-In definitva, Java è tra i linguaggi OOP mainstream che gestisce nel modo pggiore i tipi generici.
+In definitiva, Java è tra i linguaggi OOP mainstream che gestisce nel modo peggiore i tipi generici.
+
+# Appunti 20/12/2023 (lecture 16 + 17)
+```Java
+this.defensiveMagic = new DefensiveBag<Magic>();
+this.defensiveMagic.add(m1);
+this.offensiveMagic = new OffensiveBag<Magic>();
+this.offensiveMagic.add(m1);
+```
+Qui ho aliasing, ma stavolta sono io che voglio averlo. La magia è sia difesa che attacco, può andare sia in una che nell'altra bag. Mi serve che lo stesso oggetto sia riferito da entrambe le classi, così da mantenere ilcontrollo sull'evoluzione, usandolo prima in un modo e poi nell'altro.
+
+## Java in Action
+**Object**: superclasse di tutto. Nella gerarchia delle classi, ogni classe estede la radic di tutto, che è `object`.
+Non estende nessun'altra classe. Ha una serie di metodi già implementati. Una volta esistva il metodo finalize, che era un distruttore.
+Il problema è che in java c'è il garbage collector, ma è indefinito quando verrà effettivamente chiamato,, quindi è deprecato e non viene usato.
+Poi ci sono alcuni metodi (notify, wait etc) che sono inerenti a multithreading e concorrenza. Poi c'è `getclass()`, che pero vedremo più avanti con la reflection. I metodi che ci interessano sono:
+### Equals
+In Java non esistono gli operatori come in C++. Per l'operatore ==  esiste `equals` object riceve un altro object. Restituisce True se i due oggettisono ugualli.
+Ma qual è la definizione di uguaglianza? 
+
+L'operatore == controlla solo il puntatore all'oggetto, non controlla la semantica dell'operatore. Java ci dà l'override, in cui bisogna metterci il controllo `istance of`.
+#### proprietà
+La classe è di fatto un insieme, per cui deve rispondere alle stesse regole che esistono in matematica discreta:
+* riflessiva
+* simmetrica
+* commutativa
+* transitiva
+
+È figo che l'IDE permette di generarlo in automatico, dicendogli quali campi controllare.
+
+
+### Clone
+fa esattamente quello che pensi. SI puo scegliere di non clonare gli oggetti. in generale è protected. POsso farla anche public, per principio di sostituzione. Non tutti gli oggetti sono clonobli, si può anche specicifare. Clone è protected, deve fornire anche questo una serie di garanzie:
+* le due copie devono essere `equals` (uguali semanticamente)
+* le due copie devono essere oggetti diversi (separati in memoria)
+* il tipo dei due cloni deve essere uguale
+
+Per come è definito il metodo clone, non è una deep copy.
+
+### Hashcode
+Ci servono conoscere le tabelle Hash (mappe). 
+Se gli oggetti sono ugual, l'hascode deve necessariamente essere uguale.
+
+```Java
+public int HashCode(){
+    return 0;
+}
+```
+
+Tecnicamente questa implementazione è corretta. Ha poco senso però. Posso pensare un `return id;`, o un `return id%50`. Sono un peogrammatore ad oggetti, uso le librerie. `return hash(id)`.
+
+## String
+È una classe che si trova subito sotto a object ed è `final`. Quando si assegna una stringa ("vdf") viene presa come valore costante nel bytecode. 
+
+```Java
+String a = "pippo";
+String b = "pippo";
+a.equals(b); // True
+a == b; // True
+```
+a e b sono lo stesso oggetto! se cambio a modifico b come side effect?
+La classe stringa ha la particolarità di essere immutabile. se si usa il replace, si crea un'altra stringa. 
+Altra caratteristica è un'eccezione sugli operatori. il `+` concatena due stringhe. Il metodo si chiama concat, ma è l'unico che ammette l'uso di un operatore, (appunto, il `+`). Una volta il + non era ammesso, ora esistono entrambi,hanno la stessa semantica, ma si comportano in modo diverso. Il concat è costoso perché ogni volta invoca costruttore e mette costante in stack etc, il + ha delle ottimizzazioni a livello di bytecode che permettono di bypassare l'immutabilità delle stringhe (non entriamo nel dettaglio).
+
+### ToString (classe object)
+Mostra l'oggetto in forma di stringa. Il default richiama un po' i file json, ma si può modificare a piacimento. A livello di debug, è utile perché è il meotodo usato per mostrare dinamicamente le info dell'oggetto a runtime.Altra funzione utile è per il logging. QUando si concatena una stringa con un oggetto, sullìoggeto viene inovocato a sua volta il ToString().
+
