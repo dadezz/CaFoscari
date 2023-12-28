@@ -625,4 +625,43 @@ Nel momento in cui ho un field in manok, posso anche settarlo. se non ho accesso
 Method m1 = cls.getDeclaredMethod("getInfoDefense");
 Object result = m1.invoke(/*args*/);
 ```
-(si noti che ritorna un int warpped, non primitivo).
+(si noti che ritorna un int wrapped, non primitivo).
+Invocare un metodo by reflection ritorna sempre e comunque qualcosa. la stessa roba del metodo, o null in caso sia void.
+
+La reflection cerca di estendere java a un'esistenza più dinamica, tipica dei linguaggi moderni, però togliendo l'enacpsulation e aumentando verbosità. Oltretutto fare debug quand c'è reflection non è per nulla facile.
+
+***
+
+# Appunti 28/12/2023 (lecture 23)
+
+Le annotation sono utilissime nella reflection, e diventano mollto più di un commento. 
+```Java
+public final void restore(){
+    for(DefensiveObject d : this.getAllDefensiveOBjects())
+        restore(d);
+    for(OffensiveeObject d : this.getAllOffensiveOBjects())
+        restore(d);
+}
+
+private void restore (DaDObject obj){
+    Class cls = obj.getClass();
+    for (Method m : cls.getDeclaredMethods())
+        if (m.getAnnotation(Restore.class) != null){
+            if (m.getParameterCount() == 0){
+                m.setAccessible(true);
+                m.invoke(obj);
+            }
+            else
+                throw new tException("più di un arg")
+        }
+}
+```
+
+## Library Management and Gradle
+
+Classpath: percorso dove vengono trovate le librerie necessarie per il programma che sto scrivendo. Class path to Jar, zip, class.Con tnante librerie è prono a errori, gli import semplificano sta cosa. Le classi vengono caricate in modo dinamico a runtime, non ci sono errori se ci si dimentica di aggiungere roba sul classpath finché quella libreria non viene effettivamente usata.
+
+come numerare le versioni di una libreria?
+`<major release>.<minor>[.<bugfix>]`
+cambiare major singnifica cmbiare interfaccia, non è detto che sia retrocompatibile, metodi deprecati possono essere eliminati etc. La minor di solito aggiunge feature rimanendo retrocompatibile. Il bugfix non cambia nulla se non che aggiunge patch. Di norma servono per le vulnerabilità. Esistono poi le versioni taggate come `beta`, tipo preview. Le versioni precedenti vanno mantenute come dichiarato nel contratto.
+Come si builda una libreria? ci possono essere varie build, tipo test, release etc. Il build significa passare da sorgente a binario. si usano spesso build automation, in prticolare gradle. È una specie di makefile esponenziato, che crea release. Attenzione a usare librerie perché si tende a ingrandire un sacco la release
