@@ -507,3 +507,122 @@ Object obj = 5; // obj is an Integer object
     int x = ((Integer) obj).intValue();
     System.out.println(x); // prints 5
 ```
+
+# Appunti 28/12/2023 (Lecture 19 + 20 + 21 + 22)
+
+## Implicit type casting
+da numeri "corti" a numeri "lunghi" dello stesso tipo è ok. per esempio, float->double, int->long etc.
+Non è vero il contrario. double->float è problematico tanto quanto long->int. Implicitamente non è permesso, viene però acettato con il casting esplicito. Riducendo il numero di bit non è detto (anzi, si dia per scontato coe non è così) che il risultato sia consistente (MaxLong castato a int diventa -1).
+Casting da intero a float va bene. Il contrario invece non è implicitamente permesso (`int i = 0.9f` non funzia). Java obbliga il cast esplicito. A un intero non si può assegnare un booleano, né viceversa. Nemmeno casting esplicito da bool a int va bene.Il char trasformato a intero segna il valore Ascii. non vale il contrrario (scelta discutibile).
+#### Object
+sottoclassi: `Boolen, Chaaracter, Number, String`; sotto il Number c'è `Integer, Byte, DOuble , Float, LOng, Short`. 
+#### Concat:
+```Java
+String s = "sfdb";
+int i = 1;
+String s2 = s + i;
+String s3 = i + s;
+```
+È tutta roba che funziona, risulta nella concatenazione di stringhe. Ma allora, che succede con 
+```JAVA
+String s = "sfdb";
+int i = 1, i1 = 2;
+String s2 = i + i1 + s;
+```
+il risultato sarà (1+2) e concat s oppure 1 concat 2 concat s?
+È ambiguo. in questo caso associa da sinistra, quindi diventa `3sfdb`, se avessi messo il contrario diventerebbe `sfdb12`.4
+
+## Exceptions
+Ci si era rotti dei segfault, ci sono problematiche che se capitano non è detto che debbano far scoppiare tutto, ma si può passare a fare altro. L'errore è rappresentat da una classe a tutti gli effetti. Per esempio, `NullPointerException` mostra tutta le chiamate stack, e quando viene lanciata il programma viene sospeso. Se non è gestita, continuo a "uscire" a cascata dai mvari metodi, fino ad arrivare al main e quindi a uscire dal programma. La root di tutti gli errori è la classe `Throwable`, che fa davvero poco, si può costruire con un `String message`. (Essenziale la gestione con mesaggi belli esplicativi). Oltre al mex x'è il `setStackTrace`, che è quello che mmostra tutte le chiamate.
+
+### Errore e Eccezione
+Errore è davvero serio, non può riprendere l'eccezione del programma, al massimo stampo log e facio il minimo indispendsbile. Eccezione è qualcosa di fgestibile, si pò catturare e continuare l'exec normale. Per esempio, La fine della memooria è assolutamente un errore, il passaggio di un valore null a un metodo che richiede un oggetto èpò essere sia un errore che un'eccezione, a seconda del caso. Un bot telegram che non riesce a leggere un messagiogio è unecczione, perché non deve per forza scoppiare, basta che continui a leggere gli altri, almeno non muore del tutto.
+
+È bello che le eccezioni siano classi percHé possono essere estese. Meglio non estendere throwable, ma exception. 
+
+```Java
+public class MissingFigureException extends Exception {
+    // serve costruttore con stringa per il messaggio. estende la classe exception che già lo ha
+    public MissingFigureException(String message){
+        super(message);
+    }
+}
+
+// ... 
+public FightBetweenFigure (Figure c1, Figure c2) throws MissingFigureException {
+    if (c1 == null || c2 == null){
+        throw new MissingFigureException("non posson essere null - o meglio, messaggio esplicativo del problema")
+    }
+    // continuazione funzione
+}
+```
+
+È essenziale che il metodo segnali nella firma quale eccezione deve lanciare, altrimenti ha problemi a compilazione. è una pigna in culo perché anche tutti i metodi pafre devono dichiararlo. Quando invoco un metodo che rischia di lanciare eccezioni, devo usare il `try-catch`. Se sono 100% sicuro che quando chiamo un metodo non gli sto passando roba null, posso metterci nel catch un throw error. L'error è bene che abbia nel costruttore sia il campo `String message` che un `Throwable exc`: posso passare l'eccezione all'errore, è utile per vedere se ci sono eccezioni lanciate dove non dovrebbero essere lanciate. 
+Per gli errori, non è necessario dichiararli in firma, esistono infatti due sottoclassi di Throwable che non richiedono la dichiarazione: `Errors` e `RuntimeException`. Queste ultime sono tutte le eccezioni comuni invocate dalla VM (sarebbe troppo verboso dichiararle tutte), tipo il segfault, divisione per zero etc. `RuntimeException` è sottoclasse di Exception. Vengono detto unchecked. La nostra `MissingFigure` estende exception, non runtimeEsception.
+Nel Javadoc, esiste il tag `@throws` per commentare l'eccezione. 
+
+### try-catch
+iblocchi sono `try`, `catch` e `finally`, ovvero "alla fine esegui sta cosa in ogni caso" (tipo chiudere file aperti). Esiste anche il try con chiusura automatica in cui non serve specificare il catch o il finally, perché tutti gli oggetti di tipo Closeable (I/O) sono chiusi e le risorse automaticamente rilasciate
+
+### Assertion
+Controllo che una condizione sia vera.
+`assert c1!=null && c2!=null`. Che succede se l'asserzione è falsa? scoppia tutto. PercHé ciò accada è necessario specificare al compilatore di autorizzare e controllare le assertion (`-ea` come parametro). Sono condizioni, anche molto costose, che sono controllate solo in fase di sviluppo e test, in produzionie sono ignorate. Se un assertion accade l'exec viene interrotta, lancia un error non un'eccezione. se dopo la condizione si mette `: "mex"`, si passa il mex nel messaggio d'errore.
+
+## Annotations
+Cosa sono i tag che abbiamo visto sopra le funzioni tipo `@override`? annotazioni. Sono informazioni che possono assere attaccate a diversi elementi degli oggetti (normalmente metodi e parametri). Sono brevi info sntentiche e standard. Il tag Override è una specie di messaggio al compilatore, che fa il controllo e ti segnala che c'è qualcosa che non va se stai sbagliando. È un controllo diretto col compilatore. Altro tag utile è il `@deprecated`, per un metodo che i serve tenere per retrocompatibilità ma non è più usato; si può anche aggiungere un `(since = '2.0')`. Un'annotazione no è solo un tag, ma aggiunge anche inofo inpiù, come per esempio apunto il since. Possiamo anche definire delle annotation personali. Annotation è un interfaccia. in un file a parte si definisce
+```JAVA
+@interface Speed {
+    String type() default "km/h";
+    boolean forward();
+}
+```
+e poi
+```Java
+public class Vehicle {
+    @Speed(forward = true)
+    private double speed;
+
+    public Vehicle(@Speed(type = "m/s", forward = true) double in){/*...*/}
+
+    @Speed(forward = true) public double getSpeed() {/*...*/}
+    public void brake (@Speed(forward=false) double a) {/*...*/}
+}
+```
+Si noti che nell'interfaccia `@interface Speed {}` i `type` e `forward` sono a tutti gli effetti dei campi, anche se per qualche motivo la scelta di java è stata di mettere anche le parentesi (idk, java fa cagare ogni giorno di più). 
+Posso anche limitare i target dell'nnotazione. Come? con un'annotazione sull'annotazione, ovvero `@target({Element.tyoe.FIELD, etc})`.
+
+Posso poi specifiacre cosa farmene al momeno di compilazione: `@retention`:
+* SOURCE: come se fosse un commento, viene scartato in toto dal compilatore
+* CLASS: lasciato nel javadoc ma non visibile al runtime
+* RUNTIME: vidsibile sia in doc che a runtime. Utile anche perché si possono specificare annotazioni di tipo "test" e poi ci sono dei framework che fan andare tutti i metodi con quel tag. La retention può quindi essere vista a runtime, ma vedremo sta cosa nella prox lezione. 
+
+Un'altra annotazione interessante è `@SuppressWarnings`: Toglie i warnings generati dal compilatore. richiede un argomento, come lista di stringhe, su cosa sopprimere ("all", "unused" etc). Un argomento non riconosciuto non genera errore. Caso d'uso pratico è con la reflaction.
+
+Altro: `JUnit test`: Framework to urn tests on java programs. It relies on several types of annotation:
+* `@Test` specifies a method is a test
+* `altre annotation`
+
+```Java
+public class FighterTester {
+    
+    @Test 
+    public void test1(){
+        Sword w1 = new Sword(10);
+        Armor a1 = new Armor(2);
+        Figure f1 = new Fighter(w1, a1);
+        Assertions.assertTrue(figure1.isAlive()); 
+    }
+}
+```
+Posso eseguire la classe usando il framework junit. Durante l'esecuzione prende tutti i metodi con scritto @test, controlla tutti gli assert in un unica volta e ritorna il risultato: `Test passed: 1, test failed: n`. JUnit è un framework, che invoca i nostri metodi tramite reflection, che vedremo.
+
+Altro: `JAXB`: libreria per salvare una libreria in file, serializzato in formato XML. fino a java8 era nella libreria core. Per prima cosa uso `@XmlRootElement`, poi per ogni pezzo dell'oggetto posso scegliere se salvarlo come `@XmlElement` o `@XmlAttribute`. Creo poi i metodi `marshall` e `unmarshall` che sono quelli che caricano i file. (marshall salava su disco, unmarshall legge un file e ritorna un oggetto)
+
+## Reflection
+Le annotazioni sono utili perché permettono un'accesso programmatico al codice, tramite reflection. È contenuta nella libreria standard di java su `java.lang.reflect`. Tornando alla classe object, posso invocare uno dei metodi predefiniti: `Class<?> getClass()`: ritorna il tipo .class. Esiste nella libreria standard la classe `Class`. Ci rappresenta la struttura delle classi. tramite questo oggetto posso chiedere le interfacce, la superclasse, le annotazioni, i costruttori, i campi, i metodi, etc etc. La reflection vuole preservare l'encapsulation. Per quelli con visibilità ridotta esiste il metodo specifico `getDeclaredMethod` (oltre a metod, anche field, etc).
+Nel momento in cui ho un field in manok, posso anche settarlo. se non ho accesso al campo, ci butto un Declared e posso leggerlo, però non posso settarlo. Come fa JAXP? esiste `setAccessible(true)` e in pratica si sputtana l'encapsulation dei campi. Il limite dell'accesso rimane comunque all'interno del modulo. Tramite reflection posso vdere com'è fatta dentro una libreria, che non è proprio il massimo. Visti i campi, i metodi? posso eseguirli (da qui il "ignora warning unused" -> non lo uso in modo esplicito ma lo guardo con reflection). 
+```Java
+Method m1 = cls.getDeclaredMethod("getInfoDefense");
+Object result = m1.invoke(/*args*/);
+```
+(si noti che ritorna un int warpped, non primitivo).
