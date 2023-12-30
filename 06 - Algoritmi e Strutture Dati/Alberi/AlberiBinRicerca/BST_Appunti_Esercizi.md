@@ -162,3 +162,103 @@ ipotesi forti a disposizione:
 * almeo due nodi presenti
 
 Visito l'albero in modo smmetrico, così ordino l'insieme delle chiavi -> la distanza minima tra due chiavi va cercata nelle coppie successive e non in tutte le coppie disponibili. È una banale visita + un for su array -> 2N -> Theta di N
+
+
+```rust
+fn DistanzaMinima(T){
+    x = Tree_min(T.root)
+    y = Tree_successor(x)
+    mind = y.key-x.key
+    x = Tree_successor(y)
+    while x != NIL
+        diff = x.key - y.key
+        if diff < mind:
+            mind = diff
+        y = x
+        x= TreeSUccesor(y)
+    return mind
+}
+```
+
+L'attraversamento simmetrico di un albero binario di ricerca di N nodi può essere implementato trovando l'elemento minimo nell'albero con la procedura tree_min e poi effettuando n-1 chiamate di tree_successor. Viene eseguito in tempo THETA(n).
+DIMOSTRAZIONE BLANDA:
+la chiamata  atree min seguita da n-1 chiamate a tree.succ esegue esattamente una visita simmetrica come fa la procedura in order. Infatti, INORDER stampa prima il minimo (il valore di tree_min) e poi per definizione il tree_succ è il prox nodo di una visita simmetrica. 
+l'algortmo richiede come minimo Omega(n) perché fa n chiamate di funzione. Inoltre attraversa al più 2 volte gli n-1 archi dell'albero, da cui O(n). PercHé al più due volte? una volta scendendo e una volta risalendo. INfatti:
+sia (u, v) un generico arco. Partendo dalla radice dobbiamo attraversare (u, v) da u a v prima di attraversarlo nel senso opposto. L'unico modo di attraversarlo da u a v (downword) è nella funzione tree_min, mentre upword nella tree_succ quando il nodo non ha un figlio destro.
+
+# Esercizi
+## 1
+Scrivere una funzinoe effic che, dato una alb bin ric verifica se è sddisfatta la seguente condizione: per ogni intero k se le chiavi k e k+2 sono nellì'albero, allora anche al chiave k+1 è nell'albero
+
+come faccio a verificarla? basta verificare quando non è veriicata: se ho una chiave k e il successore è k+2, non è verificata
+
+```rust
+fn check(T) {
+    u = t.root
+    if u == NIL
+        return true
+    u = Tree_min(u)
+    ok = true
+    while(u != NIL && ok)
+        succ = Tree_succ(u)
+        if (succ != NIL && succ.key == u.key+2)
+            ok = false
+        else
+            u = succ
+    return false
+}
+```
+
+T exec è O(n).
+
+## 2
+Dato un alb bin, scrivere una f che controlli se l'albero è un alb bin ric
+
+usiamo la definizione di albbinric 
+
+```rust
+fn checkBST(u){
+    if u == NIL
+        return true
+    else 
+        < ris, min, max > = check_aux(u)
+    return ris
+}
+fn check_aux(u){
+    if (u.left == NIL)
+        rissx = true
+        minsx = u.key
+        maxsx = u.key
+    else 
+        <rissx, minsx, maxsx> = check_aux(u.left)
+    if u.right == NIL
+        risdx = true
+        mindx= u.ey
+        maxdx = u.key
+    else 
+        <risdx, mindx, maxdx> = check_aux(u.right)
+    if !rissx || !risdx || maxsx>u.key || mindx<u.key
+        return <false, -, ->
+    else 
+        return <true, minsx, maxdx>    
+}
+```
+
+La complessità è theta(n) in quanto visita.
+
+in alternativa, usiamo il teo appena dimostrato che una visita simmetrica non decrescente implica un BST
+```rust
+fn check(u){
+    if u == NIL
+        return true
+    ok = true 
+    u = Tree_min(u)
+    while (u!= NIL && ok)
+        succ = Tree_succ(u)
+        if (succ!=NIL and succ.key < u.key)
+            ok = false
+        else 
+            u=succ
+    return ok
+}
+```
