@@ -32,7 +32,7 @@ Quando il ciclo termina, j assume il  A.length+1. L'invariante è vero anche all
 **DIM** ordina in loco xk ho un solo elemento memeorizzato fuori dall'array di input.
 Il ciclo esterno è eseguito n-1 volte ed esegue il numero di confronti espresso da 
 
-$$ \sum_{j=2}^{n}j-1 = \sum_{k=1}^{n-1}k = \frac{(n-1)n}{2} $$
+$$ \sum_{j=2}^{n}j-1 = \sum_{k=1}^{n-1}k = \frac{(n-1)n}{2} $$ 
 
 
 il caso migliore? array già ordinato in ordine crescente, divetanta Theta(n)
@@ -147,25 +147,25 @@ cn -- c(n-1) -- T(n-2)
 cn -- c(n-1) -- c(n-2) -- ..... -- T(0)
 
 
-$ T(n) =  \sum_{i=1}^{n}ci + T(0) = c*\frac{n(n+1)}{2} + T(0) = \Theta(n^2) $ 
+ $$ T(n) =  \sum_{i=1}^{n}ci + T(0) = c*\frac{n(n+1)}{2} + T(0) = \Theta(n^2) $$ 
 
-caso migliore: partizionamenti bilanciati, diciamo n/2, la ricorrenza è la stessa del mergesort per cui, col master theorem, $ \Theta(n\log(n)) $ 
+caso migliore: partizionamenti bilanciati, diciamo n/2, la ricorrenza è la stessa del mergesort per cui, col master theorem, $\Theta(n\log(n))$ 
 
 Ma quindi il caso medio? non guardiamo dimostrazione formale, ma è più vicino al caso migliore. poniamo che ci sia una partizione proporzionale, tipo 1:9. la ricorrenza è T(n) = T(n/10) + T(9n/10) + cn. sviluppiamo al ricorrenza:
 
 cn -- cn/10 + c9/10 + cn -- cn/100 + 9cn/100 + 9cn/100 + 81cn/100 -- 
 
-ogni costo è cn. qual'è l'altezza del cammino? $ \log_{10}n $, da cui O(nlogn).
+ogni costo è cn. qual'è l'altezza del cammino? $\log_{10}n$ , da cui O(nlogn).
 
 E cosa succede invece se ho una partizione fortunata e una no? Quindi, alternanza di partizioni buone e pessime.
 Posso fare un sistema di ricorrenze
-$ L(n) = 2U(n/2) + \Theta(n) $      //lucky
+ $L(n) = 2U(n/2) + \Theta(n)$      //lucky
 
-$ U(n) = L(n-1) + \Theta(n)$        //unlucky
+ $U(n) = L(n-1) + \Theta(n)$        //unlucky
 
-$ L(n) = 2(L(n/2-1) + \Theta(n/2))  + \Theta(n/2)$
+ $L(n) = 2(L(n/2-1) + \Theta(n/2))  + \Theta(n/2)$ 
 
-$ L(n) = 2(L(n/2-1) + \Theta(n/2)) $ dimostrabilmente $\Theta(n\log(n))$
+ $L(n) = 2(L(n/2-1) + \Theta(n/2))$ dimostrabilmente $\Theta(n\log(n))$ 
 
 ## Ottimizzazioni
 
@@ -276,10 +276,10 @@ Due tipi di heap:
 2. min_heap, che ha la proprietà simmetrica a questa appena vista
 
 ## Heap:
-* L'altezza di un heap di n elementi è parte intera inferiore di logn. DIM: poiché un heap è un albero quasi cokmpleto, se ha un'altezza h allora haun numero di nodi compreso tra $ \sum_{i=0}^{h-1}2^i+1 = 2^h $ e $ \sum_{i=0}^{h}2^i = 2^{h+1}-1 $
-  siccome $ h <= \log(n) <h+1 $, allora $\lfloor\log(n)\rfloor$.
-* Nell'array che rappresenta un heap di n elementi, le foglie sono i nodi con indici da $\lfloor (n/2) \rfloor +1 $ a $n$.
-* Ci sono al massimo $\lceil \frac{n}{2^{h+1}} \rceil $ nodi di altezza h in un qualsiasi heap di n elementi. 
+* L'altezza di un heap di n elementi è parte intera inferiore di logn. DIM: poiché un heap è un albero quasi cokmpleto, se ha un'altezza h allora haun numero di nodi compreso tra $\sum_{i=0}^{h-1}2^i+1 = 2^h$ e $\sum_{i=0}^{h}2^i = 2^{h+1}-1$ 
+  siccome $h <= \log(n) <h+1$ , allora $\lfloor\log(n)\rfloor$ .
+* Nell'array che rappresenta un heap di n elementi, le foglie sono i nodi con indici da $\lfloor (n/2) \rfloor +1$ a n.
+* Ci sono al massimo $\lceil \frac{n}{2^{h+1}} \rceil$ nodi di altezza h in un qualsiasi heap di n elementi. 
 
 ### max_heapify
 procedura che serve per mantenere la proprietà max_heap
@@ -319,16 +319,16 @@ ANALISI: Limite superiore: Ogni chimata di max_heapify costa O(logn) e ci sono O
 
 Assumo di applicare la max_heapify a tutti i nodi dell'albero (maggiorazione). 
 per il lemma 3, io ho 
-$$ \sum_{h=0}^{\lfloor \log n \rfloor}\lceil \frac{n}{2^{h+1}} \mathcal{O}(h) \rceil $$
+ $$  \sum_{h=0}^{\lfloor \log n \rfloor}\lceil \frac{n}{2^{h+1}} \mathcal{O}(h) \rceil  $$ 
 vado a fare un'ulteriore maggiorazione
-$$ \mathcal{O}(\sum_{h=0}^{\lfloor \log n \rfloor}\lceil \frac{h}{2^{h}}  \rceil) $$
+ $$ \mathcal{O}(\sum_{h=0}^{\lfloor \log n \rfloor}\lceil \frac{h}{2^{h}}  \rceil) $$ 
 è una sommatoria nota (+inf)
 
-$$ \sum_{h=0}^{\infin}hx^h = \frac{x}{(1-x)^2} per |x|<1 $$
+ $$  \sum_{h=0}^{\infin}hx^h = \frac{x}{(1-x)^2} per |x|<1 $$ 
 affinché io possa usare sta sommatoria, pongo x = 1/2
 
 maggioro infine ulteriormente:
-$$ \mathcal{O}(\sum_{h=0}^{\infin} \frac{h}{2^{h}})= \mathcal{O}(2n) = \mathcal{O}(n) $$
+ $$  \mathcal{O}(\sum_{h=0}^{\infin} \frac{h}{2^{h}})= \mathcal{O}(2n) = \mathcal{O}(n) $$ 
 Il tempo di esecuzione di build_max_heap è O(n).
 
 Definita la struttura, posso finalmente implemenare un algoritmo di ordinamento:
@@ -367,7 +367,7 @@ andando a iterare così, estraggo sempre gli elementi massimi.
 Quando il ciclo termina, i = 1, sostituendo nell'invariante il valore 1, risulta che il sottoarray a[1] è un maxheap che contiene l'elemento più piccol di A di partenza, e il sottoarray a[2..n] contienegli n-1 elementi più grandi di a[1..n], odinati -> ecco che il vettore risulta ordinato.
 
 ### complessità
-build:max_heap costa n. il ciclo viene eseguito n-1 volte, e contene max_heapify applicata sempre alla radice dell'albero. da cui $T(n) = \mathcal{O}(n)+\mathcal{O}(n\log n) =\mathcal{O}(n\log n)$
+build:max_heap costa n. il ciclo viene eseguito n-1 volte, e contene max_heapify applicata sempre alla radice dell'albero. da cui $$ T(n) = \mathcal{O}(n)+\mathcal{O}(n\log n) =\mathcal{O}(n\log n) $$ 
 
 L'algoritmo trasforma il vettore di partenza in uno heap, quindi è de facto in loco.
 L'algoriemo heapsort ordina in loco n elementi eseguendo nel caso peggiore nlogn confronti. Prende la caratteristica migliore di insertionsort (loco) e di mergesort (complessità)e le unisce. Però una implementazione efficiente del quicksort come quella che abbiamo visto risulta comunque essere mediamente migliore (non nel caso peggiore come abbiamo visto).
