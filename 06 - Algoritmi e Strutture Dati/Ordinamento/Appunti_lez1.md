@@ -1,2 +1,0 @@
-# Algoritmi di ordinamento
-
