@@ -665,3 +665,48 @@ come numerare le versioni di una libreria?
 `<major release>.<minor>[.<bugfix>]`
 cambiare major singnifica cmbiare interfaccia, non è detto che sia retrocompatibile, metodi deprecati possono essere eliminati etc. La minor di solito aggiunge feature rimanendo retrocompatibile. Il bugfix non cambia nulla se non che aggiunge patch. Di norma servono per le vulnerabilità. Esistono poi le versioni taggate come `beta`, tipo preview. Le versioni precedenti vanno mantenute come dichiarato nel contratto.
 Come si builda una libreria? ci possono essere varie build, tipo test, release etc. Il build significa passare da sorgente a binario. si usano spesso build automation, in prticolare gradle. È una specie di makefile esponenziato, che crea release. Attenzione a usare librerie perché si tende a ingrandire un sacco la release
+
+# Appunti 02/01/2024 (Lecture 24 - ultima lezione)
+
+## gradle
+crea file e nomina build.gradle. 
+Ci sono i template già costruiti. Ci sono una serie di task che vengono importati in automatico. si possono definire varie versioni, come per esempio qeuelle di test( con commenti debug) e quelle release. Un problema critico è che le libreria è scaricata la prima volta e poi salvata in cache. Se non la trova nella cache la riscarica. Problema? libreira 1.0 buggata, la bugfix viene chiamata di nuovo 1.0 e siccome ho la 1.0 vecchia in cache non ricevo il fix.
+
+## Summary
+1. encaspsulation
+2. polimorfismo
+3. java in action (classi, tipi, reflecion, eccezioni)
+
+### 1
+classe -> oggetto istaniato con new.
+Le classi fanno parte di pakages, con i modificatori di visibilità dico chi può vedere cosa
+
+* private: class->class
+* default: class->package
+* public: class->everybody
+
+i packages sono messi in un contenitore (per esempio la libreria) con estensione jar, in cui si trova anche il javadoc e i contratti
+
+### 2
+* Unqualcosa ererdita tutti i membri di una classe quando la estende
+* un ualcosa può sosttituire qhalcos'altro se ha un'interfaccia più grande
+* una sottoclasse può sostituire una superclasse
+* i tipi sono dichiarati, statici e strong.
+* i tipi possono essere dinamici solo in termini di sostituzione -> una sottoclasse è sottotipo di una superclasse. 
+* polimorfismo: lo stesso simbolo ha comportamenti diversi a seconda dell'oggetto che lo invoca
+* una classe si estende, un interfaccia si implementa
+* ereditarietà singola
+* iterable: coniene un iteratore
+* collection: sottotipo iterabile che permette di aggiunsgere/togliere elementi
+* varie sottoclassi default 
+
+### 3 
+Boolean, Character, Number, String sono tipi wrapped che rappresentano i primitivi come sottoclassi di Object. In questo contesto, Integer, Byte, Double, Float, LOng, Short estendono Number. 
+
+Errori e Ecceizoni sono sottoclassi di Throwable. La prima è definitiva, la seconda recuperabile. RuntimeException è sottoclasse di Exception e non richiede di dichiararne il possibile lancio nella firma del metodo. Il blocco finally nel try-catch viene eseguito sempre e comunque a prescindere.
+
+Annotazioni: va bene il sistema di tipi statico, forte etc, ma voglio avere la possibilità di taggare i metodi con qualche nome ed eseguirli tramite tag. Annotazione definita con @interface, contiene campi (anche se scritti con le parentesi), che può essere aggiunta a metodi, classi, campi etc. Con la reflection posso dire dammi la classe, dammi il costruttore, dato un metodo eseguilo, dato un costruttore crea una nuova istanza etc.
+
+# Esame 
+30' prova teorica senza materale. 3 domande, 50% voto.
+1h00' prova pratica con materiale solo cartaceo

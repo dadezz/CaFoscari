@@ -333,7 +333,7 @@ Il tempo di esecuzione di build_max_heap è O(n).
 
 Definita la struttura, posso finalmente implemenare un algoritmo di ordinamento:
 ```cpp
-Heapsord(A){
+Heapsort(A){
     build_max_heap(A)
     for i = a.length down to 2
         scambia(a[1], a[i])
