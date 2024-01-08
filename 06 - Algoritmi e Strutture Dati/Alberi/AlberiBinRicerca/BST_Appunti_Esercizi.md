@@ -5,7 +5,7 @@
 sempre a sinisrta:
 ```rust 
 Tree_min(x) {
-    while x-left != NIL
+    while x->left != NIL
         x = x.left
     return x
 }
@@ -66,7 +66,7 @@ fn Tree_insert(T, z){
 * se z ha un unico figlio, stacchiamo z creando un collegamento tra suo figlio e suo padre
 * per eliminare un nodo "completo", bisogna sostituirlo col suo successore.
 
-definiamo un'operazione ausiliaira: spostare sottoablero con radice in v nella posizione del sottoablero con radice in v
+definiamo un'operazione ausiliaira: spostare sottoablero con radice in v nella posizione del sottoablero con radice in u
 
 ```rust
 fn Transplant(T, u, v){
