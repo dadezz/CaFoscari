@@ -1,0 +1,543 @@
+---
+title: "Lab 2: Analisi descrittive"
+subtitle: "Analisi dei Dati 2023-24"
+author: "Cristiano Varin"
+output:
+  html_document: 
+    df_print: paged
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = TRUE)
+```  
+
+# Sintesi numeriche 
+
+Iniziamo utilizzando i dati sui tempi di elaborazione dei processi presentati nel Capitolo 8 del Baron (2014).
+
+Leggiamo i dati: 
+```{r }
+cpu <- scan("CPU-times.txt")
+cpu
+``` 
+Calcoliamo la media:
+```{r }
+mean(cpu)
+```
+La mediana:
+```{r }
+median(cpu)
+```
+Il primo, il secondo e il terzo quartile, che corrispondono ai quantili di ordine 0.25, 0.5 e 0.75:
+```{r }
+## primo quartile
+quantile(cpu, probs = 0.25, type = 2)
+## secondo quartile
+quantile(cpu, probs = 0.5, type = 2)
+## terzo quartile
+quantile(cpu, probs = 0.75, type = 2)
+```
+L'argomento `type = 2` nella funzione **quantile** è necessario per calcolare i quantili in modo coerente con il libro di testo Baron (2014). Esistono infatti diversi algoritmi per calcolare i quantili e quello usato di default da **R** porta a risultati diversi, come potete vedere di seguito:
+```{r }
+## primo quartile, calcolo di default
+quantile(cpu, probs = 0.25)
+## secondo quartile, calcolo di default
+quantile(cpu, probs = 0.5)
+## terzo quartile, calcolo di default
+quantile(cpu, probs = 0.75)
+```
+La varianza:
+```{r }
+var(cpu)
+## verifica
+sum((cpu - mean(cpu)) ^ 2) / (length(cpu) - 1)
+```
+La deviazione standard:
+```{r }
+sd(cpu)
+```
+Lo scarto interquartile:
+```{r }
+Q1 <- quantile(cpu, probs = 0.25, type = 2)
+Q3 <- quantile(cpu, probs = 0.75, type = 2)
+Q3 - Q1
+## o direttamente con la funzione IQR
+IQR(cpu, type = 2)
+```
+ 
+# Sintesi grafiche
+
+Nella seconda sezione utilizzando sempre i dati presentati nel Capitolo 8 del Baron (2014) per mostrare come disegnare alcuni grafici di base con **R**.
+
+## Istogrammi
+La funzione `hist` disegna di *default* l'istogramma delle frequenza (assolute):
+```{r}
+isto <- hist(cpu, main = "Tempi elaborazione CPU", xlab = "Tempo (sec)", 
+ylab = "Frequenze", col = "steelblue")
+``` 
+
+Il comando precedente ha salvato l'istogramma nell'oggetto `isto` per esplorare le sue componenti:
+```{r }
+names(isto)
+```
+Le componenti dell'oggetto `isto` possono essere estratte con l'operatore `$`:
+```{r }
+## osservazioni per intervallo
+isto$counts
+## intervalli (breaks)
+isto$breaks
+``` 
+L'istogramma è stato disegnato con il colore `steelblue` che verrà usato molto spesso nei grafici di questo corso. Se volete variare i colori dei vostri grafici potete consultare questa guida: http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf.   
+
+Per ottenere l'istogramma delle densità bisogna usare l'opzione `freq = FALSE`:
+```{r }
+isto <- hist(cpu, freq = FALSE, main = "Tempi elaborazione CPU", xlab = "Tempo (sec)", ylab = "Densita'", col = "steelblue")
+```
+ 
+Le densità che appaiono nell'istogramma sono:
+```{r }
+isto$density
+```
+Le densità sono pari alle frequenze relative divise per la dimensione degli intervalli:
+```{r }
+freqrel <- isto$counts / sum(isto$counts)
+freqrel / 20
+```
+Dividere per la dimensione degli intervalli è importante se gli intervalli hanno larghezze diverse.  
+
+L'opzione `breaks` permette, in principio, di modificare il numero di intervalli con cui è disegnato l'istogramma. In pratica, **R** prende l'indicazione fornita con `breaks` come un suggerimento e sceglie un numero di intervalli vicino che soddisfi delle regole interne: 
+```{r }
+isto <- hist(cpu, freq = FALSE, main = "Tempi elaborazione CPU", xlab = "Tempo (sec)", ylab = "Densita'", col = "steelblue", breaks = 12)
+``` 
+ 
+Vediamo quanti intervalli sono stati, effettivamente, calcolati da `hist`:
+```{r }
+isto$breaks
+length(isto$breaks)
+```
+Spesso è utile sovrapporre all'istogramma una stima della funzione di densità calcolata con la funzione `density`: 
+```{r }
+hist(cpu, freq = FALSE, main = "Tempi elaborazione CPU",  xlab = "Tempo (sec)", ylab = "Densita'", col = "steelblue", breaks = 12)
+lines(density(cpu), col = "red", lwd = 2) ## linea con spessore doppio (lwd = 2)
+```
+
+
+## Grafici a scatola (boxplot)
+Il boxplot dei tempi di elaborazione si può disegnare con la funzione `boxplot`:
+```{r }
+bp <- boxplot(cpu, main = "Tempi elaborazione CPU", col = "steelblue")
+```
+
+Le statistiche utilizzate per disegnare il boxplot si possono ottenere con la funzione `summary`:
+```{r }
+summary(cpu)
+```
+In realtà, però, le statistiche usate dalla funzione `boxplot` sono leggermente diverse:
+```{r }
+bp$stats
+```
+Lo slot `stats` dell'oggetto `bp` contiene, nell'ordine, il "baffo" inferiore, il primo quartile, la mediana, il terzo quartile, il "baffo" superiore. Il baffo superiore si ferma a 89 poiché il boxplot non disegna punti oltre il seguente limite:
+```{r }
+59 + 1.5 * (59 - 34)
+```
+e l'osservazione più grande che non supera questo limite è appunto
+```{r }
+max(cpu[cpu <= 96.5])
+```
+Quest'ultimo comando calcola il massimo fra tutti i tempi di elaborazione non superiori a 96.5. Per estrarre il sottoinsieme dei tempi non superiori a 96.5 è stato usato l'operatore `[]`. 
+
+Possiamo aggiungere al boxplot la media dei tempi di elaborazione con la funzione `points`: 
+```{r }
+boxplot(cpu, col = "steelblue")
+points(mean(cpu), pch = "+") ## pch significa "point character"
+```
+
+
+Il file **CPU-times-2.txt** contiene un secondo campione di tempi di elaborazione: 
+```{r }
+cpu2 <- scan("CPU-times-2.txt")
+```
+Possiamo confrontare visivamente i due campioni attraverso due boxplot appaiati:  
+```{r }
+boxplot(cpu, cpu2, col = c("steelblue", "lightblue"), names = c("Campione 1", "Campione 2"))
+```
+
+Nell'ultima chiamata a `boxplot` abbiamo usato la funzione `c` ("combine") per creare un vettore di due colori, `c("steelblue", "lightblue")`, e un vettore di due etichette, `c("campione 1", "campione 2")`.
+
+## Grafici a dispersione
+
+Il file **antivirus.csv** contiene i dati discussi nel capitolo 8 del Baron (2014) sulla relazione fra l'utilizzo degli antivirus nell'ultimo mese e i virus (*worms*) individuati. Possiamo importare i dati in **R** con la funzione `read.csv`:
+```{r }
+antivirus <- read.csv("antivirus.csv")
+antivirus
+```
+Grafico a dispersione del numero di *worms* in funzione del numero di volte che l'antivirus è stato eseguito nell'ultimo mese:
+```{r }
+with(antivirus, plot(x, y, xlab = "Esecuzioni antivirus", ylab = "Worms individuati"))
+```
+
+Siccome ci sono molte osservazioni ripetute il grafico non coglie davvero la struttura dei dati. Possiamo ovviare a questo problema aggiungendo un piccola quantità di errore casuale ad ogni osservazione con la funzione `jitter` ("agitato"):
+```{r }
+with(antivirus, plot(jitter(x), jitter(y), xlab = "Esecuzioni antivirus", ylab = "Worms individuati"))
+```
+
+# I prezzi delle case
+
+In questa terza sezione vengono illustrate le analisi esplorative di base su un campione di dati del mercato immobiliare di una città americana. I dati, contenuti nel file **HousePrice.csv**^[Dati provenienti dal testo *Jank, W. (2011)*. Business Analytics for Managers. Springer}.], comprendono le seguenti informazioni: 
+
+- `Price` prezzo dell'abitazione in dollari americani;
+- `SqFt` dimensione dell'abitazione in piedi quadri;
+- `Bedrooms` numero di stanze da letto;
+- `Bathrooms` numero di stanze da bagno; 
+- `Offers` numero di offerte che ha ricevuto l'abitazione da quando è stata messa sul mercato;
+- `Brick` indicatore se l'abitazione ha i muri in mattone;
+- `Neighborhood` il quartiere dove si trova l'abitazione:  `East`, `West` o `North`. 
+ 
+
+Leggiamo i dati con la funzione `read.csv`:
+```{r }
+house <- read.csv("HousePrices.csv")
+```
+Qualche informazione di partenza sui dati:
+```{r }
+## dimensione del dataset
+dim(house)
+## numero di righe, numero di colonne
+nrow(house)
+ncol(house)
+## prime righe del dataset
+head(house)
+## un po' di piu'...
+head(house, 10)
+## ultime righe
+tail(house)
+## nomi delle colonne
+names(house)
+```
+Se avete bisogno di più dettagli sulla sintassi di un commando **R**, potete invocare la guida in linea:
+```{r eval=FALSE}
+help("tail")
+## oppure
+?"tail"
+```
+
+Come di consuetudine in statistica, le righe del dataset corrispondono alle diverse unità statistiche, ovvero nel caso specifico le abitazioni, mentre le colonne corrispondono alle variabili osservate sulle unità.  
+
+Per estrarre il prezzo della ventesima abitazione si può utilizzare l'operatore `[]` specificando l'unità (riga 20) e la variabile (colonna 2):
+```{r }
+house[20, 2]
+```
+oppure dichiarando esplicitamente la variabile di interesse:
+```{r }
+house[20, "Price"]
+```
+Per estrarre tutte le informazioni relative alla ventesima abitazione bisogna indicare esclusivamente la riga 20:
+```{r }
+house[20, ]
+```
+Per estrarre invece tutte le osservazioni relative alla variabile `Price` che corrisponde alla seconda colonna si indica esclusivamente la colonna 2:
+```{r }
+head(house[, 2])
+```
+oppure usando il nome della variabile:
+```{r }
+head(house[, "Price"])
+```
+o ancora con l'operatore `$`:
+```{r }
+head(house$Price)
+```
+Usiamo ora la funzione `summary` per riassumere il dataset:
+```{r }
+summary(house)
+```
+L'output della funzione `summary` evidenzia che il dataset contiene sei variabili numeriche (` HomeID`, `Price`, `SqFt`, `Bedrooms`, `Bathrooms`, `Offers`) e due variabili categoriali (`Brick` e `Neighborhood`).  
+
+I "riassunti" delle variabili numeriche riportano il minimo, il massimo, i quartili e la media. Le due variabili categoriali sono state lette come stringhe di caratteri (`Class: character`) ma per le analisi successive è meglio codificarle come variabili categoriali con la funzione `factor`:
+```{r }
+house$Brick <- factor(house$Brick)
+house$Neighborhood <- factor(house$Neighborhood)
+```
+Vediamo nuovamente il riassunto del dataset dopo la ricodifica delle variabili categoriali:
+```{r }
+summary(house)
+```
+L'output di `summary` ora riporta la distribuzione di frequenza per le variabili categoriali, ovvero la frequenza con la quale sono osservati i diversi livelli delle variabili categoriali: `No` e `Yes` per `Brick`; `East`, `North` e `West` per `Neighborhood`. 
+
+Avremmo potuto evitare di dover covertire `Brick` e `Neighborhood` to `factors` leggendo i dati con la funzione `read.csv` con l'opzione `stringsAsFactors = TRUE`:
+```{r}
+prova <- read.csv("HousePrices.csv", stringsAsFactors = TRUE)
+summary(prova)
+```
+
+Possiamo usare `summary` per riassumere separatamente ogni singola variabile, per esempio `Price`:
+```{r }
+with(house, summary(Price))
+```
+
+Disegniamo l'istogramma di `Price`:
+```{r }
+with(house, hist(Price, col = "lightblue"))
+```
+
+e il boxplot di `Price`:
+```{r }
+with(house, boxplot(Price, col = "lightblue"))
+```
+
+Ora istogramma e boxplot di `Price` nello stesso grafico:
+```{r }
+## per prima cosa suddividiamo la finestra grafica in 1 riga e 2 colonne
+par(mfrow = c(1, 2))
+## e quindi
+with(house, hist(Price, col = "lightblue"))
+with(house, boxplot(Price, col = "lightblue"))
+## torniamo alla finestra grafica non suddivisa
+par(mfrow = c(1, 1))
+```
+
+
+Calcoliamo la covarianza fra `Price` e `SqFt`:
+```{r }
+with(house, cov(Price, SqFt))
+## verifica
+with(house, sum((Price - mean(Price)) * (SqFt - mean(SqFt))) / (nrow(house) - 1))
+```
+e la correlazione fra  `Price` e `SqFt`:
+```{r }
+with(house, cor(Price, SqFt))
+```
+Possiamo controllare il numero di cifre significative della correlazione con la funzione `signif`:
+```{r }
+with(house, signif(cor(Price, SqFt), digits = 2))
+```
+Ora disegniamo il grafico a dispersione di `Price` rispetto a `SqFt` per visualizzare la relazione crescente fra prezzo e dimensione dell'abitazione:
+```{r }
+plot(Price ~ SqFt, data = house, pch = 20)
+```
+
+Vediamo ora il riassunto di `Bedrooms`:
+```{r }
+with(house, summary(Bedrooms))
+```
+Il boxplot di `Bedrooms` non è molto informativo...
+```{r }
+with(house, boxplot(Bedrooms, col = "lightblue"))
+```
+
+Siccome `Bedrooms` presenta solo quattro possibili valori, allora la sua distribuzione può essere più efficacemente riassunta da una tabella di frequenza:
+```{r }
+with(house, table(Bedrooms))
+```
+oppure usando le frequenze relative:
+```{r }
+tab.bed <- with(house, prop.table(table(Bedrooms)))
+tab.bed
+```
+La distribuzione di `Bedrooms` può essere rappresentata con un grafico a barre:
+```{r }
+with(house, barplot(tab.bed, col = c("white", "lightblue", "blue", "darkblue")))
+```
+
+La distribuzione di `Price` condizionatamente a `Bedrooms` può essere rappresentata con dei boxplot appaiati:
+```{r }
+boxplot(Price ~ Bedrooms, data = house, xlab = "Stanze da letto", ylab = "Prezzo")
+```
+
+Possiamo migliorare l'estetica del grafico precedente usando le tavolozze di colori (*color palettes*) disponibili con il pacchetto opzionale **RColorBrewer**. Per prima cosa dobbiamo caricare il pacchetto:  
+```{r eval=FALSE}
+## installiamo il pacchetto (solo la prima volta!)
+install.packages("RColorBrewer")  
+## carichiamo il pacchetto
+library("RColorBrewer")  
+```
+```{r echo=FALSE}
+library("RColorBrewer")
+```
+Ora disegniamo i boxplot appaiati con una tavolozza blu:
+```{r }
+boxplot(Price ~ Bedrooms, data = house, col = brewer.pal(4, "Blues"), xlab = "Stanze da letto", ylab = "Prezzo")
+```
+
+Calcoliamo la correlazione fra ``Price`` e ``Bedrooms``:
+```{r }
+with(house, cor(Price, Bedrooms))
+```
+Passiamo ora alla variabile categoriale `Neighborhood`:
+```{r }
+with(house, summary(Neighborhood))
+```
+Non ha ovviamente senso calcolare la media, la mediana o qualsiasi altra sintesi numerica per  `Neighborhood`:
+```{r }
+mean(house$Neighborhood)
+median(house$Neighborhood)
+```
+La distribuzione di frequenza di  ``Neighborhood`` può essere visualizzata con un grafico a barre:
+```{r }
+with(house, plot(Neighborhood, col = brewer.pal(3, "Greens")))
+```
+
+La distribuzione di ``Price`` condizionatamente a `Neighborhood` può essere riassunta con la funzione ``summary`` applicata ai livelli di `Neighborhood` tramite la funzione ``by``:
+```{r }
+with(house, by(Price, Neighborhood, summary))
+```
+Possiamo anche ottenere la distribuzione condizionata tramite l'operatore `[]`:
+```{r }
+## per esempio, i prezzi nel quartiere East
+with(house, summary(Price[Neighborhood == "East"]))
+```
+Infine, disegniamo i boxplot di `Price` condizionatamente ai livelli di `Neighborhood`:
+```{r }
+boxplot(Price ~ Neighborhood, data = house, col = brewer.pal(3, "Oranges"), ylab = "Prezzo", xlab = "Quartiere")
+```
+
+# I dipinti di Claude Monet
+
+Nell'ultima sezione lavoriamo su un dataset che contiene il prezzo d'asta a cui sono stati battuti dei dipinti del celebre pittore impressionista Claude Monet. 
+
+Leggiamo i dati:
+```{r}
+monet <- read.csv("monet.csv")
+```
+Iniziamo con le statistiche descrittive di base del prezzo di vendita:
+```{r}
+summary(monet$price)
+```
+Il prezzo di vendita dei dipinti varia da 10 mila dollari  a 33 milioni di dollari. Il prezzo di vendita medio è poco superiore ai 3 milioni di dollari, mentre il prezzo mediano è pari a 1,3 milioni di dollari. La differenza fra media e mediana indica che la distribuzione dei prezzi di vendita ha una asimmetria destra, come si vede nel seguente boxplot:
+```{r}
+with(monet, boxplot(price, col = "steelblue", ylab = "Prezzo [milioni $]"))
+```
+
+L'asimmetria può essere ampiamente ridotta considerando una trasformazione logartimica:
+```{r}
+with(monet, boxplot(log(price), col = "steelblue", 
+ylab = "Prezzo [log(milioni $)]"))
+```
+
+Vediamo come varia il prezzo di vendita del dipinto a seconda se sia o non sia firmato da Monet. Innanzitutto, notiamo che circa l'82% dei dipinti venduti sono firmati: 
+```{r}
+table(monet$signed)
+## frequenze relative
+prop.table(table(monet$signed))
+signif(prop.table(table(monet$signed)), digits = 2)
+```
+La distribuzione del prezzo di vendita condizionata alla firma mostra chiaramente che i dipinti firmati vengono venduti a prezzi decisamente superiori: 
+```{r}
+with(monet, by(price, signed, summary))
+```
+Il prezzo medio dei dipinti firmati è 3,3 milioni di dollari contro 1,8 per i dipinti non firmati, mentre i prezzi mediani sono 1,5 milioni di dollari  per i dipinti firmati e 0,4 milioni di dollari per i dipinti non firmati.
+
+I boxplot del prezzo di vendita condizionato alla firma risentono della forte asimmetricità della distribuzione dei prezzi:
+```{r}
+with(monet, boxplot(price ~ signed, col = c("tomato3", "steelblue"), 
+xlab = "Firmato?", ylab = "Prezzo [milioni $]"))
+```
+
+Un confronto visivo più efficace si ottiene passando alla scala logaritmica:
+```{r}
+with(monet, boxplot(log(price) ~ signed, col = c("tomato3", "steelblue"), 
+xlab = "Firmato?", ylab = "Prezzo [log(milioni $)]"))
+```
+
+La variabile ``signed`` può essere resa più espressiva modificando le etichette dei suoi livelli in modo che lo zero corrisponda a 
+``No`` e l'uno a ``Sì``:
+```{r}
+## signed e' una variabile numerica
+class(monet$signed)
+## trasformazione in variabile categoriale
+monet$signed <- factor(monet$signed)
+## livelli di signed
+levels(monet$signed)
+## ricodifica dei livelli
+levels(monet$signed) <- c("No", "Sì")
+summary(monet$signed)
+```
+Vediamo i boxplot dopo la modifica delle etichette dei livelli di \textbf{signed}:
+```{r}
+with(monet, boxplot(log(price) ~ signed, col = c("tomato3", "steelblue"), xlab = "Firmato?", ylab = "Prezzo [log(milioni $)]"))
+```
+
+Passiamo ora alla relazione fra il prezzo di vendita e la dimensione del dipinto. Nel dataset abbiamo informazioni circa l'altezza e la larghezza del dipinto. Per prima cosa convertiamo queste misure in metri:
+```{r}
+monet$height <- 0.0254 * monet$height
+monet$width <- 0.0254 * monet$width
+```
+Vediamo le dimensioni nel sistema metrico decimale:
+```{r}
+summary(monet$height)
+summary(monet$width)
+```
+I quadri hanno un altezza che varia da 10 cm a 2 metri e una larghezza che varia da 17 centimetri a 2 metri e 26 centimetri.
+
+Ora combiniamo queste due informazioni calcolando l'area del dipinto e ne valutiamo la relazione con il prezzo di vendita. Iniziamo creando la variabile ``area``:
+```{r}
+monet$area <- with(monet, height * width)
+summary(monet$area)
+```
+I dipinti variano da 0.017 a 4 metri quadri. Il seguente grafico di dispersione mostra la relazione fra il prezzo di vendita e l'area del dipinto:
+```{r}
+monet$area <- with(monet, height * width)
+plot(price ~ area, data = monet, col = "steelblue", xlab = "Dimensione [metri quadri]", ylab = "Prezzo [milioni $]")
+```
+
+Vista l'asimmetria della distribuzione dei prezzi di vendita, consideriamo anche il grafico di dispersione su scala logaritmica: 
+```{r}
+plot(log(price) ~ area, data = monet, col = "steelblue", xlab = "Dimensione [metri quadri]", ylab = "Prezzo [log(milioni $)]")
+```
+
+La relazione fra prezzo di vendita e dimensione non sembra molto chiara. Proviamo a disegnare con due colori diversi i punti nel grafico di dispersione a seconda se i dipinti siano firmati: 
+```{r}
+## disegniamo prima i dipinti firmati
+plot(log(price) ~ area, data = monet, subset = (signed == "Sì"), col = "steelblue",  xlab = "Dimensione [metri quadri]", ylab = "Prezzo [log(milioni $)]")
+## e ora aggiungiamo i dipinti non firmati
+points(log(price) ~ area, data = monet, subset = (signed == "No"), col = "tomato3")
+```
+
+In modo forse più efficace, possiamo disegnare due grafici di dispersione appaiati per i dipinti firmati e non firmati:
+```{r}
+## dividiamo la finestra grafica in due parti
+par(mfrow = c(1, 2))
+## dipinti firmati
+plot(log(price) ~ area, data = monet, subset = (signed == "Sì"), col = "steelblue", main = "Dipinti firmati", xlab = "Dimensione [metri quadri]", ylab = "Prezzo [log(milioni $)]", ylim = range(log(price)), xlim = range(area))
+## dipinti non firmati
+plot(log(price) ~ area, data = monet, subset = (signed == "No"), col = "tomato3", 
+main = "Dipinti non firmati", xlab = "Dimensione [metri quadri]", ylab = "Prezzo [log(milioni $)]", ylim = range(log(price)), xlim = range(area))
+```
+
+I grafici distinti a seconda della presenza della firma, mostrano che la crescita del prezzo su scala logaritmica è approssimativamente lineare fino ad una dimensione di circa un metro quadri, con un tasso di crescita più rapido per i dipinti firmati. 
+ 
+ Infine, valutiamo la relazione fra il prezzo di vendita e la casa d'aste. La variabile ``house`` è codificata come una variabile numerica, come si vede dal risultato della funzione ``summary``: 
+```{r}
+summary(monet$house)
+```
+Conviene trasformare la variabile ``house`` in una variabile categoriale:
+```{r}
+monet$house <- factor(monet$house)
+summary(monet$house)
+```
+Inoltre, può essere preferibile indicare le case d'aste con delle lettere:
+```{r}
+levels(monet$house) <- c("A", "B", "C")
+summary(monet$house)
+```
+La distribuzione di frequenza relativa  mostra che le prime due case d'aste hanno una proporzione simile di dipinti venduti, mentre la terza casa d'aste  ha poco più del 5% dei dipinti: 
+```{r}
+table(monet$house)
+prop.table(table(monet$house))
+signif(prop.table(table(monet$house)), digits = 2)
+```
+
+Vediamo ora la distribuzione del prezzo di vendita condizionatamente alla casa d'aste:
+```{r}
+with(monet, by(price, house, summary))
+```
+Le distribuzioni condizionate indicano che le prime due case d'aste hanno venduto dipinti a prezzi relativamente simili, mentre la terza casa d'aste ha venduto dipinti a prezzi medi nettamente inferiori, come si può visualizzare nei boxplot appaiati: 
+```{r}
+with(monet, boxplot(log(price) ~ house, col = brewer.pal(3, "Blues"), ylab = "Prezzo [log(milioni $)]", xlab = "Casa d'aste"))
+```
+ 
+ 
+

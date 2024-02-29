@@ -11,7 +11,7 @@ public class ArrayList<T> implements List<T> {
 
     public void add(T x) {
         if (size >= a.length){
-            Objectþ[] old = a;
+            Object[] old = a;
             a = new Object[a.length*2];
             for (int i=0; i<old.length; i++)
                 a[i] = old[i];
@@ -38,10 +38,10 @@ public class ArrayList<T> implements List<T> {
 
     public T set(int i, T t){
         if (i<size){
-            z = (T) a[i];
+            T z = (T) a[i];
             a[i] = t;
             return z;
-        };
+        }
         else 
             throw new RuntimeException(String.format("ArrayList.get(): index %d out of bounds %d", i, size));
     }
@@ -55,6 +55,7 @@ public class ArrayList<T> implements List<T> {
         // class: ugualmente manca this (quello dello stronzo che sta fuori, non il suo).
     // lo stesso film si applica ai generics
     private class MyIterator implements Iterator<T> {
+        int pos = 0;
         @Override
         public boolean hasNext () {
             return this.pos < ArrayList.this.size();//posso specificare un this di una classe enclosing 
@@ -69,5 +70,51 @@ public class ArrayList<T> implements List<T> {
     }
     public Iterator<T> iterator() {
         return new MyIterator();
+    }
+
+    public boolean contains(T x){
+        Iterator<T> it = iterator();
+        while(it.hasNext()){
+            T o = it.next();
+            if (x.equals(o))
+                return true;
+        }
+        return false;
+    }
+
+    public void remove (T x){
+        for (int i=0; i<size(); i++){
+            T o = get(i);
+            if (o.equals(x)){
+                for (int j=i; j<size()-1; j++){
+                    set(j, get(j+1));
+                }
+                --size;
+            }
+        }
+    }
+
+    @Override
+    public boolean isEmpty() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isEmpty'");
+    }
+
+    @Override
+    public int size() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'size'");
+    }
+
+    @Override
+    public void add(int index, T x) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'add'");
+    }
+
+    @Override
+    public T remove(int index) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'remove'");
     }
 }
