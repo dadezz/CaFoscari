@@ -12,7 +12,17 @@ public interface Collection<T> extends Iterable<T> {
 
     void clear();
 
-    boolean contains(T x);
+    default boolean contains(T x){
+        /* deve dire se il parametro c'è nella sequenza */
+        Iterator<T> it = iterator();
+        while (it.hasNext()) {
+            T e = it.next();
+            // il binding non è necessario in realtà
+            if(e.equals(x))
+                return true;
+        }
+        return false;
+    }
 
     boolean isEmpty();
 

@@ -173,32 +173,62 @@ void print_cut_rod_solution(int p, int n){
 ```
 costo = n^2 + ciclo(n). -> theta(n^2).
 
+## Longest Common Subsequence (LCS)
 
+interessante in bioinformatica. Una seq di DNA è costituita da una sequenza di basi azotate AGCT. Possiamo andare a rappresentare un filameto di dna come una stringa sull'alfabeto fromato da questi 4 caratteri.
+Spesso si va a confrontare queste stringhe per trovare delle analogie. Una delle similarità è la *edit distance*: il minimo numero di operazioni da fare ad una stringa per ottenere un altra stringa, per renderla uguale all'altra. Posso 
+* sostituire un carattere
+* inserire un carattere
+* copiare un carattere
+* cancellare un carattere
+* swappare due caratteri
 
+meno sono le operazioni, più simili sono le due stringhe. 
 
+Questo è un tipo di similarità, un'altro è la LCS: la sottosequenza comune alle due stringhe di maggior lunghezza. Non è necessariamente unica. 
+Indichiamo le sequenze con $ X = x_1, x_2, ..., x_m $. Una sottosequenza non è altro che anch'essa una sequenza, tale che $ x_{i1}, ..., x_{ik} \in \{1..m\} \And i_1 < ... < i_k $ quindi una successione strettamente crescente.
 
+### Problema lcs
 
+date due sequenze 
+* $ X = x_1, x_2, ..., x_m $
+* $ Y = y_1, y_2, ..., y_n $
 
+trovare una sottosequenza W che sia:
+* sottosequenza di X e Y
+* di lunghezza massima
 
+**NON SI PARLA DI SOTTOSTRINGHE, MA DI SOTTOSEQUENZE**: ABBAC, ABBBC -> LCS = ABBC. il fatto che ci sia un'altra lettera in mezzo è irrilevante
 
+***OSSERVAZIONI***:
+* Non c'è un unica LCS di due sequenze. -> notazione: indichiamo con LCS(X, Y) l'insieme delle LCS di X e Y
+* Un algoritmo di forza bruta genera tutte le sottosequenze di X, verifica se è sottosequenza di Y e tiene la più lunga.
+* Le sottosequenze sono 2^m perché ogni carattere possiamo scegliere se prenderlo oppure no -> l'algortimo di bruteforce ha costo esponenziale e quindi fortemente inefficiente.
 
+per applicare la programmazione dinamica, bisogna 
+poter scrivere la soluzione come combinazione di soluzioni ottime di sottoproblemi che hanno ordine polinomiale
 
+### PASSO 1. caratterizzazione della struttura della soluzione ottima
+prefissi: indico con $ X^k $ il prefisso di lunghezza k di X. 
+In generale, ogni sequenza ha n+1 prefissi. Se si riduce il problema della longest common subsequence ai prefissi, si ottengono O(m*n) prefissi. Quindi il sottoproblema dei prefissi è polinomiale
 
+#### Teorema (Sottostruttura ottima per LCS)
+Siano X e Y sequenze costituite rispettivamente da m e n caratteri, sia poi W, costituito da k caratteri, una delle LCS per X,Y. allora:
+1. se $ x_m = y_n $ , allora $ w_k = x_m = y_n $ e $ W^{k-1} \in LCS (X^{m-1}, Y^{n-1}) $ .
+2. se $ x_m \neq y_n $
+	1. se $ w_k \neq x_m $ allora $ W \in LCS (X^{m-1}, Y) $
+	2. altrimenti $ W \in LCS (X, Y^{n-1}) $
 
+#### dimostrazione
 
+Usiamo la tecnica *taglia e incolla* (per assurdo).
+1. Nell'ipotesi che $ x_m = y_n $, se $ x_m \neq w_k $ allora potrei costruire una sottosequenza $ Wx_m $. A sto punto che succede? ho trovato una sottosequenza più lunga di W, che per definizione è LCS, è assurdo, quindi deve essere che  $ w_k = x_m = y_n $. per quanto riguarda la seconda parte, so con certezza che $ W^{k-1} $ è una sottosequenza comune di $ X^{m-1} $ e $ Y^{n-1} $ . supponiamo per assurdo che ci sia una sottosequenza che chiamiamo $ W' \in  LCS (X^{m-1}, Y) \And |W'| > |W^{k-1}| = k-1 $. Possiamo concatenare a W' il carattere $ x_m = y_n $, ottenendo $ W'x_m $ , che sicuramente è una sottosequenza, e $ |W'x_m| > k-1+1 > k $ , che è assurdo perché k è la lunghezza massima delle LCS(X,Y).
+2. (dimostro solo i, perché ii si dimostra allo stesso identico modo). Se $ x_m \neq y_n \And w_k \neq x_m $ , allora W è una sottosequenza comune di $ X^{m-1},Y $ . Vorremmo dimostrare che $ W \in LCS(X^{m-1}, Y) $ . Se ci fosse una sottosequenza comune W' più lunga di W, sarebbe anche sottosequenza di X e Y, ma allora W non sarebbe più LCS, stiamo contraddicendo l'ipotesi secondo cui W è la sottosequenza più lunga
+ 
+### PASSO 2. Soluzione ricorsiva
 
+Dati X e Y, di lunghezza m e n, indichiamo con c[i,j] la lunghezza LCS fra $ x^i, Y^j $ . 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+* se una delle due è vuota, la sottoseq massima ha lunghezza 0
+* altrimenti, se gli ultimi due caratteri sono uguali, la sottoseq ha lunghezza 1+c[i-1, j-1].
+* altrimenti, la sottoseq ha lunghezza max(c[i-1, j], c[i, j-1]).

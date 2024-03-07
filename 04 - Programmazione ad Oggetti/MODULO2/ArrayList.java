@@ -72,16 +72,6 @@ public class ArrayList<T> implements List<T> {
         return new MyIterator();
     }
 
-    public boolean contains(T x){
-        Iterator<T> it = iterator();
-        while(it.hasNext()){
-            T o = it.next();
-            if (x.equals(o))
-                return true;
-        }
-        return false;
-    }
-
     public void remove (T x){
         for (int i=0; i<size(); i++){
             T o = get(i);
