@@ -232,3 +232,117 @@ Dati X e Y, di lunghezza m e n, indichiamo con c[i,j] la lunghezza LCS fra $ x^i
 * se una delle due è vuota, la sottoseq massima ha lunghezza 0
 * altrimenti, se gli ultimi due caratteri sono uguali, la sottoseq ha lunghezza 1+c[i-1, j-1].
 * altrimenti, la sottoseq ha lunghezza max(c[i-1, j], c[i, j-1]).
+
+### PASSO 3: Algoritmo di programmazione dinamica
+#### bottom-up:
+
+Parto dal basso. enumero tutti i sottoproblemi a partire dal più piccolo finoa  aquello di dimensione totale.
+Manteniamo c[i, j] = lunghezza della LCS(xi, yi). Mantengo anche b[i, j] = informazioni utili a recuperare la soluzione. 
+
+Le prime informazioni sono dei segnaposto che mi dicono che scelta ho fatto:
+* lettere uguali, mi sposto su entrambi i vettori (U) // freccia obliqua
+* lettere diverse, mi sposto su Y (Y) // freccia sinistra
+*  "        "    , mi sporto su X (X) // freccia in alto
+
+```cpp
+def LCS (vector x, vector y){
+   m = x.size();
+   n = y.size();
+   matrix b[m][n]; 
+   matrix c[m+1][n+1]; 
+   for (int i = 0; i<=m; i++){
+      c[i][0] = 0;
+   }
+   for (int i = 0; i<=n; i++){
+      c[0][i] = 0;
+   }
+   for (int i  = 1; 1<=m; i++) {
+      for (int j = 1; j<=n; j++){
+         if (x[i] == y[j]){
+            c[i][j] = 1+ c[i-1, j-1];
+            b[i][j] = 'U';
+         }
+         else if (c[i-1][j] >= c[i][j-1]){
+            c[i][j] = c[i-1][j];
+            b[i][j] = 'Y';
+         }
+         else {
+            c[i][j] = c[i][j-1];
+            b[i][j] = 'X';
+         }
+      }
+   }
+}
+```
+il tempo di esecuzione è Theta(m*n).
+Come si ricostruisce la soluzione? (non unica, ricordiamo).
+
+```cpp
+def printLCS_aux(x, b, i, j){
+   if (i>0 && j>0){
+      if (b[i, j] == 'U'){
+         printLCS_aux(x,b,i-1, j-1);
+         print(x[i]);
+      }
+      else if (b[i, j] == 'Y'){
+         printLCS_aux(x, b, i-1, j);
+      }
+      else printLCS_aux(x, b, i, j-1);
+   }
+}
+def printLCS(vector x, vector y){
+   b, c = LCS(x, y);
+   printLCS_aux(x, b, x.size(), y.size()); // non è necessario passare y, perchP i caratteri sono comuni anche in x
+}
+```
+
+il t di exec della funzione aux è dato da O(i+j) in quanto a ogni chiamata nel caso peggiore, la somma diminuisce di 1 (o decremento j o decremeto i). nel caso migliore decremento entrambi. Il t exe totale di printLCS è quindi dato da Theta(mn) + Theta(m+n) => Theta(mn).
+
+**Ottimizzazioni** :
+Si può ottimizzare o spazio di memoria utilizzato. Osserviamo che per determinare c[i, j] usiamo solo tre valori: c[i-1, j-1] o c[i-1, j] o c[i, j-1]. L'idea è che confrontado questi valori posso capire qual è il sottoproblema utilizzato. Assumiao uindi che B non sia mai stato calcolato
+
+```cpp
+def printLCS_aux(x, c, i, j){
+   if (i>0 && j>0){
+      if (c[i, j] == c[i-1, j]){
+         printLCS_aux(x,c,i-1, j);
+      }
+      else if (c[i, j] == c[i, j-1]){
+         printLCS_aux(x, c, i, j-1);
+      }
+      else {
+         print(x[i]);
+         printLCS_aux(x, c, i, j-1);
+      }
+   }
+}
+def printLCS(vector x, vector y){
+   c = LCS(x, y);
+   printLCS_aux(x, c x.size(), y.size()); // non è necessario passare y, perchP i caratteri sono comuni anche in x
+}
+```
+
+Lo spazio a livello asintotico non è cambiato.
+**NB** se sono interessato esclusivamente alla lunghezza, poso evitare di mantenere la tabella c dato che posso calcolare la riga i+1 usando solo la riga i. Ma in realtà (da dimostrre) si può utilizzare come spazio il minimo tra m, n posizioni più un O(1) aggiuntivo.
+
+#### Soluzione top-down
+Ricordiamo che basta trasformare la soluzione ricorsiva, mettendo come prima istruzione un controllo se il valore è gia stato calcolato o meno
+
+```cpp
+def tdLCS_aux(x, y, c, i, j){
+   //primo passo: controllo se è già stato risolto
+   if (c[i, j] == -1) {
+      // RISOLVO
+      if (i = 0  || j = 0) c[i, j] = 0;
+      else if (x[i] == y[j]) c[i, j] = 1+ tdLCS_aux(x, y, c, i-1, j-1);
+      else c[i, j] = std::max(tdLCS_aux(x, y, c, i-1, j), tdLCS_aux(x, y, c, i, j-1));
+   }
+   return c[i, j];
+}
+def tdLCS(x, y){
+   m = x.len();
+   n = y.len();
+   c[m, n] = -1; // costo m*n
+   return tdLCS_aux(x, y, c, m, n);
+}
+```
