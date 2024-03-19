@@ -53,7 +53,7 @@ Input: A[1..n] dove a[i] è un intero compreso nell'intervallo. n e  k sono para
 Output: vect orinato.
 Serve memoria ausiliaria: C[0..k], vettore delle occorrenze.
 ```cpp
-Array countingsort(Array a, Array c, int n, int k){
+Array countingsort(Array a, Array b, int n, int k){
     Array c(k);
     for (int i=0; i<k; i++){
         c[i] = 0;
