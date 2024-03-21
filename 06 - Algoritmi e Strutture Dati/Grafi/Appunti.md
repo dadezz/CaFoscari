@@ -91,7 +91,61 @@ La lunghezza di un cammino è il numero di ARCHI del cammino (non il numero di v
 Un ciclo è un cammino in cui x_0 e x_q coincidono. 
 **NB:** se G è non orientato, ci devono essere almeno tre vertici per definire un ciclo. Sta cosa non vale in caso di grafi orientati (anzi, un cappio è un ciclo).
 
-# Tipi di Grafo (non orientato)
+# Nozioni varie sui grafi (non orientati)
+## Tipi
 * aciclico: se non esistono cicli. Chiamato anche foresta
 * connesso: se non esistono vertici irraggiungibili. Un grafo è connesso se, comunque io prenda due vertici distinti, esiste sempre un cammino tra i due vertici. 
-* Albero libero: Grafo connesso e aciclico. Ha proprietà interessanti. Per esempio, il numero di arhi coincide con il numero di vertici -1. O anche, il cammino è sempre unico. Studieremo approfonditamente
+* Albero libero: Grafo connesso e aciclico. Ha proprietà interessanti. Per esempio, il numero di arhi coincide con il numero di vertici -1. O anche, il cammino è sempre unico. Studieremo approfonditamente.
+
+## Componente connessa 
+Possiamo vedere un grafo non connesso come la somma di grafi distitnti. Questi grafi distinti vengono detti componenti connesse.
+* La componente connessa è un sottografo connesso
+* La componente connessa non è estendibile con un vertice esterno rimanendo connessa ( => è il sottografo connesso più grande).
+
+L'insieme delle cc di un grafo G forma una ***partizione*** di V.
+per dimostrarlo dobbiamo vedere che
+1) l'intersezione delle cc è vuota => per assurdo
+2) l'unione è V.
+
+## Grafo vuoto (E_n)
+un grafo G si dice vuoto se l'insieme degli archi è l'insieme vuoto. Se ha n vertici, ha n componenti connesse
+
+## Grafo completo (K_n)
+grafo G per cui esistono tutti i possibili archi $ \binom{V}{2} $
+
+## Grafo complemento
+dicesi complemento di grafo G il grafo cosruito sugli stessi vertici, che ha un insieme di archi che gode di questa proprietà: $ (u,v) \in E \iff (u,v) \notin E' $.
+
+Un grafo G è completo se e solo se il suo complemento è vuoto.
+
+## Grafo bipartito
+un grafo è bipartito se è possibile dividerlo in due sottografi vuoti. gli archi, se ci sono, connettono i due sottografi, ma non sono nei sottografi. Un grafo si dice bipartito completo se ci sono tutti gli archi possibili che connettono i due sottografi. Un grafo bipartito completo ha n1 * n2 archi.
+
+## Grado del vertice
+Ad ogni vertice posso associare un numero, detto grado, che è il numero di vertici adiacenti, o anche il numero di archi incidenti.
+Si indica con deg
+in caso di grafi non orientati si parla di grado del vertice, in caso di grafi orientati si parla di grado in entrata e grado in usicta.
+
+### Esercizio
+costruire un grafo su n vertici che abbia come proprietà che tutti i vertici abbiano grado diverso. Non è possibile:
+Congettura: se G è un grafo finito non orientato, allora esistono almeno due vertici che abbiano lo stesso grado
+Dimostrazione: supponiamo per assurdo che esista un grafo g con tutti i gradi diversi. il grado di un vertice sarà sempre maggiore uguale a 0 e minore uguale a n-1. Significa che ci sarà un vertice con grado 0, un vertice con 1, 2, ... ,n-1. Avremmo l'assurdo che ci sia un vertice con grado 0 e uno con grado n-1 => il vertice collegato con tutti deve essere collegato anche con il vertice scollegato, che è assurdo.
+
+### Lemma della stretta di mano
+Vale solo per grafi non orientati. Indichiamo con m il numero di archi. La somma dei gradi dei vertici è sempre 2m. 
+
+### Calcolo
+Il grado di un vertice si può calcolare tramite la matrice di adiacenza:
+$$ deg(i) = \sum_{j=1}^{n}a_{ij} $$.
+
+### Grafi regolari
+Un grafo si dice K-regolare se per ogni u in V, il grado è K
+**proprietà:**:
+- se G è 2-regolare, il numero di archi coincide col numero di vertici (conseguenza della stretta di mano) => non è un albero
+- se G è 3-regolare, allora n è pari
+- se G è 4-regolare, allra m è pari
+- Se G è un grafo non orientato, allora il numero di vertici di grado dispari è pari
+
+
+### Esercizio
+sia A la matrice nxn di adiacenza di G. Essendo quadrata si può fare A*A. cosa rappresenta a_{ij} della matrice risultante?

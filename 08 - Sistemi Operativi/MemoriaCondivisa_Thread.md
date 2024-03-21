@@ -230,8 +230,217 @@ lock = false;
 in sto modo il loop busy waiting viene fatto solo sulla lettura di lock, più efficiente di test and set.
 
 Figo intel, che offre
-```XCHG(bool *x, bool *y){
+```c
+XCHG(bool *x, bool *y){
     tmp = *x;
     *x = *y;
     *y = tmp
 }
+```
+
+# Thread POSIX
+
+È una libreria, va linkata esplicitamente al compilatore.
+* Un thread è un’unità di esecuzione all’interno di un processo
+* Un processo può avere più thread in esecuzione, che tipicamente condividono le risorse del processo e, in particolare, la memoria
+* Lo standard POSIX definisce un insieme di funzioni per la creazione e la sincronizzazione di thread.
+
+## Creazione thread
+
+`pthread_create(pthread_t *thread, pthread_attr_t *attr, void *(*start_routine)(void *), void *arg)`
+
+1. thread: un puntatore a pthread_t, l’analogo di pid_t. Attenzione che non necessariamente è implementato come un intero;
+2. attr: attributi del nuovo thread. Se non si vogliono modificare gli attributi è sufficiente passare NULL;
+3. start_routine il codice da eseguire. È un puntatore a funzione che prende un puntatore a void e restituisce un puntatore a void. Ricordarsi che in C il nome di una funzione è un puntatore alla funzione;
+4. arg eventuali argomenti da passare, NULL se non si intende passare parametri. 
+
+punto 2: non lo usiamo mai, sempre NULL
+punto 3: `void *(*start_routine)(void *)` è una funzione che prende come parametro un puntatore a void e restituisce un puntatore a void. I puntatori sono indirizzi, word di memoria, vuol dire che di fatto è un puntatore generico, castabile al tipo che si vuole. BIsogna darli il nome di una funzione che ha quel tipo lì. Quella funzione è il codice che il thread eseguirà. Se voglio passare argomenti alla funzione, li passo nel punto 4 (altrimenti butto NULL).
+
+## Exit e Join
+`pthread_exit(void *retval)`
+termina l’esecuzione di un thread restituendo retval. Si noti che quando il processo termina (exit) tutti i suoi thread vengono terminati. Per far terminare un singolo thread si deve usare pthread_exit;
+
+
+`pthread_join(pthread_t th, void **thread_return)` 
+Assomiglia alla wait dei processi. se voglio aspettare la terminazione di un thread.
+attende la terminazione del thread th. Se ha successo, ritorna 0 e un puntatore al valore ritornato dal thread. Se non si vuole ricevere il valore di ritorno è sufficiente passare NULL come secondo parametro.
+Il primo parametro è l'id del thread
+
+## Detach e  self
+`pthread_detach(pthread_t th)`
+se non si vuole attendere la terminazione di un thread allora si deve eseguire questa funzione che pone th in stato detached: nessun altro thread potrà attendere la sua terminazione con pthread_join e quando terminerà le sue risorse verranno automaticamente rilasciate (evita che diventino thread “zombie”).
+Si noti che pthread_detach non fa sì che il thread rimanga attivo quando il processo termina con exit.
+In praica dichiari che non ti interessa aspettare il thread, non attendi la terminazione e quando lui finisce, libera le risorse in automatico.
+
+`pthread_t pthread_self()`
+ritorna il proprio thread id.
+
+ATTENZIONE: questo è l’ID della libreria phread e non l’ID di sistema. Per visualizzare l’ID di sistema si può usare, in Linux, `syscall(SYS_gettid)`.
+
+
+## Esempio
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <sys/syscall.h>   /* For SYS_xxx definitions */
+
+// codice dei thread. Notare che e' una funzione che prende 
+// un puntatore e ritorna un puntatore (a void)
+void * codice_thread(void * a) {
+    pthread_t tid;
+    int ptid;
+    
+    tid  = pthread_self();      // library tid
+    ptid = syscall(SYS_gettid); // tid assegnato dal SO (funziona solo in Linux)
+
+    printf("Sono il thread %lu (%i) del processo %i\n",tid,ptid,getpid());
+    sleep(1);
+    pthread_exit(NULL);
+}
+
+int main() {
+    pthread_t tid[2];
+    int i,err;
+
+    // crea i thread (ritorna 0 quando ha successo, vedere il man!)
+    // - gli attributi sono quelli di default (il secondo parametro e' NULL)
+    // - codice_thread e' il nome della funzione da eseguire
+    // - non vegnono passati parametri (quarto parametro e' NULL)
+    for (i=0;i<2;i++) {
+        if (err=pthread_create(&tid[i],NULL,codice_thread,NULL)) {
+            printf("errore create [%i]\n",err);
+            exit(EXIT_FAILURE); }
+    }
+    // attende i thread. Non si legge il valore di ritorno (secondo parametro NULL)
+    for (i=0;i<2;i++) {
+        if (err=pthread_join(tid[i],NULL)) {
+            printf("errore join [%i]\n",err);
+            exit(EXIT_FAILURE); }
+    }
+    printf("I thread hanno terminato l'esecuzione correttamente\n");
+}
+```
+
+Ho bisogno di due variabili distinte per salvarmi i thread id. È importante che siano variabili diverse, perxhé la memoria è sempre condivisa, si rischia di sovrascriverlo. Se devo creare n thread, gestisco tutte le variabili, parametri compresi, con un array. 
+ciclo creando due thread. L'if(err) controlla l'errore. in C 0 è false, quindi se orna un valore maggiore di 0 (insuccesso), vado dentro l'if percHé true. Loro vanno per la loro strada, eseguono codice thread.
+Subito dopo faccio le join percHé le voglio aspettare. La printf finale verrà fatta sicuramente dopo che i due thread hannp finito, percHé c'è la join che ne attende la terminazione.
+
+notare che codice thread ha la firma corretta. (a è necessaria, anche se poi non la uso). La funzione semplicemente stampa thread id di libreria, il tid di sistema e il pid di sistema. Fa la sleep solo per verificare che la printf finale venisse eseguita solo alla fine della terminazione deithread, perché le join sono bloccanti
+
+***NOTA***: *Per compilare, usare l'opzione -pthread*. `gcc test1.c -pthread -o test1`
+
+## Esercizio
+Provare a “distaccare” uno dei thread e osservare l’errore restituito dalla join.
+ATTENZIONE: essendo una libreria esterna, gli errori non possono essere visualizzati con perror (che stampa gli errori di sistema). Consultare il manuale delle chiamate a libreria per vedere i possibili errori restituiti.
+In ubuntu 64 bit, i codici di errore si trovano in /usr/include/asm-generic/errno-base.h.
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <sys/syscall.h>   /* For SYS_xxx definitions */
+
+// codice dei thread. Notare che e' una funzione che prende 
+// un puntatore e ritorna un puntatore (a void)
+void * codice_thread(void * a) {
+    pthread_t tid;
+    int ptid;
+    
+    tid  = pthread_self();      // library tid
+    ptid = syscall(SYS_gettid); // tid assegnato dal SO (funziona solo in Linux)
+
+    printf("Sono il thread %lu (%i) del processo %i\n",tid,ptid,getpid());
+    sleep(1);
+    pthread_exit(NULL);
+}
+
+int main() {
+    pthread_t tid[2];
+    int i,err;
+
+    // crea i thread (ritorna 0 quando ha successo, vedere il man!)
+    // - gli attributi sono quelli di default (il secondo parametro e' NULL)
+    // - codice_thread e' il nome della funzione da eseguire
+    // - non vegnono passati parametri (quarto parametro e' NULL)
+    for (i=0;i<2;i++) {
+        if (err=pthread_create(&tid[i],NULL,codice_thread,NULL)) {
+            printf("errore create [%i]\n",err);
+            exit(EXIT_FAILURE); }
+    }
+
+    /////////////////////////////////////////////////////////////////////
+    pthread_detach(&tid[0]);
+    /////////////////////////////////////////////////////////////////////
+
+    // attende i thread. Non si legge il valore di ritorno (secondo parametro NULL)
+    for (i=0;i<2;i++) {
+        if (err=pthread_join(tid[i],NULL)) {
+            printf("errore join [%i]\n",err);
+            exit(EXIT_FAILURE); }
+    }
+    printf("I thread hanno terminato l'esecuzione correttamente\n");
+}
+```
+
+## Esercizio 2
+Passate ai 2 thread 2 interi letti dalla linea di comando (argv[1] e argv[2]). I due thread calcolano il quadrato del numero intero e il thread principale, infine, stampa la somma dei due valori ottenuti.
+
+Fare attenzione: la memoria è condivisa quindi si deve passare ai 2 thread l’indirizzo di una zona di memoria “riservata” in modo da evitare interferenze.
+
+ * Create un array di interi num[2] nel main
+ * Copiate atoi(argv[1]) e atoi(argv[2]) in num[0] e num[1]
+ * Passate l’indirizzo di num[0] e num[1] ai due thread (è necessario un cast a void *)
+ * Nei thread, calcolate il quadrato e risalvatelo in num[0] e num[1] (è necessario un cast a int *)
+ * Dopo le join il main può stampare num[0]+num[1], le join infatti assicurano che i thread abbiamo già computato la somma (lasciate la sleep per verificare che il main attende i risultati corretti) 
+
+Variante: se volete tenere input e output dei thread distinti potete usare una struct con due campi. 
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <sys/syscall.h>   /* For SYS_xxx definitions */
+
+// codice dei thread. Notare che e' una funzione che prende 
+// un puntatore e ritorna un puntatore (a void)
+void * codice_thread(void * a) {
+     int *num = (int *)a; 
+    *num = *num * *num;
+
+    pthread_exit(NULL);
+}
+
+int main(int argc, char** argv) {
+    pthread_t tid[2];
+    int somme[2];
+    int i,err;
+    
+    for (i=0; i<2; i++){
+        somme[i] = atoi(argv[i+1]);
+    }
+
+    for (i=0;i<2;i++) {
+        if (err=pthread_create(&tid[i],NULL,codice_thread, (void*) &sommw[i])) {
+            printf("errore create [%i]\n",err);
+            exit(EXIT_FAILURE); }
+    }
+
+    // attende i thread. Non si legge il valore di ritorno (secondo parametro NULL)
+    for (i=0;i<2;i++) {
+        if (err=pthread_join(tid[i],NULL)) {
+            printf("errore join [%i]\n",err);
+            exit(EXIT_FAILURE); }
+    }
+
+    int res = somme[0] + somme[1];
+
+    printf("I thread hanno terminato l'esecuzione correttamente. Risultato: %d\n", res);
+}
+
+```
