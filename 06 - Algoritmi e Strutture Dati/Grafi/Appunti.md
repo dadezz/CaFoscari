@@ -149,3 +149,47 @@ Un grafo si dice K-regolare se per ogni u in V, il grado è K
 
 ### Esercizio
 sia A la matrice nxn di adiacenza di G. Essendo quadrata si può fare A*A. cosa rappresenta a_{ij} della matrice risultante?
+
+***
+
+lezione mancante
+
+***
+
+# Matrice di adiacenza proprietà
+quando si moltiplica la matrice di adiacenza per sé stessa, ogni a_{ij} rappresenta il numero di cammini di lunghezza 2 tra i nodi i e j.
+
+## Teorema
+$ a^k_{ij} = $ numero di cammini di lunghezza k tra i e j.
+### dim
+$ A^k = A^{k-1} \times A $. da cui $ a^k_{ij} = \sum_{l=1}^n a_{lj} \cdot a^{k-1}_{il} $. Il secondo termine è il numero di cammini di lunghezza k-1 tra i e l, mentre il primo assume valori 1/0, che indica la presenza o meno dell'arco. Immagina ci siano n cammini tra i e l, dove l è il penultimo vertice prima di j. i cammini fino a j devono essere fatti da 0 se non c'è cammino o n se c'è. per ogni l questo vale, di conseguenza devo sommare per ogni nodo l tutte le n, qeusto è il significato di quella sommatoria.
+
+**grafi orientati**: in un ciclo un grafico orientato deve avere tutti i vertici distinti, in questa rappresentazione non è detto che accada.
+
+## Esercizio 
+Mostrare che un grafo G non orientato contiene $ K_3 $ (grafo completo con tre vertici) se e soltanto se si verifica la seguente condizione: 
+$$ \exist i, j \in V, i \neq j t.c. a_{ij} \cdot a^2_{ij} \neq 0 $$.
+
+Ovvero dimostrare l'esistenza di un triangolo ciclico in un grafo utilizzando le matrici di adiacenza. La dimostrazione in realtà è abbasstanza ovvia.
+
+## Esercizio
+Se G è un grafo non orientato,
+1. La traccia della matrice di adiacenza quanto vale? 0, perché la diagonale è sempre nulla in quanto non esistono cappi.
+2. La traccia del quadrato di A a cosa è uguale? la somma di tutti i gradi dei nodi, che è uguale a due volte la cardinalità degli archi (2m). Per il lemma della stretta di mano
+3. La traccia del cubo? $ tr(A^3) = \sum_{i=1}^{n} a^{(3)}_{ii} $ ->  numero di cammini di lunghezza 3 per ogni a_ii è 2 volte il numemro di triangoli che passano attraverso i (i due versi di percorrenza del triangolo). Sommando tutti questi a_ii, cosa otteniamo? 6 volte il numero di triangoli in G.
+
+per k maggiori invece le cose si complicano, perché non è detto che il cammino sia un ciclo. Queste relazioni fino al grado 3 sono comunque molto interessanti.
+
+# Graph isomorphism
+problema che non è dimostrato sia intrattabile ma per il quale non esiste algoritmo efficiente. Non è per nulla banale quindi verificare che due grafi siano isomorfi, è abbstanza banale invece dimostrare che non lo siano.
+### Condizioni necessarie ma NON sufficienti
+1. cardinalità V1 = cardinalità V2
+2. cardinalità E1 = cardinalità E2
+3. vettore in cui sono scritti in ordine crescente tutti igradi del mio grafo: degree-sequence(G1) = degree-sequence(G2).
+4. una clique è un sottografo completo. È detta massima se è la più grande in assoluto, è detta massimale se non è contenuta in una clique più grande. Si indica con omega(G) il clique number, ovvero la cardinalità della clique massima. -> omega(G1) = omega(G2).
+
+# Connettività 
+Perché un grafo di n vertici sia connesso è necessario che ci siano almeno n-1 vertici. Dimostro per induzione su n = |V|. 
+* Base: n=1 -> numero di archi è 0, |V| = 1, effettivamente |E| = |V|-1
+* Acido: n>=2. Sia G connesso con n vertici. Prendo G' sottografo di G senza un vertice z. NOn posso a priori garantire che G' sia connesso. Lavoro però sulle sue componenti connesse. k=|cc|. se G' è connesso, k=1. Mi aspetto che per ogni cc, |E| sia >= |V|-1. 
+  Da cui $ |E| = \sum_{i=1}^k |E_i| +deg(z) $ ovvero la somma degli archi delle componenti connesse, a cui vanno aggiunti gli archi del vertice eliminato. Tutti gli E_i sono maggiori uguali di |V_i| -1 , da cui posso maggiorare $ |E| \geq \sum_{i=1}^k (|V_i| -1) +deg(z) $, che è uguale a $ \sum_{i=1}^k |V_i| -k +deg(z) $. La sommatoria è esattamente |V|-1, percHé la sommatoria della cardinalità di cc è la cardinalità iniziale, -1 per via del vertice cavato. Posso dire essere sicuramente vero che deg(z) >= k. per l'ipotesi iniziale che il grafo di partenza fosse connesso, quindi la disuguaglianza continua a valere in quanto si sta maggiorando. il grado di z non può essrere minore di k xk sennò il grafo iniziale non sarebbe connesso.

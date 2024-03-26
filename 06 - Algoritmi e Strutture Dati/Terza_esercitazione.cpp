@@ -49,12 +49,12 @@ void order (std::vector<int>& arr){
     }
     // il vettore è ordinato in ordine crescente. per farlo al contrario, lo giro, usando b come appoggio.
     // il costo è O(n) in quanto va a scorrere due volte il vettore per tutta la lunghezza, senza quindi intaccare la comlpessità asintotica
-    /*for(int i=0; i<n; i++){
+    for(int i=0; i<n; i++){
         b[i] = arr[n-i-1];
     }
     for(int i=0; i<n; i++){
         arr[i] = b[i];
-    }*/
+    }
 }
 
 void counting_sort(std::vector<int>& arr, std::vector<int>& b, int cifra){
@@ -75,9 +75,9 @@ void counting_sort(std::vector<int>& arr, std::vector<int>& b, int cifra){
     for (int i=1; i<n; i++){
         c[i] = c[i] + c[i-1];
     }
-    for (int j = n-1; j>0; j--){
+    for (int j = n-1; j>=0; j--){
         int digit = (arr[j] / powern) % n;
-        b[c[digit]] = arr[j];
+        b[c[digit]-1] = arr[j];
         c[digit]--;
     }
 }

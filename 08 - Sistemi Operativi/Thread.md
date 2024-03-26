@@ -228,8 +228,8 @@ while(test&set(&lock)){
 lock = false;
 ```
 in sto modo il loop busy waiting viene fatto solo sulla lettura di lock, più efficiente di test and set.
-
-Figo intel, che offre
+# Xchg
+istruzione hardware atomica e indivisibile che scambia due variabili in memoria, bloccando il bus di accesso alla ram. solo su intel.
 ```c
 XCHG(bool *x, bool *y){
     tmp = *x;
@@ -238,7 +238,18 @@ XCHG(bool *x, bool *y){
 }
 ```
 
-# Thread POSIX
+come si evita la race condition usando xchg? 
+
+```c
+// thread 0
+bool b0 = true;
+
+while(b0){XCHG(&b0, &lock)} // si usano i due loop come prima per ottimizzare e evitare di loopare su xchg
+// sezione critica
+EXCHG(&b0, &lock);
+```
+
+# Thread POSIX in C
 
 È una libreria, va linkata esplicitamente al compilatore.
 * Un thread è un’unità di esecuzione all’interno di un processo
@@ -442,5 +453,118 @@ int main(int argc, char** argv) {
 
     printf("I thread hanno terminato l'esecuzione correttamente. Risultato: %d\n", res);
 }
-
 ```
+
+# Semafori
+Il programma è in grado di fare la sync con i modi visti (xchg, etc etc), ma c'p il problema del busy waiting, sarebbe più furbo essere sospesi dal OS. I semafori permettono di realizzare la sezione critica senza busy wairinf e in modo seplice. Il semaforo, più che rosso/verde, assomiglia a quello di un parcheggio, che conta anche i posti disponibili. finché ci son posti è verde, poi diventa rosso. Questi sistemi infatti si chiamano **semafori contatori**. 
+La cosa è abbastanza intuitiva, incrementa all'ingresso, decrementa all'uscita e blocca a 0. Poniamo ora di avere 2 ingressi. Se c'è un posto e arrivano in due contemporaneamente, c'è race condition -> il contatore va protetto. Sta roba ce la offre il sistema operativo. Lui lo fa coi suoi meccanismi interni di lock, a noi però è trasparente, usiamo i semafori senza doverci implementare i vari lock. posso avere anche più entrate e più uscite. C'è ancora una roba che manca nell'esempio. I semafori dei sistemi operativi dicono anche quante auto stanno aspettando fuori: il contatore va anhe in negativo, crea una coda di attesa. 
+
+Come sono fatti sti semafori?
+Sono un invenzione di Dijkstra nel 65
+
+```c
+struct semaphore {
+    int value;
+    thread_t *queue;
+}
+```
+
+due primitive: P(s), V(s). sono quelle che invoco per allocare e rilasciare una risorsa. come devono funzionare?
+P è quella all'entrata. S è il semaforo. In pseudo-C:
+```c
+P(s){
+    --s.value;  
+    if (s.value < 0) {
+        s.queue.add(&this_pid);
+    }
+} 
+V(s){
+    ++s.value;  
+    if (s.value <= 0) {
+        s.queue.remove();
+    }
+} 
+```
+
+Quindi come si usa un semaforo per i thread? (sempre in psudocode):
+
+```c
+Semaphore_t mutex = 1; // è un mutex, c'è un solo posto
+
+//thread0
+P(mutex); // è bloccante-> se è rosso non entro in sez
+sez_critica;
+V(mutex);
+
+//thread1
+codice indentico;
+```
+Scala con qualsiasi quantità di thread ed è facilissimo da usare. Ci sono casi in cui non bisogna inizializzare a 1. Supponiamo di avere 3 risorse uguali, tipo 3 stampanti. è indifferente quale uso. Se voglio gestire l'accesso a una risorsa che ha più istanze, posso stampare contemporaneamente in 3, non serve mutua esclusione, inizializzo semaforo a 3.
+
+## produttore consumatore
+ritiriamo fuori la roba di produttore/consumatore. l'avevamo sincronizzato col busy waiting.
+```c
+produttore() {
+    while(true){
+        produce(d);
+        buffer[inserisci] = d;
+        inserisci = inserisci+1 % max;
+    }
+}
+
+consumatore() {
+    while(true){
+        d = buffer[preleva];
+        preleva = preleva+1 % max;
+        consuma(d);
+    }
+}
+```
+proviamo ora a sincarlo con i semafori. Vale sempre il discorso del parcheggio: valore del semaforo = numero di risorse che ho disponibili. 
+
+```c
+semaphore_t vuote = MAX;
+semaphore_t piene = 0;
+
+produttore() {
+    while(true){
+        produce(d);
+
+        P(vuote); 
+        buffer[inserisci] = d;
+        inserisci = inserisci+1 % max;
+        V(piene);
+    }
+}
+
+consumatore() {
+    while(true){
+
+        P(piene);
+        d = buffer[preleva];
+        preleva = preleva+1 % max;
+        V(vuote);
+
+        consuma(d);
+    }
+}
+```
+
+Si noti che i semafori sono p-ati e v-ati da due funzioni diverse. vuote è p-ato da produttore e v-ato da consumatore, piene è il contrario.
+
+Se ho un solo produttore e un solo consumatore sta roba funziona. supponiamo ora di averne 4 produttori e 2 consumatori. Manca un pezzo al produttore -> entrambe possono scrivere la stessa cella: c'è inserisci che è una variabile in race condition, perché il buffer è unico ma condiviso.
+```c
+produttore() {
+    while(true){
+        produce(d);
+
+        P(vuote); 
+        P(mutex); // sez critica
+        buffer[inserisci] = d;
+        inserisci = inserisci+1 % max;
+        V(mutex); // fine sez critica
+        V(piene);
+    }
+}
+```
+idem per il produttore
