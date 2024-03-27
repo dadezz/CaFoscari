@@ -6,40 +6,26 @@ void order(vector<int>& arr)
 Analizzare e motivare in modo chiaro, preciso ed approfondito la complessità della funzione.
 */
 #include <vector>
+#include <cmath>
+#include <iostream>
+
 void counting_sort(std::vector<int>& arr, std::vector<int>& b, int cifra);
 void order (std::vector<int>& arr){
     /**
      * devo usare algoritmo di ordinamento lineare. sfruttando la conoscenza del fatto che gli interi del vettore sono compresi
      * tra 0 e n^4-1. L'idea è usare il radix sort, con i numeri scritti in base n, su 4 cifre.
-     *      Input: A[1..n] dove a[i] è un intero compreso nell'intervallo.   
-     *      Output: vect ordinato.
-     * Il radix sort scorre ogni elemento su ogni cifra ogni elemento, applicando a quella cifra il counting sort.
+     * Il radix sort scorre su ogni cifra ogni elemento, applicando a quella cifra il counting sort.
+     * Il counting sort è un algoritmo di ordinamento lineare, in quanto itera singolarmente 4 volte 
+     * (4 è una costante moltiplicativa e in quanto tale non influisce sulla complessità asintotica) sugli N elementi del vettore, 
+     * e su un vettore che, per come è costruito, ha anch'esso n elementi (infatti, il range in cui possono variare gli elementi,
+     * è fatto in modo da essere esattamente N). 
+     * Il vettore iniziale è quindi lungo N, il vettore delle occorrenze è lungo Theta(N), in particolare esattamente N. In tutto ci sono
+     * 4 cicli for, quindi il counting sort ha complessità Theta(4N) -> Theta(N).
      * 
-     * questo il counting sort in pseudocode:
-     * Array countingsort(Array a, Array b, int n, int k){
-            Array c(k);
-            for (int i=0; i<k; i++){
-                c[i] = 0;
-            }
-            for (int j = 0; i<n; i++){
-                c[a[j]]++;
-            }
-            sto contando quante volte il numero compare in a.
-            ora banalmente li butto tutti nel vector e fine
-            for (int i=0; i<k; i++){
-                c[i] = c[i] + c[i-1]; 
-                // per ciascun valore i, quanti sono i valori minori uguali di i?
-            }
-            // posiziono l'elemento nell'ordine corretto. Se so che ci sono 5 elementi
-            // minori o uguali di i, dove lo butto? in posizione 5.
-            // decremento il numero di occorrenze così se ci sono ue elementi uguali, 
-            // al posto di sovrapporre lo metto nella posizione immediatamente prima.
-            for (int j = n; j>0; j--){
-                b[c[a[j]]] = a[j];
-                c[aj]--;
-            }
-        }
-     *
+     * Il radix sort ha complessità anch'esso lineare, in quanto è stata scelta la base in modo da avere un numero di cifre costanti,
+     * conosciute a priori. Nel caso specifico, di n^4-1, se si prende come base n si ottiene un nuemro di cifre massimo pari a 4.
+     * Il radix sort non fa altro che chiamare il counting sort 4 volte. dal momento che 4 è una costante, otteniamo una complessità asintotica
+     * lineare.
     */
     int n = arr.size();
     std::vector<int> b (n);
@@ -60,10 +46,7 @@ void order (std::vector<int>& arr){
 void counting_sort(std::vector<int>& arr, std::vector<int>& b, int cifra){
     // n è arr.size(), k è n, in quanto ogni numero è espresso in base n
     int n = arr.size();
-    int powern = 1;
-    for (int i = 0; i<cifra; i++){
-        powern *= n;
-    }
+    int powern = std::pow(n, cifra);
     std::vector<int> c(n);
     for (int i=0; i<n; i++){
         c[i] = 0;
@@ -82,32 +65,91 @@ void counting_sort(std::vector<int>& arr, std::vector<int>& b, int cifra){
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*Esercizio 2
 
-#include <iostream>
+Sia A un vettore in cui ogni elemento contiene due campi: A[i].value contiene un numero intero ed A[i].color 
+contiene un colore ('b' o 'n'). Gli elementi di A sono ordinati in ordine crescente rispetto al campo value.
 
+a) Si consideri il problema di ordinare gli elementi di A rispetto al campo color secondo l’ordinamento b < n, 
+facendo in modo che gli elementi dello stesso colore siano ordinati rispetto al campo value. 
+Si scriva una procedura EFFICIENTE per risolvere il problema proposto. Si valuti e giustifichi la complessità.
 
+Il prototipo della procedura è:*/
 
-// Testing main function
-int main() {
-    // Test input data
-    std::vector<int> test_input = {13, 25, 7, 1, 3, 19, 11, 9};
+void ordinaPerColore(std::vector<ValCol>& arr);
 
-    // Display original vector
-    std::cout << "Original vector: ";
-    for (int num : test_input) {
-        std::cout << num << " ";
+/*b) Si consideri il problema di ordinare gli elementi di A rispetto al campo value, 
+facendo in modo che gli elementi che hanno stesso value siano ordinati rispetto al campo colore (sempre con la convenzione b < n). 
+Si scriva una procedura EFFICIENTE per risolvere il problema proposto. Si valuti e giustifichi la complessità.
+
+Il prototipo della procedura è:*/
+
+void ordinaPerValore(std::vector<ValCol>& arr);
+
+//Il tipo ValCol e' cosi' definito:
+
+typedef struct{
+    int value;
+    char colour;
+} ValCol; 
+
+void ordinaPerColore(std::vector<ValCol>& arr){
+    /**
+     * Per ipotesi, l'array è già ordinato rispetto al campo value, mi è sufficiente quindi raggruppare secondo i due campi colore,
+    */
+    std::vector<ValCol> b;
+    std::vector<ValCol> n;
+
+    for(int i=0; i<arr.size(); i++){
+        auto x = arr.at(i);
+        if (x.colour = 'n') n.push_back(x);
+        else b.push_back(x);
     }
-    std::cout << std::endl;
 
-    // Sort the vector
-    order(test_input);
-
-    // Display sorted vector
-    std::cout << "Sorted vector: ";
-    for (int num : test_input) {
-        std::cout << num << " ";
+    int i=0;
+    for(; i<b.size(); i++){
+        arr[i] = b[i];
     }
-    std::cout << std::endl;
+    i = 0;
+    for(; i<arr.size(); i++){
+        arr[i+b.size()] = n[i];
+    }
+}
+void ordinaPerValore(std::vector<ValCol>& arr){
+    /**
+     * per la stessa ipotesi di cui sopra, posso agire allo stesso modo:
+     * il vettore arr di partenza è già ordinato rispetto al campo value, ciò significa che mi basta
+     * splittare i due colori e dopo eseguire un merge. 
+     * I vettori dei due colori sono già ordinati, in quanto parto da un vettore già ordinato. facendo il merge dopo
+     * riesco a rimettere sempre in ordine per value, pescando però sia da un lato che dall'altro
+    */
+    std::vector<ValCol> b;
+    std::vector<ValCol> n;
 
-    return 0;
+    // separo i due colori
+    for(int i=0; i<arr.size(); i++){
+        auto x = arr.at(i);
+        if (x.colour = 'n') n.push_back(x);
+        else b.push_back(x);
+    }
+
+    // eseguo il merge
+    int i, j, w;
+    i = j = w = 0;
+    while(i<b.size() && j<n.size()){
+        auto xb = b.at(i).value;
+        auto xn = n.at(j).value;
+
+        if (xb < xn) 
+            arr[w++] = n.at(j++);
+        else
+            arr[w++] = b.at(i++);
+    }
+
+    // finisco gli eventuali valori mancanti
+    while(i<b.size())
+        arr[w++] = b.at(i++);
+    while (j<n.size())
+        arr[w++] = n.at(j++);
 }

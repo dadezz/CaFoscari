@@ -191,5 +191,24 @@ problema che non è dimostrato sia intrattabile ma per il quale non esiste algor
 # Connettività 
 Perché un grafo di n vertici sia connesso è necessario che ci siano almeno n-1 vertici. Dimostro per induzione su n = |V|. 
 * Base: n=1 -> numero di archi è 0, |V| = 1, effettivamente |E| = |V|-1
-* Acido: n>=2. Sia G connesso con n vertici. Prendo G' sottografo di G senza un vertice z. NOn posso a priori garantire che G' sia connesso. Lavoro però sulle sue componenti connesse. k=|cc|. se G' è connesso, k=1. Mi aspetto che per ogni cc, |E| sia >= |V|-1. 
+* acido (passo induttivo): n>=2. Sia G connesso con n vertici. Prendo G' sottografo di G senza un vertice z. NOn posso a priori garantire che G' sia connesso. Lavoro però sulle sue componenti connesse. k=|cc|. se G' è connesso, k=1. Mi aspetto che per ogni cc, |E| sia >= |V|-1. 
   Da cui $ |E| = \sum_{i=1}^k |E_i| +deg(z) $ ovvero la somma degli archi delle componenti connesse, a cui vanno aggiunti gli archi del vertice eliminato. Tutti gli E_i sono maggiori uguali di |V_i| -1 , da cui posso maggiorare $ |E| \geq \sum_{i=1}^k (|V_i| -1) +deg(z) $, che è uguale a $ \sum_{i=1}^k |V_i| -k +deg(z) $. La sommatoria è esattamente |V|-1, percHé la sommatoria della cardinalità di cc è la cardinalità iniziale, -1 per via del vertice cavato. Posso dire essere sicuramente vero che deg(z) >= k. per l'ipotesi iniziale che il grafo di partenza fosse connesso, quindi la disuguaglianza continua a valere in quanto si sta maggiorando. il grado di z non può essrere minore di k xk sennò il grafo iniziale non sarebbe connesso.
+
+## Grafi aciclici
+
+## Grafi Complemento
+
+osservazioni: sono vere queste cose? 
+
+* grafo G connesso e duale connesso: non è una implicazione valida (il complemento di un grafo completo è il grafo vuoto)
+* gradfo G connesso e G' disconnesso: non è un'implicazione valida, per esempio grafi autocomplementari
+* grafo G disconnesso e G' connesso: unica implicazione valida
+* entrambi disconnessi: non è un implicazione valida per lo stesso discorso del punto 1
+
+dimostrrazione informale del punto 3
+prendiamo le k componenti connesse del grafo G (ovviametne k>=2). il complemento per forza collega queste componenti connesse. u e v sono vertici. ci sono due casi:
+1. u appartiene a una cc e v a un'altra -> soluzione banale: nel complemento ci sarà direttamente un arco che li connette
+2. u, v appartengono alla stessa cc -> sono entrambi connessi a un nodo terzo su un'altra cc.
+
+c'è sempre un cammino tra due vertici u,v presi nel grafo complemento di G -> è connesso. 
+
