@@ -66,6 +66,13 @@ void counting_sort(std::vector<int>& arr, std::vector<int>& b, int cifra){
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Il tipo ValCol e' cosi' definito:
+
+typedef struct{
+    int value;
+    char colour;
+} ValCol; 
 /*Esercizio 2
 
 Sia A un vettore in cui ogni elemento contiene due campi: A[i].value contiene un numero intero ed A[i].color 
@@ -87,13 +94,6 @@ Il prototipo della procedura è:*/
 
 void ordinaPerValore(std::vector<ValCol>& arr);
 
-//Il tipo ValCol e' cosi' definito:
-
-typedef struct{
-    int value;
-    char colour;
-} ValCol; 
-
 void ordinaPerColore(std::vector<ValCol>& arr){
     /**
      * Per ipotesi, l'array è già ordinato rispetto al campo value, mi è sufficiente quindi raggruppare secondo i due campi colore,
@@ -103,7 +103,7 @@ void ordinaPerColore(std::vector<ValCol>& arr){
 
     for(int i=0; i<arr.size(); i++){
         auto x = arr.at(i);
-        if (x.colour = 'n') n.push_back(x);
+        if (x.colour == 'n') n.push_back(x);
         else b.push_back(x);
     }
 
@@ -130,7 +130,7 @@ void ordinaPerValore(std::vector<ValCol>& arr){
     // separo i due colori
     for(int i=0; i<arr.size(); i++){
         auto x = arr.at(i);
-        if (x.colour = 'n') n.push_back(x);
+        if (x.colour == 'n') n.push_back(x);
         else b.push_back(x);
     }
 
@@ -141,10 +141,10 @@ void ordinaPerValore(std::vector<ValCol>& arr){
         auto xb = b.at(i).value;
         auto xn = n.at(j).value;
 
-        if (xb < xn) 
-            arr[w++] = n.at(j++);
-        else
+        if (xb <= xn) 
             arr[w++] = b.at(i++);
+        else
+            arr[w++] = n.at(j++);
     }
 
     // finisco gli eventuali valori mancanti
@@ -153,3 +153,15 @@ void ordinaPerValore(std::vector<ValCol>& arr){
     while (j<n.size())
         arr[w++] = n.at(j++);
 }
+
+/**
+ * è immediato vedere che in entrambi i casi la complessità è lineare. Prima viene copiato una volta tutto l'array,
+ * separandolo in due array separati (ma il cui numero complessivo di elementi è comunque n).
+ * 
+ * poi in un caso vengono semplicemente ricopiati nuovamente i due array nell'array originale, uno di seguito all'altro per un totale 
+ * quindi di 2 cicli for da n iterazioni -> Theta(N);
+ * nel secondo caso succede la stessa cosa, solo che al posto di copiarli di seguito, vengono copiati in altro ordine, per un totale 
+ * in ogni caso di n iterazioni
+ * 
+ * la complessità è in entrambi i casi theta(n)
+*/
