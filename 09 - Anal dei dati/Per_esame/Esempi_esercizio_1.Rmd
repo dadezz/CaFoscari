@@ -1,0 +1,98 @@
+---
+title: "Nome Cognome - Esercizio X"
+output:
+  html_document: 
+    df_print: paged
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+*******************************
+# ESEMPIO 1
+*******************************
+Si consideri un campione casuale semplice $(X_1, X_2, X_3)$ da una variabile di Poisson con media $\theta>0$. Si considerino i due stimatori di $\theta$:
+$$ T_1=\frac{2 X_1+X_2/2+X_3}{5} \quad \text{e} \quad T_2=\frac{X_1+2X_2+3X_3}{4}. $$
+
+Si risponda ai seguenti quesiti:
+
+**si calcoli la distorsione dei due stimatori**
+ per la distorsione devo guardare il valore atteso dello stimatore $\hat \theta$ (in sto caso rispettivamente T1 e T2).
+$$ E(\frac{2 X_1+X_2/2+X_3}{5}) = \frac{2 E(X_1)+E(X_2)/2+E(X_3)}{5}$$
+essendo una variabile di poisson, $E(X) =  \lambda $ (o theta). sostituisco quindi lambda al posto delle X
+$$ \frac{2 \lambda+\lambda/2+\lambda}{5} = 0.7\lambda = \frac{7}{10}\lambda$$
+Non ho finito, questa non è la distorsione!
+$$bias(T1) = \frac{7}{10}\lambda - \lambda = \frac{3}{10}\lambda \text{ stimatore distorto!}$$
+idem per T2.
+**si calcoli la varianza dei due stimatori;**
+ricordiamo sempre che 
+$$ Var(aX + bY + c) = a^2Var(X) + b^2Var(Y) + 2abCov(X,Y)$$
+dal momento che le varie x sono indipendenti tra loro, non abbiamo covarianza. In poisson, lambda è anche uno stimatore della varianza, di conseguenza ottengo:
+$$Var(\frac{2 X_1+X_2/2+X_3}{5}) = \frac{2^2 Var(X_1)+Var(X_2)/2^2+Var(X_3)}{5^2} = \\ \frac{4 \lambda+\lambda/4+\lambda}{25} = 0.21\lambda = \frac{21}{100}\lambda$$
+
+**si dica quale dei due stimatori è preferibile.**
+per valutare quale è preferibile, debo guardare l'errore quadratico medio.
+$$ MSE(T_1)=Bias(\hat \theta)^2+ Var(\hat \theta) = \frac{9}{100} \theta^2+ \frac{21}{100}\theta $$
+Si guarda poi la differenza tra i due errori:
+$$ MSE(T_2)-MSE(T_1) =\theta(0.16 \theta +0.665) $$
+Siccome la differenza dei due errori quadratici medi è positiva per qualsiasi valore ammissibile di $\theta$, concludiamo che lo stimatore $T_1$ è preferibile. 
+
+*******************************
+# ESEMPIO 2
+*******************************
+Sia $X_1, \ldots, X_n$ un campione casuale semplice da una variabile casuale discreta con funzione di probabilità:
+$$ \text{Pr}(X=x; \theta)=\begin{cases}
+1/2, & \text{se} \; x=-1,\\
+(1-\theta)/2, & \text{se} \; x=0,\\
+\theta/2, & \text{se} \; x=1,
+\end{cases} $$
+per un qualche parametro ignoto $\theta \in [0,1]$. Si consideri lo stimatore $\hat \theta = 2 \bar{X}+ 1$.
+
+**si calcoli la distorsione dello stimatore** 
+Lo stimatore è 2*valore atteso di X +1, e per calcolare il bias devo trovare il valroe atteso dello stimatore.
+$$ E(2 \bar x + 1) = 2 E(x) +1$$
+cos'è E(x)? posso usare la media, da cui 
+$$E(x) = (-1)*1/2 + (0)*(1-\theta)/2 + (1)*\theta/2 \\ \text{da cui} \\ E(2 \bar X + 1) = 2((-1)*1/2 + (0)*(1-\theta)/2 + (1)*\theta/2) +1
+= \\ 2(-\frac{1}{2} + \frac{\theta}{2})+1 = \theta \text{ Non distorto!!}$$
+
+**si calcoli l’errore standard dello stimatore**
+
+L'errore standard SE di uno stimatore è dato da $\sigma / \sqrt{n}$. siccome sigma non lo conosciamo, possiamo sostituirlo con una sua stima consistente, tipo S. devo quindi calcolarmi la varianza. Cos'è la varianza? $Var(X)= E(X^2) - E(X)^2$. Esattamente come ho fatto prima, mi calcoloE(X^2): 
+$$ E(X_1^2)=(-1^2)*1/2 + (0^2)*(1-\theta)/2 + (1^2)*\theta/2 = 1/2 + \theta /2 =  \frac{\theta+1}{2}$$
+Ora posso concludere la varianza: $$var(X_1)=\frac{\theta+1}{2} - \frac{(\theta-1)^2}{4}=\frac{-\theta^2+4\theta + 1}{4}$$
+Avendo la varianza dela variabile casuale, posso finalmente ricavare quella campionaria
+$$Var(2 \hat X +1) = 4Var(\hat X) = 4Var(X)/n$$
+
+L'errore standard è semplicemente la radice quadrata della varianza:
+$$
+SE(\hat \theta)=\sqrt{ \frac{4}{n} \text{var}(X_1)}= \sqrt{\frac{-\theta^2+4\theta + 1}{n}}
+$$
+
+**si valuti se lo stimatore \hat \theta è consistente**
+uno stimatore è consistente se, al crescere della dimensione campionaria n, il suo errore tende a zero. Uno stimatore per essere consistentte deve non essere distorto e la varianza deve andare asintoticamente a 0. In questo caso la risposta del prof è stata semplicemente: *"Lo stimatore è consistente perché non è distorto e il suo errore standard converge a zero al crescere di $n$".*
+
+*******************************
+# ESEMPIO 3
+*******************************
+Sia $X_1, \ldots, X_n$ un campione casuale semplice da una variabile casuale con funzione di densità
+$$f(x; \theta) = 2 \theta^2 x^{-3}, \quad \text{per} \; x > \theta \; \text{e} \; \theta >0.$$
+Si consideri lo stimatore $\hat\theta=\bar{X}/2$.
+
+**Si calcoli la distorsione di theta**
+la distorsione è ancora una volta il calcolo del valore atteso dello stimatore. $$E(\hat X) = E(\bar X /2) = E(X_1)/2$$
+devo quindi calcolarmi il valore atteso della variabile casuale X
+$$ E(X_1) \text{ è definito come: } \int_{\theta}^\infty x \cdot f(x, \theta) \\=\int_{\theta}^\infty 2 \theta^2 x^{-2} \; d x = 2\theta \\ \text{conseguentemente, il valore atteso campionario:  }\\ E(\hat X) = E(X_1)/2 \\ =2\theta / 2 = \theta$$
+Ne consegue quindi che lo stimatore è non distorto
+
+**Si calcoli l’errore standard dello stimatore**
+per lo SE mi serve la varianza. Siccome $\bar X$ è la media campionaria, sappiamo che $Var(\bar X) = \frac{Var(X)}{n}$. Ora, lo stimatore è $\bar X /2$, conseguentemente $Var(\hat \theta) = Var(\bar X /2) = 1/4Var(\bar X)$. Tengo questo risultato da parte e mi concentro sul caclcolo di $Var (X)$, che poi mi serve per Xbarrato e infine per lo stimatore
+$$
+\begin{align*}
+var(X_1)&=E(X_1^2)-E(X_1)^2 \\
+&= E(X_1^2)-4\theta^2\\
+&=\int_{\theta}^\infty 2 \theta^2 x^{-1} \; d x - 4\theta^2
+\end{align*}
+$$
+Siccome l'integrale è divergente,  la varianza non è finita e quindi l'errore standard di $\hat \theta$ non esiste finito.
+
+**Si valuti la consistenza dello stimatore**
+Siccome la varianza non è finita, lo stimatore non è consistente.
