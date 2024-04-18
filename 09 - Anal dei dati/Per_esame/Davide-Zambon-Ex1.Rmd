@@ -1,0 +1,45 @@
+---
+title: "Nome Cognome - Esercizio X"
+output:
+  html_document: 
+    df_print: paged
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+# Soluzione quesito 1
+Si calcoli la distorsione dei due stimatori:
+
+Rispettivamente:
+In quanto variabile di Poisson, $E(X_1) = \theta$
+$$
+E(\hat \theta_1) = 1/7E(X_1) + 6/7E(X_n) = 7/7\theta = \theta \\
+E(\hat \theta_2) = \frac{1}{n-2}\sum_1^nE(X_1) = \frac{1}{n-2}\cdot n\theta
+$$
+$\hat \theta_1$ è uno stimatore non distorto, $\hat \theta_2$ invece lo è solo asintoticamente, in quanto al crescere di n, la quantità n/(n-2) tende a 1.
+
+# Soluzione quesito 2
+Si calcoli l’errore standard dei due stimatori:
+
+L'errore standard SE di uno stimatore è dato da $\sigma / \sqrt{n}$. siccome sigma non lo conosciamo, possiamo sostituirlo con una sua stima consistente.
+Calcolo la varianza:
+In quanto variabile di Poisson, $Var(X_1) = \theta$
+$$
+Var(\hat \theta_1)= (1/49)Var(X_1) + (36/49)Var(X_n) = (37/49) \theta \\
+Var(\hat \theta_2) = \frac{n}{n-2} \theta
+$$
+Da cui gli errori standard:
+$$
+SE(\hat \theta_1) = \sqrt{\frac{37\cdot \theta}{49}} \\
+SE(\hat \theta_2) = \sqrt{\frac{n}{n-2} \theta}
+$$
+# Soluzione quesito 3
+
+$$
+\theta = 4 \iff \begin{cases}
+SE(\hat \theta_1) = 1.737932 \\
+SE(\hat \theta_2) = \sqrt\frac{4n}{n-2}
+\end{cases}
+$$
+Lo stimatore 2 è preferibile quando $n\leq 5$, in quanto $SE(\hat \theta_1) \leq SE(\hat \theta_2) \iff n\leq 5$

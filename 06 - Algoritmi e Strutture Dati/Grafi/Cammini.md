@@ -35,3 +35,69 @@ dijkstra(G, w, a){
     }
 }
 ```
+
+## Teorema
+Alla fine dell'algoritmo di Dijkstra si avrà:
+1. $ d[u] = \delta (s, u) \forall u \in V $
+2. $ g_{\pi} $ è un albero di camm. min.
+
+### Dimostrazione
+dimostriamo solo il punto 1.
+$ \forall u \in V $ all'atto dell'estrazione di u dalla Q si ha che $ d[u] = \delta (s, u) $. Se dimostro questo, per la proprietà del limite inferiore riesco a dimostrare il teorema. Procediamo per assurdo. Facciamo finta che esista un vertice per cui non valga questa proprietà, quindi che $ d[u] \neq \delta(s, u) $. Suppongo anche che questo sia il primo vertice per cui accade. 
+
+1. Osservazione: il vertice u sicuramente non è la sorgente: immediatamente dopo la init, ho d[s] = 0, che è la distanza tra s e sé stesso; questo perché non ci sono pesi negativi.
+2. Osservazione: al momento dell'estrazione di u, S sarà non vuoto. 
+3. Osservazione: u sarà sicuramente raggiungibile da s: se u non fosse raggiungibile, la distanza sarebbe infinito, ma guarda caso d[u] dopo la init è +inf, e coincide con delta. per ipotesi però delta è diverso da d.
+
+Sia p un cammino minimo tra s e u. ci sarà un certo momento in cui il cammino attraversa il taglio S/Q, pirtendo da un vertice x in S a un vertice y in Q
+
+1. $ d[x] = \delta[x] e d[y] = \delta [y] $: nel caso di x possiamo dirlo xk la proprietà di "diverso" deve valere per u per la prima volta, e x è già stato estratto. y per la proprietà della convergenza: se mi trovo su un cammino minimo e il predecessore ha d = delta, allora la prima relax su y sistema d=delta anche su y.
+2. d[u]<=d[y] e delta(s, y) <= delta (s, u).
+3. delta(s, u) = delta(s, y)+somme dei pesi tra y e u.
+4. delta(s,u) <= d[u]
+
+Mettendo isieme i pezzi finora, riusciamo a dimostrare d[u] = delta[s,u]?
+
+delta(s.u) <= d[u] <= d[y] <= delta(s,y) <= delta(s, u). da cui si deriva l'uguaglianza. 
+
+## Pesi negativi?
+si potrebbe pensare di sommare una costante a tutti i pesi sugli archi, non è corretto però. il problema sorge per il fatto che il peso di un cammino dipende da quanti archi ci sono. la costante viene sommata tante volte quanti sono gli archi. uno può tenerne conto ogni passo che fa, ma a livello computazionale non è una buonissima idea.
+
+# Algoritmo di Bellman-ford
+algortitmo di forza bruta che fa relax a tappeto.
+```c
+Bellman-ford(G, w, s) {
+    inizializza(G);
+    for i=1 to |V[G]|-1{
+        for each (u, v) in E[G]{
+            relax(u, v, w(u,v));
+        }
+    }
+    // in presenza di un grafo con pesi negativi possono esserci cicli negativi
+    // questa seconda parte serve a segnalare la presenza di cicli negativi
+    for each (u, v) in E[G]{
+        if (d[v] > d[u] + w[u, v]) {
+            return false; // nel grafo ci sono cicli negativi: non fidarti del risutato ottenuto
+        }
+    }
+    return true;
+}
+```
+
+complessità: inizializza = N. i due for = (n-1)m; ultimo ciclo = m. Da cui n*m complessità totale
+
+## Teorema
+Se G non contiene cicli negativi raggiungibili dalla sorgente, allora alla fine dell'algoritmo:
+1. $ d[v] = \delta(s,v) \forall v \in V $
+2. $ G_{\pi} $ è un albero di camminio minimo
+3. l'algoritmo restituisce true.
+
+Se invece G contiene un ciclo negativo raggiungibile dalla sorgente, allora alla fine dell'algortimo:
+1. l'algoritmo restituisce false.
+
+### dimostrazione
+come prima non dimostreremo (2).
+Poniamoci nel primo caso, quindi non esistono cicli negativi raggiungibili dallla sorgente.
+prendo un vertice v. sicuramnente quindi delta(s,v) non è -inf. o è inf o appartiene a R. se è infinito, è ovvia la dimostrazione, percHé già dopo la init d=delta; Se appartiene a R? chiamo p un cammino minimo semplice tra s e v (può esistere cammino non semplice se il ciclo ha peso 0). Non essendoci cicli, nel caso peggiore p ha n-1 archi.
+
+Immediatamente dopo la init, d[x_0] = delta(x_0, x_0). poi per la proprietà della convergenza ad ogni passo (al passo k), ho d[x_k] = delta (s, x_k). e la dimostrazione in realtà è finita. fai il passo per ogni arco e top.

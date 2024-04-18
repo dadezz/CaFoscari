@@ -1,0 +1,32 @@
+---
+title: "Nome Cognome - Esercizio X"
+output:
+  html_document: 
+    df_print: paged
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+# Soluzione quesito 1
+Calcolo log-verosimiglianza
+$$
+\ell \propto -\frac{x}{\theta} 6\log {x}
+$$ 
+Calcolo funzione punteggio
+$$
+\ell' = -\frac{1}{\theta} 6\log {x} - \frac{x}{\theta}\cdot\frac{6}{x}
+$$ 
+la pongo uguale a 0:
+$$
+0 = -\frac{1}{\theta} 6\log {x} - \frac{x}{\theta}\cdot\frac{6}{x}
+$$ 
+verifico tramite derivata seconda che sia un punto di massimo
+$$
+-\frac{6}{\theta x} <0 \text{ sempre}
+$$
+esplicitando theta nell'equazione in cui ho posto uguale a 0, ottengo lo stimatore. sostituendo coi dati in possesso ottengo la stima.
+
+# Soluzione quesito 2
+
+# Soluzione que

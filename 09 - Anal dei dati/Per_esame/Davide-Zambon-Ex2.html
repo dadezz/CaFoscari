@@ -2753,125 +2753,29 @@ border-radius: 0px;
 </div>
 
 
-<hr />
-<div id="esempio-1" class="section level1" number="1">
-<h1><span class="header-section-number">1</span> ESEMPIO 1</h1>
-<hr />
-<p>Si consideri un campione casuale semplice <span class="math inline">\((X_1, X_2, X_3)\)</span> da una variabile di
-Poisson con media <span class="math inline">\(\theta&gt;0\)</span>. Si
-considerino i due stimatori di <span class="math inline">\(\theta\)</span>: <span class="math display">\[
-T_1=\frac{2 X_1+X_2/2+X_3}{5} \quad \text{e} \quad
-T_2=\frac{X_1+2X_2+3X_3}{4}. \]</span></p>
-<p>Si risponda ai seguenti quesiti:</p>
-<p><strong>si calcoli la distorsione dei due stimatori</strong> per la
-distorsione devo guardare il valore atteso dello stimatore <span class="math inline">\(\hat \theta\)</span> (in sto caso rispettivamente
-T1 e T2). <span class="math display">\[ E(\frac{2 X_1+X_2/2+X_3}{5}) =
-\frac{2 E(X_1)+E(X_2)/2+E(X_3)}{5}\]</span> essendo una variabile di
-poisson, $E(X) = $ (o theta). sostituisco quindi lambda al posto delle X
-<span class="math display">\[ \frac{2 \lambda+\lambda/2+\lambda}{5} =
-0.7\lambda = \frac{7}{10}\lambda\]</span> Non ho finito, questa non è la
-distorsione! <span class="math display">\[bias(T1) = \frac{7}{10}\lambda
-- \lambda = \frac{3}{10}\lambda \text{ stimatore distorto!}\]</span>
-idem per T2. <strong>si calcoli la varianza dei due stimatori;</strong>
-ricordiamo sempre che <span class="math display">\[ Var(aX + bY + c) =
-a^2Var(X) + b^2Var(Y) + 2abCov(X,Y)\]</span> dal momento che le varie x
-sono indipendenti tra loro, non abbiamo covarianza. In poisson, lambda è
-anche uno stimatore della varianza, di conseguenza ottengo: <span class="math display">\[Var(\frac{2 X_1+X_2/2+X_3}{5}) = \frac{2^2
-Var(X_1)+Var(X_2)/2^2+Var(X_3)}{5^2} = \\ \frac{4
-\lambda+\lambda/4+\lambda}{25} = 0.21\lambda =
-\frac{21}{100}\lambda\]</span></p>
-<p><strong>si dica quale dei due stimatori è preferibile.</strong> per
-valutare quale è preferibile, debo guardare l’errore quadratico medio.
-<span class="math display">\[ MSE(T_1)=Bias(\hat \theta)^2+ Var(\hat
-\theta) = \frac{9}{100} \theta^2+ \frac{21}{100}\theta \]</span> Si
-guarda poi la differenza tra i due errori: <span class="math display">\[
-MSE(T_2)-MSE(T_1) =\theta(0.16 \theta +0.665) \]</span> Siccome la
-differenza dei due errori quadratici medi è positiva per qualsiasi
-valore ammissibile di <span class="math inline">\(\theta\)</span>,
-concludiamo che lo stimatore <span class="math inline">\(T_1\)</span> è
-preferibile.</p>
-<hr />
-</div>
-<div id="esempio-2" class="section level1" number="2">
-<h1><span class="header-section-number">2</span> ESEMPIO 2</h1>
-<hr />
-<p>Sia <span class="math inline">\(X_1, \ldots, X_n\)</span> un campione
-casuale semplice da una variabile casuale discreta con funzione di
-probabilità: <span class="math display">\[ \text{Pr}(X=x;
-\theta)=\begin{cases}
-1/2, &amp; \text{se} \; x=-1,\\
-(1-\theta)/2, &amp; \text{se} \; x=0,\\
-\theta/2, &amp; \text{se} \; x=1,
-\end{cases} \]</span> per un qualche parametro ignoto <span class="math inline">\(\theta \in [0,1]\)</span>. Si consideri lo
-stimatore <span class="math inline">\(\hat \theta = 2 \bar{X}+
-1\)</span>.</p>
-<p><strong>si calcoli la distorsione dello stimatore</strong> Lo
-stimatore è 2*valore atteso di X +1, e per calcolare il bias devo
-trovare il valroe atteso dello stimatore. <span class="math display">\[
-E(2 \bar x + 1) = 2 E(x) +1\]</span> cos’è E(x)? posso usare la media,
-da cui <span class="math display">\[E(x) = (-1)*1/2 + (0)*(1-\theta)/2 +
-(1)*\theta/2 \\ \text{da cui} \\ E(2 \bar X + 1) = 2((-1)*1/2 +
-(0)*(1-\theta)/2 + (1)*\theta/2) +1
-= \\ 2(-\frac{1}{2} + \frac{\theta}{2})+1 = \theta \text{ Non
-distorto!!}\]</span></p>
-<p><strong>si calcoli l’errore standard dello stimatore</strong></p>
-<p>L’errore standard SE di uno stimatore è dato da <span class="math inline">\(\sigma / \sqrt{n}\)</span>. siccome sigma non lo
-conosciamo, possiamo sostituirlo con una sua stima consistente, tipo S.
-devo quindi calcolarmi la varianza. Cos’è la varianza? <span class="math inline">\(Var(X)= E(X^2) - E(X)^2\)</span>. Esattamente come
-ho fatto prima, mi calcoloE(X^2): <span class="math display">\[
-E(X_1^2)=(-1^2)*1/2 + (0^2)*(1-\theta)/2 + (1^2)*\theta/2 = 1/2 + \theta
-/2 =  \frac{\theta+1}{2}\]</span> Ora posso concludere la varianza:
-<span class="math display">\[var(X_1)=\frac{\theta+1}{2} -
-\frac{(\theta-1)^2}{4}=\frac{-\theta^2+4\theta + 1}{4}\]</span> Avendo
-la varianza dela variabile casuale, posso finalmente ricavare quella
-campionaria <span class="math display">\[Var(2 \hat X +1) = 4Var(\hat X)
-= 4Var(X)/n\]</span></p>
-<p>L’errore standard è semplicemente la radice quadrata della varianza:
+<div id="soluzione-quesito-1" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Soluzione quesito
+1</h1>
+<p>Calcolo log-verosimiglianza <span class="math display">\[
+\ell \propto -\frac{x}{\theta} 6\log {x}
+\]</span> Calcolo funzione punteggio <span class="math display">\[
+\ell&#39; = -\frac{1}{\theta} 6\log {x} -
+\frac{x}{\theta}\cdot\frac{6}{x}
+\]</span> la pongo uguale a 0: <span class="math display">\[
+0 = -\frac{1}{\theta} 6\log {x} - \frac{x}{\theta}\cdot\frac{6}{x}
+\]</span> verifico tramite derivata seconda che sia un punto di massimo
 <span class="math display">\[
-SE(\hat \theta)=\sqrt{ \frac{4}{n} \text{var}(X_1)}=
-\sqrt{\frac{-\theta^2+4\theta + 1}{n}}
-\]</span></p>
-<p><strong>si valuti se lo stimatore è consistente</strong> uno
-stimatore è consistente se, al crescere della dimensione campionaria n,
-il suo errore tende a zero. Uno stimatore per essere consistentte deve
-non essere distorto e la varianza deve andare asintoticamente a 0. In
-questo caso la risposta del prof è stata semplicemente: <em>“Lo
-stimatore è consistente perché non è distorto e il suo errore standard
-converge a zero al crescere di <span class="math inline">\(n\)</span>”.</em></p>
-<hr />
+-\frac{6}{\theta x} &lt;0 \text{ sempre}
+\]</span> esplicitando theta nell’equazione in cui ho posto uguale a 0,
+ottengo lo stimatore. sostituendo coi dati in possesso ottengo la
+stima.</p>
 </div>
-<div id="esempio-3" class="section level1" number="3">
-<h1><span class="header-section-number">3</span> ESEMPIO 3</h1>
-<hr />
-<p>Sia <span class="math inline">\(X_1, \ldots, X_n\)</span> un campione
-casuale semplice da una variabile casuale con funzione di densità <span class="math display">\[f(x; \theta) = 2 \theta^2 x^{-3}, \quad
-\text{per} \; x &gt; \theta \; \text{e} \; \theta &gt;0.\]</span> Si
-consideri lo stimatore <span class="math inline">\(\hat\theta=\bar{X}/2\)</span>.</p>
-<p><strong>Si calcoli la distorsione di theta</strong> la distorsione è
-ancora una volta il calcolo del valore atteso dello stimatore. <span class="math display">\[E(\hat X) = E(\bar X /2) = E(X_1)/2\]</span> devo
-quindi calcolarmi il valore atteso della variabile casuale X <span class="math display">\[ E(X_1) \text{ è definito come: }
-\int_{\theta}^\infty x \cdot f(x, \theta) \\=\int_{\theta}^\infty 2
-\theta^2 x^{-2} \; d x = 2\theta \\ \text{conseguentemente, il valore
-atteso campionario:  }\\ E(\hat X) = E(X_1)/2 \\ =2\theta / 2 =
-\theta\]</span> Ne consegue quindi che lo stimatore è non distorto</p>
-<p><strong>Si calcoli l’errore standard dello stimatore</strong> per lo
-SE mi serve la varianza. Siccome <span class="math inline">\(\bar
-X\)</span> è la media campionaria, sappiamo che <span class="math inline">\(Var(\bar X) = \frac{Var(X)}{n}\)</span>. Ora, lo
-stimatore è <span class="math inline">\(\bar X /2\)</span>,
-conseguentemente <span class="math inline">\(Var(\hat \theta) = Var(\bar
-X /2) = 1/4Var(\bar X)\)</span>. Tengo questo risultato da parte e mi
-concentro sul caclcolo di <span class="math inline">\(Var (X)\)</span>,
-che poi mi serve per Xbarrato e infine per lo stimatore <span class="math display">\[
-\begin{align*}
-var(X_1)&amp;=E(X_1^2)-E(X_1)^2 \\
-&amp;= E(X_1^2)-4\theta^2\\
-&amp;=\int_{\theta}^\infty 2 \theta^2 x^{-1} \; d x - 4\theta^2
-\end{align*}
-\]</span> Siccome l’integrale è divergente, la varianza non è finita e
-quindi l’errore standard di <span class="math inline">\(\hat
-\theta\)</span> non esiste finito.</p>
-<p><strong>Si valuti la consistenza dello stimatore</strong> Siccome la
-varianza non è finita, lo stimatore non è consistente.</p>
+<div id="soluzione-quesito-2" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Soluzione quesito
+2</h1>
+</div>
+<div id="soluzione-que" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Soluzione que</h1>
 </div>
 
 

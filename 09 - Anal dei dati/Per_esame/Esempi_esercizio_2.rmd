@@ -1,0 +1,299 @@
+---
+title: "Nome Cognome - Esercizio X"
+output:
+  html_document: 
+    df_print: paged
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+*******************************
+# ESEMPIO 1
+*******************************
+Sia $X_1, \ldots, X_n$ un campione casuale semplice da una distribuzione discreta con funzione di probabilità
+$$\text{Pr}(X=x; \theta)= \theta(1-\theta)^x, \quad x = 0, 1, 2, \ldots, \; 0<\theta<1.$$
+Sapendo che un campione casuale semplice di dimensione 52 ha dato le statistiche
+$$
+    \sum_{i=1}^{52} \sqrt{x_i} = 22.17; \quad
+
+    \sum_{i=1}^{52} x_i = 31; \quad
+
+    \sum_{i=1}^{52} x_i^2 = 73;\quad
+
+    \sum_{i=1}^{52} x_i^3 = 205.\quad
+$$
+Si risponda ai seguenti quesiti:
+
+**si calcoli la stima di massima verosimiglianza di \theta**
+$$
+\text{verosimiglianza: } L(\theta) \propto \prod_{1}^{52}Pr(X_i = x_i) \\
+\text{log-verosrimiglianza: } \ell(\theta) \propto \sum \log(Pr(X_i=x_i))
+\\ \text{da cui:}\\
+\ell(\theta) \propto \sum \log (\theta) + x \cdot \log(1-\theta) \\
+= n \log(\theta) + \log (1-\theta)\sum x 
+$$
+Questa è la funzione di logverosimiglianza. Devo calcolare ora la funzione punteggio, che è la derivata prima:
+$$
+\ell' (\theta) = \frac{n}{\theta} - \frac{\sum x}{1-\theta}
+$$
+La pongo ora uguale a 0 per trovare punto di massimo
+$$
+\ell' (\theta) = 0 \iff \frac{n(1-\theta) -\theta \sum x}{\theta (1- \theta)} = 0 \\
+n - n\theta - \theta \sum x = 0 \\
+\theta(n + \sum x) = n \\
+\hat \theta = \frac {n}{n+\sum x} \quad !!!
+$$
+Quest'ultimo è lo stimatore di massima verosimiglianza (sostituendo i dati otterrò la stima di massima verosimiglianza).
+Devo guardare la concavità per assicurarmi che sia un punto di massimo
+$$
+\ell''(\theta) = - \frac{n}{\theta^2} - \frac{\sum x_i}{(1-theta)^2} <0 \quad \forall\theta
+$$
+Dicevamo: sostituendo i dati posso ottenere la stima e non solo lo stimatore:
+$$
+\theta = \frac{52}{52+31} = 0.6265
+$$
+**si calcoli una stima dell’errore standard dello stima di \theta ottenuta al punto precedente**
+utilizzo l'informazione osservata
+$$
+J = -\ell'' \\
+SE(\hat \theta) = J^{-1/2} = \frac{1}{\sqrt{-\ell''}}
+$$
+**si calcoli la stima di massima verosimiglianza di \psi=\log(\theta) e la stima del suo errore standard. [2 punti].**
+La stima di massima verosimiglianza di ψ è  (\log(\hat \theta)) = -0.4675969.
+La stima del suo errore standard è 
+$$
+SE(\hat \psi)=\frac{SE(\hat \theta)}{\hat \theta}
+$$
+*******************************
+# ESEMPIO 2
+*******************************
+Sia $X_1, \ldots, X_{261}$ un campione casuale semplice da una distribuzione continua con funzione di densità
+$$
+f(x; \theta)=\frac{1}{\theta}x^{(1-\theta)/\theta}, \quad 0 < x < 1, \; \theta >0.
+$$
+Sapendo che nel campione sono state osservate le seguenti statistiche
+$$
+\sum_{i=1}^{261} x_i = 131.4, \quad 
+\sum_{i=1}^{261} \frac{1}{x_i} = 620.12, \quad
+\sum_{i=1}^{261} \log x_i = -159.59, \quad
+\sum_{i=1}^{261} x_i^2 = 92.49,
+$$
+si risponda ai seguenti quesiti:
+
+**si calcoli la stima con il metodo dei momenti di \theta **
+praticamente devo trovare il valore atteso, che è funzione di theta e uguagliarlo con la media campionaria (letteralmente, x barrato). esplicito thetacappello.
+
+il momento di primo ordine è calcolato come:
+Per variabile casuale discreta:
+E[X] = ∑(x * f(x))
+Per variabile casuale continua:
+E[X] = ∫(x * f(x) dx).
+
+Momento di secondo ordine (varianza):
+Il momento di secondo ordine è la varianza di una distribuzione di probabilità ed è indicato come Var[X] o σ^2 (sigma al quadrato). Esso misura la dispersione dei dati intorno alla media. Per una variabile casuale discreta X o continua X, la varianza è calcolata come:
+
+Per variabile casuale discreta:
+Var[X] = E[(X - μ)^2] = ∑[(x - μ)^2 * f(x)]
+
+Per variabile casuale continua:
+Var[X] = E[(X - μ)^2] = ∫[(x - μ)^2 * f(x) dx]
+
+La deviazione standard (σ) è la radice quadrata della varianza.
+**si calcoli la stima di massima verosimiglianza di \theta **
+**si calcoli una stima dell’errore standard di una delle due stime calcolate ai punti precedenti**
+[1] Il valore atteso di X è 
+$$
+E(X) = 1 / (1+\theta).
+$$
+Quindi, lo stimatore con il metodo dei momenti di theta  è  
+$$
+\hat \theta = (1 - \bar{X}) / \bar{X}
+$$
+e la corrispondente stima vale
+```{r, error = TRUE}
+(1 - 131.4 / 261) / (131.4 / 261)
+```
+
+[2] La log-verosimiglianza è 
+
+$$
+\ell(\theta) = -261 \log \theta + \frac{1 - \theta}{\theta} \sum_{i=1}^{261} \log X_i.
+$$
+La funzione punteggio è 
+
+$$
+\ell'(\theta) = -\frac{261}{\theta} - \frac{1}{\theta^2}\sum_{i=1}^{261} \log X_i.
+$$
+
+Risolvendo l'equazione di verosimiglianza si trova la stima di massima verosimiglianza pari a
+$$
+\hat \theta=-\frac{1}{261}\sum_{i=1}^{261} \log X_i
+$$
+che è lo stimatore di massima verosimiglianza in quanto la derivata seconda della log-verosimiglianza 
+$$
+\ell^{''}(\theta)=\frac{261}{\theta^2}+\frac{2}{\theta^3}  \sum_{i=1}^{261} \log X_i
+$$
+è negativa quando calcolata in $\hat \theta$. Con i dati osservati otteniamo la stima di massima verosimiglianza:
+```{r, error = TRUE}
+-(-159.59) / 261
+```
+
+[3] L'informazione osservata è
+```{r, error = TRUE}
+j <- -261 / 0.61^2 - 2 / 0.61^3 * (-159.59)
+j
+```
+Quindi, l'errore standard stimato dello stimatore di massima verosimiglianza è approssimativamente pari a 
+```{r, error = TRUE}
+1 / sqrt(j)
+```
+
+***********************************
+          ESEMPRIO 3
+***********************************
+
+La distribuzione di probabilità data è definita come:
+$$ f(x;a) = \frac{a}{x} \left( \frac{2}{x} \right)^a$$
+## Metodo dei momenti
+### Calcolo dei momenti teorici
+Per calcolare il momento di primo ordine (la media), eseguiamo l'integrazione della distribuzione di probabilità rispetto a 'x':
+$$E[X] = \int_{2}^{\infty} x \cdot f(x;a) dx =\frac{a}{a-1}$$
+### Calcolo del momento campionario
+Per calcolare il momento campionario di primo ordine, utilizziamo la media empirica dei dati osservati:
+$$\bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i $$
+
+### Uguaglianza dei momenti
+Uguagliamo il momento teorico al momento campionario e risolviamo per il parametro 'a':
+$$\frac{a}{a-1} = \bar{x} $$
+
+Da cui otteniamo lo stimatore per 'a':
+$$a = \frac{\bar{x}}{\bar{x}-1}$$
+
+**************************************
+              ESEMPIO 4
+**************************************
+Sia $X_1, \ldots, X_{261}$ un campione casuale semplice da una distribuzione discreta con funzione di probabiltà
+
+$$ 
+Pr(X = x; \theta)= 
+\begin{cases}
+\theta/2, & \text{se x=-1,}\\
+(1-\theta), & \text{se x=0,} \\
+\theta/2, & \text{se x=1.}
+\end{cases} 
+$$
+
+Sapendo che nel campione è stato osservato 109 volte il valore -1, 49 volte il valore 0 e 103 volte il valore 1, si risponda ai seguenti quesiti:
+si calcoli la stima con il metodo dei momenti di \theta;
+si calcoli la stima di massima verosimiglianza di \theta;
+si calcoli una stima dell’errore standard della stima di massima verosimiglianza di \theta
+
+[1] Il valore atteso di X è nullo, quindi lo stimatore con il metodo dei momenti è calcolato con il momento di ordine due
+$$
+E(X_1^2)=\theta
+$$
+Quindi, la stima con il metodo dei momenti è 
+$$
+\hat \theta=\frac{\sum_{i=1}^{261} X_i^2}{261}.
+$$ 
+Con i dati a disposizione otteniamo la stima:
+```{r, error = TRUE}
+(109 + 103) / 261
+```
+
+[2] La funzione di log-verosimiglianza per $\theta$ è, a meno di termini costanti, pari a 
+$$
+\ell(\theta) = (109 + 103) \log \theta + 49 \log (1 - \theta).
+$$
+La corrispondente funzione punteggio è
+$$
+\ell'(\theta) = \frac{109 + 103}{\theta} - \frac{49}{1 - \theta}.
+$$
+Risolvendo l'equazione di verosimiglianza troviamo il punto critico 
+$$
+\hat \theta=\frac{109 + 103}{109 + 103 + 49},
+$$
+che coincide con la stima di massima verosimiglianza poiché 
+$$
+\ell^{''}(\theta)=-\frac{109 + 103}{\theta^2} - \frac{49}{(1 - \theta)^2} <0, 
+$$
+per qualsiasi valore di $\theta$. La stima di massima verosimiglianza è uguale alla stima con il metodo dei momenti.
+ 
+[3] L'informazione osservata è 
+```{r, error = TRUE}
+j <- (109 + 103) / (0.81 ^ 2) + 49 / (1 - 0.81) ^ 2
+j
+```
+Quindi, l'errore standard stimato di $\hat \theta$  è approssimativamente pari a 
+```{r, error = TRUE}
+1 / sqrt(j)
+```
+
+****************************************
+stesso esercizio secondo chatgpt
+
+Per il metodo dei momenti, uguagliamo i momenti campionari ai momenti teorici. Il primo momento teorico (la media) e il secondo momento teorico (la varianza) sono:
+
+$$
+\text{E}[X] = \sum_{i=-1}^{1} x_i \cdot Pr(X = x_i; \theta)
+\\
+\text{E}[X^2] = \sum_{i=-1}^{1} x_i^2 \cdot Pr(X = x_i; \theta)
+$$
+
+Per la distribuzione data, abbiamo:
+
+$$
+\text{E}[X] = (-1) \cdot \frac{\theta}{2} + (0) \cdot (1-\theta) + (1) \cdot \frac{\theta}{2} = 0
+\\
+\text{E}[X^2] = (-1)^2 \cdot \frac{\theta}{2} + (0)^2 \cdot (1-\theta) + (1)^2 \cdot \frac{\theta}{2} = \frac{\theta}{2} + \frac{\theta}{2} = \theta
+$$
+
+Uguagliando questi momenti ai momenti campionari otteniamo:
+
+$$
+\bar{X} = 0
+\\
+\frac{1}{n} \sum_{i=1}^{n} X_i^2 = \hat{\theta}
+$$
+
+Dove $\bar{X}$ è la media campionaria e $\hat{\theta}$ è la stima del parametro $\theta$.
+
+## Massima Verosimiglianza
+
+Per il metodo della massima verosimiglianza, la funzione di verosimiglianza è data da:
+
+$$
+L(\theta) = \prod_{i=1}^{n} Pr(X = x_i; \theta)
+$$
+
+Dove $Pr(X = x_i; \theta)$ è la funzione di probabilità data dalla distribuzione. Per comodità, possiamo scrivere:
+
+$$
+L(\theta) = \left(\frac{\theta}{2}\right)^{n_{-1}} \cdot (1-\theta)^{n_0} \cdot \left(\frac{\theta}{2}\right)^{n_1}
+$$
+
+Dove $n_{-1}$, $n_0$ e $n_1$ sono rispettivamente il numero di volte che sono stati osservati i valori -1, 0 e 1 nel campione.
+
+Il risultato della massima verosimiglianza per $\theta$ è:
+
+$$
+\hat{\theta} = \frac{n_{-1} + n_1}{n_0 + n_{-1} + n_1}
+$$
+
+## Calcolo dell'errore standard della stima di massima verosimiglianza di $\theta$
+
+L'errore standard della stima di massima verosimiglianza di $\theta$ può essere approssimato tramite la formula:
+
+$$
+\text{SE}(\hat{\theta}) = \sqrt{\frac{\hat{\theta} \cdot (1 - \hat{\theta})}{n}}
+$$
+
+Dove $n$ è la dimensione del campione.
+
+Sostituendo i valori ottenuti:
+
+$$
+\text{SE}(\hat{\theta}) = \sqrt{\frac{\frac{212}{261} \cdot \left(1 - \frac{212}{261}\right)}{261}}
+$$
+
+Calcolando questo otteniamo il valore dell'errore standard.
