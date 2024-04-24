@@ -101,3 +101,67 @@ Poniamoci nel primo caso, quindi non esistono cicli negativi raggiungibili dalll
 prendo un vertice v. sicuramnente quindi delta(s,v) non è -inf. o è inf o appartiene a R. se è infinito, è ovvia la dimostrazione, percHé già dopo la init d=delta; Se appartiene a R? chiamo p un cammino minimo semplice tra s e v (può esistere cammino non semplice se il ciclo ha peso 0). Non essendoci cicli, nel caso peggiore p ha n-1 archi.
 
 Immediatamente dopo la init, d[x_0] = delta(x_0, x_0). poi per la proprietà della convergenza ad ogni passo (al passo k), ho d[x_k] = delta (s, x_k). e la dimostrazione in realtà è finita. fai il passo per ogni arco e top.
+
+DImostriamo la parte finale con restituzione del booleano.
+La parte finale è:
+```c
+for each arco
+    if d[v] > d[u]+w(u,v)
+        return false; 
+return true;
+```
+Alla domanda "in che condizione l'algo restituisce true?" si risponde "quando non entra mai nell'if", ovvero per nessun arco la condiione viene verificata.
+
+Dimostriamo "Se invece G contiene un ciclo negativo raggiungibile dalla sorgente, allora alla fine dell'algortimo: l'algoritmo restituisce false.". pocedo per assurdo.
+
+...
+
+### Complessità (confronto Dijkstra e BF)
+
+...
+
+# Esercizi da tentare
+
+1. dato un grafo G orientato con pesi strettamente positivi per ogni arco. Vogliamo scrivere un algoritmo che risponde a "esiste un ciclo in G in cui il prodotto dei pesi sugli archi sia minore di 1?" hint: ricondurre a un problema che so già risolvere, non costruire nuovi algoritmi. Si provi a immaginare di creare un nuovo grafo a partire da quello dato che abbia pesi diversi ma struttura uguale. i pesi nuovi sono dati da log(peso vecchio)
+2. problema simile, richiede la trasformazione di elementi del grafo. Sia dato un grafo orientato G. ad ogni arco v è associato valore reale r compreso tra 0 e 1 (1 comrpeso e 0 escluso). il numero rappresenta l'affidabilità di un canale di comunicazione, più precisamete la probabilità che il messaggio che viaggia sull'arco venga ricevuto correttamente. Si assuma inoltre che le probabilità siano indipendenti. Si scrivaa un algo efficiente per trovare il cammino più affidabile tra i vertici dati
+
+# Distanze tra tutte le coppie
+
+algo che prenda in input grafo con sua funz peso e restituisca tutte le distanze. Una prima soluzione è riutilizzare algoritmi che già conosciamo: prendo Dijkstra o BF che unziona con sorgente singola e lo lancio su tutti i nodi 
+```py
+def iterated_BF(G, w):
+    for v in v(G):
+        BF(G, w, v)
+```
+
+Complessità:
+1. caso sparso
+   1. DJ: n^2logn
+   2. BF: n^3
+2. caso denso
+   1. DJ: n^3
+   2. BF: n^4
+
+Con programmazione dinaica, possiamo scrivere un algoritmo con complessità Theta(n^3), sempre, anche con pesi negativi. L'unico difetto è che viene battuto da DJ, solo sotto due condiioni particolari: grafo sparso e senza pesi negativi.
+
+## Algoritmo di Floyd Warshall
+faremo una prima semplificazione: assumeremo i vertici come numerati; esistono pesi negativi ma non cicli negativi.
+Il grafo è rappresentato da W = (w_{ij}). Trovo 0 se i=j. trovo w(i, j), ovvero il peso dell'arco se i è diverso da j e esiste un arco tra i e j. trovo +inf se non esiste arco.
+L'algoritmo ritorna una matrice nxn con in posizione d_ij = distanza(i,j).
+
+```py
+def Floyd_Warshall(W):
+    n = rows(W)
+    D[0] = W # n matrici D
+    for k in range (1, n):
+        for i in range (1, n):
+            for j in range (1, n):
+                D[k][i][j] = min(D[k-1][i][j], D[k-1][i][k]+ D[k-1][k][j])
+    return D[k]
+```
+parto da W, poi produco D1, poi D2, etc fino a Dn. 
+La formuletta dice quanto segue: nella matrice k-esima, il valore in d_ij è formato dal minimo tra il numero nella stessa posizione della matrice precedente e la somma dei valori nella posizione ik e kj. vediamo di capire la correttezza di sta cosa che non ha un cazzo di senso.
+
+### Correttezza
+
+siano i vertici V={1, 2, ..., N}. Sia poi l'insieme di cammini DD = {p  tale che p è un cammino semplice tra i e j con vertici intermedi <= k}
