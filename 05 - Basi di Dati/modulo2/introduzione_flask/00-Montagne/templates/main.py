@@ -14,4 +14,3 @@ def mountain(mt): # prendo come argomento lo stesso nome del link
 
 if __name__ == "__main__":
     app.run()
-ss

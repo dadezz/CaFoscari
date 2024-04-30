@@ -49,3 +49,65 @@ class dog : public animal {
 ```
 
 cosa vuol dire public/private/protected? è la subsumption. In java siamo abituati che chiunque può subsumere dog a animal. con private, posso far subsumere solo io, evitando che altri sappiano che sono sottotipo. etc con gli altri modificatori di visibilità
+
+tornando a parlare di liste di inizializzazione, in cpp non assegni i campi, li costruisci.
+ci sono due modi per costruire un oggetto
+
+```cpp
+typename animal* a1 = new animal(7, 2.34); // new ritorna un pointer. viene costruito nello heap
+
+// quando dichiaro una variabile di tipo int, in cpp alloca memoria nello stack e costruisce a 0
+// in pratica, in Cpp non si dichiara mai, ma si costruisce sempre col default constructor (in C non viene inizializzata, in cpp si)
+int a;
+
+// ecco che 
+typename animal a2; 
+// non va bene perché non ho ancora definito un costruttore senza parametri.
+
+typename animal a2(7, 2.34); // viene costruito sullo stack
+```
+
+copy constructor. qual è la differenza tra ste due righe?
+
+```cpp
+animal a3(a2);
+typename animal* a4 = new typename animal(a2);
+```
+
+il primo è sullo stack, il secondo sullo heap;
+riga 73: sto passando un animal sullo stack, non pointer. la semantica l'ho definita io ed è il copy constructor. ora si capisce il percHé della lista di inizializzazione:
+sto invocando i costruttori dei miei campi; in particolare il copy constructor di ogni campo
+
+come fa cpp il polimorfismo?
+
+```cpp
+class dog : public animal {
+    private:
+        bool has_pedigree;
+    public: 
+        dog(int w, double sp, bool ped) : animal(w, sp), has_pedigree(ped) {}
+        void eat(const animal& a){
+            weight += a.weight / 2; // mi serve che weight diventi protected
+                                    // a.weight è inaccessibile: in cpp il campo protected lo è SOLO per this: gli altri come te non lo possono vedere. Mi tocca usare un getter, unico modo
+            has_pedigree = !a.has_pedigree; // non esiste has_pedigree: sta mangiando un animal non un dog
+        }
+
+        // in cpp-11 si puo mettere alla fine la keyword override per avvisare il compilatore
+        // se vglio continuare a permettere l'override devocontinuare a mettere virtual. non mettere nulla equivale a scrivere final in java
+}
+```
+
+in cpp non si usano i getter, si usano degli access methods che possono essere utlizzati anche come left value
+
+```cpp
+    const int& weight() const {
+        return weight;
+    }
+    int& weight() {
+        return weight;
+    }
+```
+qual è la semantica del primo? ritorno il valore non come copia, ma ritorno esattamente il mio campo. con const garantisco che non venga cambiato.
+il metodo successivo cambia, non è più const (il this) -> chi riceve può modificarmi il campo
+
+subsumption: i valori non subsumono, reference e pointer si
