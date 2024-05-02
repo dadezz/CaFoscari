@@ -111,3 +111,67 @@ qual è la semantica del primo? ritorno il valore non come copia, ma ritorno esa
 il metodo successivo cambia, non è più const (il this) -> chi riceve può modificarmi il campo
 
 subsumption: i valori non subsumono, reference e pointer si
+
+Perché si programma a oggetti con i pointer e non con le reference? perché new e delete usano pointer, viene più naturale. Ciò detto, perché nessuno programma a oggetti in c++? 
+si programma con classi e costruttori, ma nessuno usa la virtual table. come mai? esiste un meccanismo di static dispatching che è il template system, molto migliore del dynamic dispatching. Ne parleremo tra un attimo, per oggi smeplice ponte
+
+Voglio definire un tipo per array bidimensionali
+Se voglio un generic, la sintassi è diversa da quella di java, si scrive prima la keyword template, con <class T> (T è un nome a nostra scelta, lo stiamo dichiarando).
+È il modo più semplice di usare i template
+
+**programmazione orientata ai valori**: i tipi di dato che costruisco si comportano come valori, non come oggetti, ovvero si comportano come tipi primitivi.
+- dichiarazione senza inizializzazione
+- nello stack
+- assegnamento
+- i valori si possono copiare
+
+```cpp
+#include <vector>
+
+template <class T>
+class matrix 
+{
+    private:
+        std::vector<T> v;
+        size_t cols;
+    public:
+        matrix() : v(), cols() {};
+        matrix(const matrix<T>& m) : v(m.v), cols(m.cols) {};
+        
+        matrix(size_t rows, size_t _cols) : v(rows * _cols), cols(_cols) {}; 
+        matrix(size_t rows, size_t _cols, const T& x) : v(rows * _cols, x), cols(_cols) {}; //inizializzato con valore di default passato come argomento
+
+        // default parameters: posso comprimere i due costruttori di cui sopra
+        // matrix(size_t rows, size_t _cols, const T& x = T()) : v(rows * _cols, x), cols(_cols) {}; 
+
+        explicit matrix(size_t dim) : matrix(dim, dim) {}
+}
+```
+
+problema: in c++ i costruttori unari sono operatori di conversione. ecco che bisogna mettere `explicit` prima del costruttore: in sto modo il programmatore deve chiamarlo in modo esplicito, e non viene mai usato il costruttore implicitamente come conversione. 
+Non serve il distruttore perché viene chiamato direttamente quello di vector
+
+```cpp
+#include <vector>
+
+template <class T>
+class matrix 
+{
+    ...
+    const T& at(size_t i, size_t j) const { return v[i * cols + j]; }
+    T& at(size_t i, size_t j) { return v[i * cols + j]; }
+
+    // posso in realtà perfino definire il comportamento con le parentesi tonde, anche se non sono una funzione.
+
+    const T& operator()(size_t i, size_t j) const { return v[i * cols + j]; }
+    T& operator()(size_t i, size_t j) { return v[i * cols + j]; }
+
+    size_t get_cols() const { return cols; }
+    size_t get_rows() const { return v.size() / cols; }
+}   
+
+void main() {
+    matrix<int> m(20, 30);
+    m(8, 10) = m(3, 4);
+}
+```
