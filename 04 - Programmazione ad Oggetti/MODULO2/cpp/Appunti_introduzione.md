@@ -175,3 +175,49 @@ void main() {
     m(8, 10) = m(3, 4);
 }
 ```
+
+manca una cosa:
+```cpp
+matrix<T>& operator=(const matrix<T>& m)
+```
+
+l'assegnamento non è il binding, ma la modifica. Notare che la firma dice tutto: è in grado di assegnare matrici con lo stesso tipo: 
+matrix<int> = matrix<int>, non tipo matrix<int> = matrix<string>. Il left value è this, ed è sottinteso. dove vedo allora che i due tipi sono gli stessi? il this è dichiarato in template<T>. mettendo un assegnamento con T accetto solo cose del mio stesso tipo. 
+Implemento:
+è simile a invocare un distruttore più copy assignment
+```cpp
+matrix<T>& operator=(const matrix<T>& m)
+{
+    cols = m.cols;
+    v = m.v;
+    return *this;
+}
+```
+perché c'è il return? per assegnamenti concatenati
+
+Perché dicevamo che in c++ nessuno programma a oggetti? perché si usa il value oriented programming.
+Come faccio a fare una funzione che faccia qualcosa polimorficamente su un tipo iterabile, se non esiste la subsumption a iterable?
+si usano i template.
+il template system è così figo che gli basta avere i metodi giusti colla firma giusta per fare polimorfismo
+
+```cpp
+void f(vector<int>& v){
+    v.push_back(7);
+}
+void f(list<int>& v){
+    v.push_back(7);
+}
+```
+
+come posso renderli un unica funzione?
+
+```cpp
+template<class C>
+void f(C& v){
+    v.push_back(7);
+}
+```
+
+la funzione nel main viene compilata solo al primo utilizzo. il template system permette di fare qualsiasi cosa, l'importante è che il metodo che si sta usando esista dentro alla classe. sta roba viene scoperta a compile time:
+metodi stessi nomi e stessi argomenti.
+
