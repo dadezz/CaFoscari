@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, redirect, request, render_template, url_for
 
 app = Flask(__name__)
 
@@ -57,15 +57,24 @@ def handle_params():
     else:
         return "keys missing"
 
+
 """
-GET POST PUT DELETE
+i template permettono di  scrivere struttura html che viene popolata dinamicamente
 """
+@app.route('/templates')
+def hello_world():
+    return render_template('hello_world.html')
 
-
-
-
-
-
+"""
+come gestire parametri da far inserire all'utente?
+<form action="/login" method="POST">
+    <input name="name>
+    <
+"""
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    user = request.form('user')
+    return redirect(url_for('show_profile', username=user))
 
 
 
