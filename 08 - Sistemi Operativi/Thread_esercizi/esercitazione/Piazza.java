@@ -15,7 +15,7 @@
  
  public class Piazza {
      final static int  N_THREAD=40;
-     final static int SLEEPBASE=100;
+     final static int SLEEPBASE=500;
      final static int N_ITER=20;
      final static Person[] person = new Person[N_THREAD];
      final static String contrade[] =  new String[] {"Chiocciola","Aquila","Civetta","Bruco"};
