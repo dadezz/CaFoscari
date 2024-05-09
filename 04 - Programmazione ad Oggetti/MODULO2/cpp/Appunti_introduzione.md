@@ -221,3 +221,45 @@ void f(C& v){
 la funzione nel main viene compilata solo al primo utilizzo. il template system permette di fare qualsiasi cosa, l'importante è che il metodo che si sta usando esista dentro alla classe. sta roba viene scoperta a compile time:
 metodi stessi nomi e stessi argomenti.
 
+I template si possono mettere ovunque, son più dei generics. si può templatizzare un'entità qualsiasi: classi, funzioni, metodi, typedef. Non sono templatizzabili i namespace e i campi di una classe
+
+```cpp
+template <class T>
+class matrix {
+    // ...
+public:
+    template <class S>
+    matrix(const matrix<S>& m) : cols(m.cols), v(m.get_rows() * m.get_cols()) {
+        for(int i=0; i<v.size(); i++){
+            v[i] = T(m.v[i]); //invocazione di un costruttore. 
+        }
+    } 
+}
+``` 
+
+questa cosa viene chiamata conversion constructor. Non è riconosciuto dal compilatore come metodo speciale, ma ha comunque un nome. 
+`v[i] = T(m.v[i]); //invocazione di un costruttore.`. non so se il costruttore è definito. quindi?
+Finché io scrivo roba sintatticamente corretta, va bene tutto. quando lo uso, se ci sono le cose richieste va bene, altrimenti non compila.
+
+conversion operator:
+```cpp
+template <class T>
+class matrix {
+    operator const vector<T>&() const {
+        return v;
+    }
+}
+```
+
+anche in c++ ci sono gli iteratori (in STL in realtà). Si comportano come pointer
+
+```cpp
+ostream& operator<<(ostream& os, const matrix<T>& m){
+    for(typename vector<T>::iterator it = m.v.begin(); it != m.v.end(); ++it){
+        os << *it << " " << endl;
+    }
+    return os;
+}
+```
+
+l'ostream non posso metterlo in classe, percHé il pattern << ha un operatore di sinistra e uno di destra. in cpp se sottintendo this lo interpreto come operatore di sinistra. ma lo << a sinistra ha l'ostream.
