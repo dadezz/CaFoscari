@@ -44,7 +44,7 @@ v={1, 2, 3, 4} E = {(1,2), (1,3), (1,4), (2,2), (2,3), (3,2), (3,4), (4,2)}
 In pratica, nel vettore (prima colonna) ci vanno i primi elementi di ogni tupla, quindi i vertici, nelle righe ci vanno i secondi elementi di ogni tupla
 
 **vantaggi o svantaggi**
-tutte le volte che un algoritmo vuole sapere se du vertici sono adiacenti, deve scorrere una lista concatenata (tenendo conto che i vertici possono essere tantissimi, è inefficiente). L'occupazione spaziale è invece molto buona: Theta(n+m). È una rappresentazione che nella pratica si usa in presenza di grafi sparsi. Sicuramente non in presenza di grafi sparsi
+tutte le volte che un algoritmo vuole sapere se du vertici sono adiacenti, deve scorrere una lista concatenata (tenendo conto che i vertici possono essere tantissimi, è inefficiente). L'occupazione spaziale è invece molto buona: Theta(n+m). È una rappresentazione che nella pratica si usa in presenza di grafi sparsi. Sicuramente non in presenza di grafi densi
 
 ### Matrice di adiacenza
 sia n il numero di vertici. La matrice è quadrata nxn. È una matrice binaria: troveremo solo zeri e uni. è definita come 
@@ -157,7 +157,7 @@ lezione mancante
 ***
 
 # Matrice di adiacenza proprietà
-quando si moltiplica la matrice di adiacenza per sé stessa, ogni a_{ij} rappresenta il numero di cammini di lunghezza 2 tra i nodi i e j.
+quando si moltiplica la matrice di adiacenza per sé stessa, ogni $a_{ij}$ rappresenta il numero di cammini di lunghezza 2 tra i nodi i e j.
 
 ## Teorema
 $ a^k_{ij} = $ numero di cammini di lunghezza k tra i e j.
@@ -189,7 +189,7 @@ problema che non è dimostrato sia intrattabile ma per il quale non esiste algor
 4. una clique è un sottografo completo. È detta massima se è la più grande in assoluto, è detta massimale se non è contenuta in una clique più grande. Si indica con omega(G) il clique number, ovvero la cardinalità della clique massima. -> omega(G1) = omega(G2).
 
 # Connettività 
-Perché un grafo di n vertici sia connesso è necessario che ci siano almeno n-1 vertici. Dimostro per induzione su n = |V|. 
+Perché un grafo di n vertici sia connesso è necessario che ci siano almeno n-1 archi. Dimostro per induzione su n = |V|. 
 * Base: n=1 -> numero di archi è 0, |V| = 1, effettivamente |E| = |V|-1
 * acido (passo induttivo): n>=2. Sia G connesso con n vertici. Prendo G' sottografo di G senza un vertice z. NOn posso a priori garantire che G' sia connesso. Lavoro però sulle sue componenti connesse. k=|cc|. se G' è connesso, k=1. Mi aspetto che per ogni cc, |E| sia >= |V|-1. 
   Da cui $ |E| = \sum_{i=1}^k |E_i| +deg(z) $ ovvero la somma degli archi delle componenti connesse, a cui vanno aggiunti gli archi del vertice eliminato. Tutti gli E_i sono maggiori uguali di |V_i| -1 , da cui posso maggiorare $ |E| \geq \sum_{i=1}^k (|V_i| -1) +deg(z) $, che è uguale a $ \sum_{i=1}^k |V_i| -k +deg(z) $. La sommatoria è esattamente |V|-1, percHé la sommatoria della cardinalità di cc è la cardinalità iniziale, -1 per via del vertice cavato. Posso dire essere sicuramente vero che deg(z) >= k. per l'ipotesi iniziale che il grafo di partenza fosse connesso, quindi la disuguaglianza continua a valere in quanto si sta maggiorando. il grado di z non può essrere minore di k xk sennò il grafo iniziale non sarebbe connesso.

@@ -36,7 +36,7 @@ Da cui, le foglie possono essere al più 2^h, in caso di albero completo.
 
 ### Teorema
 Qualsiasi algoritmo di ordinamento per confronti richiede $ \Omega(nlogn) $ confronti nel caso peggiore. Bisogna determinare l'altezza di un albero di decisione dove ogni permutazione appare come foglia. Si consideri un albero di decisione di altezza h con l foglie, che corrisponde a un ordinamento per confronti di n elementi. $ n! \leq f  \leq  2^h $ Ho trovato una maggiorazione di h: $ h >= \log_2{n!}$. Utilizzo l'approssimazione di Stirling:
-$$ n! = \sqrt{2 \pi n}  (\frac{n}{2})^h(1+ \Theta(\frac{1}{n})) $$.
+$$ n! = \sqrt{2 \pi n}  (\frac{n}{2})^n(1+ \Theta(\frac{1}{n})) $$.
  Per n suff grande, considero il termine più grand, e risulta
 $$ h \geq \log_2{n!} \geq n(logn -log2) \geq nlogn $$.
 
