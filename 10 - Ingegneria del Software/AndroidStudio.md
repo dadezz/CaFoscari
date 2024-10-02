@@ -44,3 +44,51 @@ deve ereditare AppCompactActivity
 * onCreate: override del padre. come prima riga chiami la versione vecchia: estende il codice vecchio.
 
 prox volta vediamo bene cosa fanno
+
+# Lezione 2
+il render grafico del design non è in java, ma è dato da config in xml. È figo perché si può fare anche drag n drop delle parti grafiche e android studio genera l'xml.
+
+vabbe ne parleremo, partiamo col codice.
+
+# Codica java
+ogni schermata è chiamata activity. Ogni schermata ha sottoragioni chiamate fragment.
+Per ogni activity c'è un sorgente (e una classe).
+qualsiasi etivity estende al superclasse AppCompactActivity.
+
+Cuore di tutto è il metodo onCreate. Fa partire l'applicazione ("quando quest'activity viene creata"). Nel amnifest c'è scritto qual'è la prima schermata. la disegna e poi dispatcha il metodo oncreate di quell'activity. 
+Nel metodo quindi cosa va messo? inizializzo ciò che devo.Quel metodo non èche loopa continuamente in attesa di un click.
+nella onCreate inizializzo dei listener: chiamo un api agganciata a un botone. Se verrà premuto il bottone, il sistema chiama la lambda che c'è messa dentro.
+
+```java
+binding.fab.setOnClickListener(new View.OnClickListener() {
+    @override
+    public void onClick(View view){
+        Snackbar.make(view, "replace with your own action", Snackbar.LENGHT_LONG)
+                .setAnchorView(R.id.fab)
+                .setAction("Action", null).show();
+    }
+})
+```
+
+si programma a suon di callback. è tutto spezzettato in metodi. Sto impostando il listener del mbottone di nome fab (nome che ho scelto io). 
+chiamando questo metodo e passandogli un anonymous class. Dentro al metodo posso scriverci quello che voglio. 
+make guardalo nella doc. setanchor è il punto su cui viene disegnato, setaction è cosa fai.
+
+binding? H tipo ActivityMainBinding. è una classe generata dall'ide. in particolare, dall'xml. posso battezzare quello che ci metto con un nome, che poi mi ritrovo nel codice java (il famoso fab, per esempio).
+
+XML scrive configurazioni ad albero
+### coordinator layout
+contiene tutto. 
+match_parent negli attributi cos'è? fammi il layout grande come tutto o schermo. il cooridnator layout cos'è?
+notare che nell xml non c'è alcuna coordinata. android si è inventato un modo per dire come vengono idistribuiti i vari tocchi dell'app. È un modo automatico di distribuire le cose al'intrno della schermata
+
+Quandoscrivo un programma separo l'aspetto delle cose da come appare.
+
+#### floating action  button (esempio):
+è definito dalla libreria di android (che definisce decine di migliaia di elementi). è definita a package quindi per definirlo devo dire tutto il path.
+attributi:
+* id: nome che gli dò (nome dentro al sorgente java). Se non mi serve quel coso in java, non mi serve il nome
+* layout_width e height: quanto largo e alto la componente bottone. wrap content-> grande come il disegno originale contenuto. si può fare ovunque, anche ricorsivamente, è potente
+* gravity: dove alloggia
+* margin: quanto margine deve avere dal bordo dello schermo
+* srcCompat: immagine da disegnare
