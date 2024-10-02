@@ -92,3 +92,71 @@ Per realizzare un progetto mi serve pianificazione delle attività, gestione del
 ## comunicazione
 * interna tra il team
 * esterna: prof, utenti finali
+
+# Il Piano di Progetto
+* introduzione: summary. leggendo devo sapere tutte le cose salienti. vanno anche recuperati gli obbiettivi generali e le caratteristiche principali
+* organizzazione: relazione tra le varie fasi
+* processi gestionali: metodi per la gestione del progetto
+* processi tecnici: strumenti e tecniche utilizzati nel processo di sviluppo
+* pianificazione delle attività e delle risorse
+* appendici
+
+## organizzazione
+1. modello del processo: waterfall? agile? ... perché?
+2. struttura organizzativa: team fatto come?
+3. interfacce organizzative: relazioni esterne: chi e come?
+4. responsabilità: ruoli del team nel progetto (chi sviluppa? chi consegna? chi controlla la qualità?)
+
+## processi gestionali
+che scelte poss pfre per gestire il proecsso?
+1. obiettivi e priorità: scadenze fisse o modulabili? qualità o efficienza?
+2. assunzioni, dipendenze e vincoli: a natale lavoro?ho periodi di esami in cui non sono disponibile? quali fattori possono influenzare il processo di sviluppo?
+3. gestione dei rischi: sezione più importante, vedremo.
+4. meccanismi di controllo: gestione dei timesheets e dei report di lavoro. Mi serrve per controllare quante ore dedicare a tutto, quanti progetti posso fare etc
+5. pianificazione dello staff: analisi degli skill presenti e richiesti.
+
+## processi tecnici
+strumenti a supporto del processo (ambiente di sviluppo, linguaggio)
+1. metodi, strumenti e tecniche
+2. documentazione (readme? commenti?)
+3. chi controlla la qualità
+
+## pianificazione delle attività e delle risorse
+wbs, pert, gannt, allocazione risorse, costi
+
+# Gestione dei rischi
+un rischio è un fattore che determina il non raggiungimento degli obiettivi prefissati.
+per ogni rischio devo stimare 
+* probabilità
+* impatto
+
+Se uno si ammala per un mese, che succede?
+se il gruppo si spacca? (circa 5% di prob) impatto devastante
+
+Cause di fallimenti dei progetti:
+* requisiti incompleti
+* mancanza di risorse
+* apsettative non realistiche
+* skill non sufficienti
+
+devo dire in anticipo cosa faccio se il rischio occorre.
+quindi: identificazione, analisi, monitoraggio, mitigazione
+
+probabilità di accadimento e di impatto hanno un livello da 1 a 4. vanno messe in una tabella dei rischi. quelli con maggior devasto sono quelli che van monitorati di più
+
+# Stima dei costi
+come faccio a valutare quanto costa un prodotto software?
+prima di iniziare lo sviluppo devo fare un preventivo. ci sono 3 modi:
+1. nel piano di progetto ho wbs, con una stima dei costi per ogni attivitò -> costo totale = somma di tutti i costi. Ha il problema che non è facile fare stime accurate. Se sono esperto può avere senso. Mi serve un piano di progetto affidabile
+2. basasrsi sulle linee di codice. stima del prodotto in termine di dimensione del codice. In media un'app android come la mia quanto è grossa? quanto costa? È una stima bella difficile, se non sono esperto posso stimare tramite confronto con altre app
+3. il più complicato  ma migliore. parte dai requisiti, ricavo gli elementi di complessità del sistema che voglio realizzare. a ogni valore di complessità, posso dare un valore monetario. A seconda di quanto presumo sia complessa la soluzione dei punti, ci dp un costo diverso
+
+## functions point
+parametri:
+* internal logical file (file interni all'app)
+* external interface file (file esterni)
+* external input (attività elementari di input)
+* external output (attività elementari di output)
+* external inquiry (attività elementari di interrograzione)
+
+faccio la tabella dei alori unadjusted, poi controllo le 14 caratteristiche quanto sono rilevanti e calcolo gli adjusted function points
