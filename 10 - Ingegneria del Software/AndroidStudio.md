@@ -92,3 +92,33 @@ attributi:
 * gravity: dove alloggia
 * margin: quanto margine deve avere dal bordo dello schermo
 * srcCompat: immagine da disegnare
+
+## binding
+Un oggetto solo di tipo ActivityMainBinding (è il nome dell'xml senza underscore). nessuno fa la new, viene dato dal metodo inflate: metodo statico che è uno pseudocostruttore. l'oggetto viene messo su un campo privato della classe: _binding_.
+Perché quella specie di costruttore si chiama inflate? nella UX significa che la disegni per la prima volta. da qui, per motivi storici, inflate vuol dire che crea l'activity per la prima volta
+
+### setonclicklistener
+è un metodo del binding che fa qualcosa quando si clicca. ci sono un sacco di `setOn-Listener`: longclick, drag, FocusChange etc. Si trovano tutti nella documentzione, c'è enrome spazio di personalizzazione per ogni evento anche raro si può fare qualcosa.
+
+## altri metodi dell'activity
+la oncreate è importantissima e inizializza l'activity.
+Il resto sono metodi che non hanno a che vedere col ciclo di vita dell'activity
+* `onCreateOptionsMenu`: chiama questo metodo quando viene creato per la prima volta il menu (cioè serve a popolarlo)
+* `onOptionsItemSelected`: quando qualcuno clicca una voce del menu. Il parametro che passa è il nome della voce del menu
+
+In pratica sto simulando un linguaggio di programmazione orintato agli eventi con un linguaggio OOP. 
+
+# Ciclo di vita activity
+guardare il diagramma sul sito di sviluppo android.
+percHé le activity hanno ciclo di vita?
+
+se guardiamo la classe MainActivity, non ci sono costruttori. nessuna new. Le activity non le devo mai costruire con la new. sono sotto il controllo di costruzione del sistema operativo. Quando viene distrutta? 
+quando cambia activity? ha senso, ed è così, ma fa una piccola ottimizzazione. Ci sono 3 livelli di costruzione e, simmetricamente, 3 di distruzione.
+Quando è ora di fare l'activity, lo costruisce e butta in memoria. per quello esiste onCreate(), perché non avrei modo di personalizzare  il costruttore, essendo esso delegato all'OS. Dopodiché, in botta, chiama anche onStart() e onResume(). poi l'activity sta runnando. Se l'activity viene spostata dallo scehrmo e vado in una seconda schermata, quella vecchia viene pausata onPause() e messa in background. se passa nu po' di tempo, essa va in onStop, se passa ancora tempo, viene distrutta onDestroy().
+Ho quindi dei gradienti per decidere come gestire le varie pause e distruzioni delle activity.
+
+I metodi sono definiti dalla classe che si eredita e si deve fare l'override. onCreate è l'unica per cui è obbligatorio fare override. Non per motivi sintaticci, a java non frega un cazzo, è android che vuole che la overridi.
+A noi probabilmente non servirà sta roba, considerare comunque che si complica non poco lo sviluppo, perché servono dei flag che controllano a che livello si è su ogni metodo, facendo una o l'altra roba.
+
+# Naming Convention
+Le activity si chiamano NomeActivity (Pascal Case). nome di metodi e campi camelcase. l'activity ha un layout. l'xml si chiama in snake e si chiama activity_nome
