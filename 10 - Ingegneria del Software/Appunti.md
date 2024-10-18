@@ -160,3 +160,57 @@ parametri:
 * external inquiry (attività elementari di interrograzione)
 
 faccio la tabella dei alori unadjusted, poi controllo le 14 caratteristiche quanto sono rilevanti e calcolo gli adjusted function points
+
+# documento dei requisiti
+È la base dl contratto, se è fatto bene è improbabile ci siano contenziosi in tribunale.
+Il documento va organizzato in sezioni.
+L'attività di raccolta dei requisiti deve avere delle robe preliminari, che possono essere brainstorming, interviste, osservazioni, questionari etc -> docuemntate nell'introduzione; più lìidentificazione di scenari specifici di utilizzo del sistema (use cases per ogni servizio).
+Tutto ciò serve ad avere chiaro quali sono le funzionalità essenziali.
+posso poi procedere sia bottomup che topdown.  
+1. top-down: questo sistema come posso organizzarlo in macroservizi che poi si dettagliano in funz più piccole?
+2. bottom-up: le funzionalità comeposso strutturarle in un sistema coeso?
+
+dove scrivo che scelta ho fatto? una possibilità è in introduzione, oppure anche nel piano di progetto (si modifica nelle versioni successive).
+
+## uml
+linguaggio di modellazione. Un modello è un'astrazione della realtà. UML è un tenativo di unificare dei modelli embrionali di progettazione software. 
+
+### diagramma d'uso
+mi concentro sulla visione del sistema come scatola nera che offre servizi ad attori esterni. Dimentico gli aspetti non funzionali.
+- attore: esprimo i diversi ruoli che le entità esterne possono avere verso il sistema. rappresentato con un omino a livello grafico. È possibile definire gerarchie tra attori
+- caso d'uso: modo in cui il sistema interagisce con gli attori esterni. rappresentato mediante un ellisse etichettata
+- scenario: insieme di casi d'uso che coinvolgono gli stessi attori.
+
+per ognuno dei casi d'uso corrisponde un template
+- nome
+- goal
+- attori
+- precondizioni
+- trigger
+- descrizione
+- alternative (cosa succede nel caso in cui ci sia condiione particolari)
+- postcondizioni 
+
+relazioni tra casi d'uso: inclusione
+dietro un servizio si nascondono altri servizi che vengono chiamati. (tipo funzione rincipale con altre chiamate a funzione). ni questo caso la relazione di dice di inclusione. 
+
+per esempio i casi d'uso prelevare e visualizzare saldo del conto, in un bancomat, includono entrambi il servizio "identificazione utente"
+
+generalizzazione: altra relazione. se effettuo ordine libro o effettuo ordine cd, sono due casi d'uso diversi, generalizzabili in "effettuo ordine".
+
+estensione: in corrispondenzaz di un certo punto d'estensione (alternativa), questo servizio ne chiama un altro. "per realizzare questo servizio, quando questa condizione è verificata, allora devo fare anche questa cosa". ricorda un po' la gestione delle eccezioni.
+
+### specifica dei requisiti
+descrizione precisa e dettagliata di ciascuno dei requisiti funzionali del sistema. serve come base da una parte per il contratto e dall'altra per la progettazione e lo sviluppo. il punto di partenza sono itemplate dei casi d'uso. per la specifica dei requisiti vengono utilizzate form strutturate.
+
+### Matrice di tracciabilità dei requisiti
+evidenzia la correlazione tra requisiti. presupponde che ogni requisito sia univocamente individualivle tramite un codice. la matrice non è simmetrica -> serve specificare come leggerla
+
+## da cui
+1. introduzione: descirve le funzinoalità generali del sistema e le modalità di coinvolgimento degli stakeholderls
+2. modelli del sistema: mostra gli use case, gli attori, i servizi e le relazioni. per ognuno degli usecase compilo il template
+3. definizione dei requisitii funzionali: elenca i servizi offerti dal sistema, ordina i requisiti in base alla priorità (prima quelli core). per ogni requisito indica la motivazione; inddica possibili evoluzione del sistema
+4. def dei requiisiti non funzionali (proprietà e vincoli sul sutema e sul processo di sviluppo - tipo versione di android supportate)
+5. specifica dei requisiti funzionali. form semi strutturato per la specifica dei servizi. è tipo la specifica di un esrcizio di programmazione. ti dico quali sono gli input, cosa mi aspetto che faccia e qualieoutput voglio.
+
+a chi è destinato il documento dei requisiti? business manager, project manager, architetti di sistema, sviluppatori (non è quindi necessario mettere nel glossario linguaggio specifico se ci si aspetta che il destinatario lo conosca)
