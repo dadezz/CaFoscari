@@ -80,3 +80,46 @@ Error(M) = Bias^2+Variance+Noise
 $$
 
 noise = errore irriducibile, tipo etichette sbagliate o features sblagliate.
+
+# Random Forest
+proviamo ad applicare bagging a un modello semplice che però ha alta varianza. invece di lavorare su un albero semplice però, lavoriamo su un albero bello grande (ovvero un albero con foglie pure). Avrà 100% accuracy su training set; alta varianza e bassa accuracy su test.
+L'altro punto debole del bagging è la difficoltà di creare modelli indipendenti tra loro.
+-> random input selection is used during node splitting. -> each node is build on a small random subset of the feature set. Notare che l'estrazione di featrure casuale avviene in ogni nodo. é un albero ma la posto di avere un loop che tocca tutte le feature, ogni volta ne sceglie un subset e sceglie solo da qquelle. nella sua interezza però potrà usare tutte le features. 
+
+for i = 1 to k:
+   get a bootstrap sample D_i from dataset D
+   train a full grown tree M_i on D_i
+      at each node split use only F << d random features
+RF = union from i=1 to k of M_i
+return RF
+
+gli alberi sono indipendenti tra loro. un albero dentro la random forest è più veloce da costruire rispetto a un albero normale, perché si riduce il numero di feature -> più efficiente
+
+# confronto tra i 3 metodi
+quale dei 3 metodi funziona meglio? quale dovrei usare?
+La differenza tra i tre metodi è abbastanza piccola e fluttua molto. se dovessi fare una scommessa al buio, mi concentrerei su boosting e random forest
+
+## uso un po'diverso di random forest
+si può usare anche per fare roba diversa da classificazione e regressione.
+
+due istanze hanno un comportamento simile se seguono un percorsosimile. osservo i path che le istanze percorrono negli alberi dentro la foresta.
+Misuro la similarità tra due istanze contando per quanti alberi della foresta cadono nella stessa foglia. in pratica è un modo di misurare la distanza tra le due istanze. Ha più senso in RF che non in boosting èpercHé in quest'ultimo ci sono i pesi, quindi ha un errore di base, non è tipo "fair"
+
+in sklearn, esiste il metodo apply che ritorna al posto dello score, l'id della foglia in cui è caduta la stessa istanza
+
+tipo, foglia uno cade in[0, 2, 2, 5, 7, 4]  // foglia numero 0 nell'albero 1; foglia numero 2 nell'albero 2 etc
+      foglia due cade in[0, 3, 2, 6, 7, 5]
+
+nell'albero 1, 3, 5 sono cadute nella stessa foglia, negli altri in foglie diverse. hanno una similarità più bassa rispetto a due istanze che hanno la stessa foglia per ogni albero.
+
+ovvero, guardo istanze diverse nello stesso albero, non  alberi diversi. 
+
+che me ne faccio?
+
+### Trovare outliers
+un punto lontano dalla distribuzione normale del fenomeno. È molto costoso.
+calcolo la distanza tra tutti gli altri oggetti del dataset. Una cosa sensata è buttare via gli outliers per allenare il modello (eviti overfitting)
+
+### missing value imputation
+ho un buco nel dataset. con cosa lo sostituisco?
+o lo butto via o lo sostituisco con altri dati. valori sensati sono media e moda. posso usare la RF con una "media furba". al posto di prendere il valore medio e basta, prendo una media pesata dove il peso è la distanza nel RF. 
