@@ -122,3 +122,76 @@ A noi probabilmente non servirà sta roba, considerare comunque che si complica 
 
 # Naming Convention
 Le activity si chiamano NomeActivity (Pascal Case). nome di metodi e campi camelcase. l'activity ha un layout. l'xml si chiama in snake e si chiama activity_nome
+
+# listener - thread rendere UI
+per fare cose normali, tipo cambiare png al bottone quando lo clicco, fa tutto android con gli xml. ma se invece voglio cambiare qualcos'altro o fare roba particolarmente strana? mi tocca usare direttamente il Runnable del thread.
+
+mettiamo che quando clicco il floating button voglio che cambi la scritta dell'altro buttone di nome "button" 
+```java
+binding.fab.setOnClickListener(new View.onClickListener(){
+  @Override
+  public void onClick(View view){
+    runOnUiThread(() -> binding.button.setText("Franco"))
+  }
+});
+```
+
+ogni volt che bisogna fare qualcosa di tipo "render" che non è scrivibile nel XML, vademandato al thread di render.
+
+# cambiare activity
+come faccio a scoprire come si fa? 
+cerco su google "how to change activity android".
+
+BTW, c'è un API apposta. non posso chiamare la onCreate dell'altra activity. in java normale sta roba potrei farla, ma android non me lo permette.
+
+```java
+binding.button.setOnClickListener(new View.onClickListener(){
+  @Override
+  public void onClick(View view){
+    startActivity(new Intent(MainActivity.this, MyOtherActivity.class));
+  }
+});
+```
+è un metodo di nome startActivity, che prende un argomento di tipo intent, il cui costruttore ha due argomenti. il primo ha tipo this (la acctvity presente) il secondo ha tipo class della seconda activity.
+ovvero si specifica chi sono io e chi voglio diventare. chi sono io è il this, chi voglio diventare è la classe (va per reflection).
+Cos'è intent? rappresenta l'intenzione di fare qualcosa. fa parte del meccaniscmo base per comnicare tra activity.
+Cosa posso comunicare? posso inventarmi quello che voglio, volendo (c'è un dictionary che posso popolare). per far partire un'activity però basta chiamare l'API (che è un metodo ereiitato, tra l'altro, in this).
+
+Regola della programmazione moderna è: se cambia solo qualcosa uso i fragment, altrimenti cambio l'activity (ma solo se cambia molto). una volta esistevano solo le activity, quindi si cambiavano solo quelle e non c'èerano i fragment. si può fare ma è scoodo e un po' deprecato.
+
+# fragment
+il fragment può essere grande anche come tutta la schermata, così da cambiare l'intera schermatar senza dover cabiare activity.
+
+il fragment dell'applicazione di default inizia sotto "First Fragment". dentro ha una scroll view, un botton e un testo. poi c'è un secondo fragment, che è il titolo sopra "first fragment" e "second fragment". questo è quello che viene cambiato alla pressione del pulsante.
+
+## codice del fist fragment:
+a cosa seve il codice? così come per le activity, serve quando parte e quando muore.
+la classe FirstFragment estende (DEVE estendere) la classe Fragment di android.
+al suo interno c'è un campo che ha loo stesso ruolo nell'activity: il binding, così da usare tutti i cosetti esistenti nel xml.
+nell'esempio questi nomi sono `button_fiest`, `textview_first`.
+
+metodo
+```java
+public void onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle SavedInstanceState){
+    binding = FragmentFirstBinding.inflate(inflater, container, false);
+    return binding.getRoot();
+  }
+```
+fa la stessa roba del metodo onCreate() delle activity. Ha un nome diverso perché ha un diverso numero di argomenti
+
+il metodo onviewcreated viene chiamato dopo oncreateview. perchésono due metodi diversi e non un unico che contiene entrambi?
+se renderizzo cose complicate, magari ci metto qualcosa, e voglio disegnare qualcosa DOPO che ho renderizzato. 
+tipo, sto renderizzando roba che dipende da file scaricati da un server, e ho un bottone che deve essere premibile solo DOPO che li ho scaricati.
+
+probabilmente sta roba gli è venuto in mente dopo un po' e solo dopo la ideazione dei fragment. infatti sulle activity non è così anche se servirebbe. amen
+
+ugualmente, fragment non ha bisogno di chiamare il super nell'onCreate, però ne ha bisogno in ondestroy. amen si fa così. dopo la ondestroy assegno null al binding così chiamo il garbage collector.
+Perché viene fatto?
+è possibile che in java un assegnamento dia un errore di compilazione? solo coi tipi diversi. non è questo il caso. e allora? l'operatore di assegnamento si può sempre fare in java; il problema è android. 
+i fragment non hanno lo stesso ciclo di vita delle activity, hanno solo 1 livello invece di 3. siccome nello heap in caso di riassegnamento non sanno se è nuovo, in pausa, o altro, nel dubbio il "distruttore" setta manualmente a null.
+
+`onViewCreated`: contiene il setonclicklistener. qual è la lambda che coniene?
+si intuisce che naviga sul secondo fragment
+
+`R.` R è una classe generata, che sta per resources. tutto ciò che va dentro al cartellone res è raggruppato a static class innestate per poter usare le robe dentro le varie cartelle in java come fossero oggetti
+NavHostFragment: il fragment (io) 
