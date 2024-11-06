@@ -123,3 +123,18 @@ calcolo la distanza tra tutti gli altri oggetti del dataset. Una cosa sensata è
 ### missing value imputation
 ho un buco nel dataset. con cosa lo sostituisco?
 o lo butto via o lo sostituisco con altri dati. valori sensati sono media e moda. posso usare la RF con una "media furba". al posto di prendere il valore medio e basta, prendo una media pesata dove il peso è la distanza nel RF. 
+
+********************************************************
+
+
+se ho variabili categoriche, come faccio? 
+dipende dall'algo che uso. per esempio possot rasformarlo in intero (tipo enum) senza problemi con un albero, però ad esempio con la regressione faccio fatica perché devo rispettare la semantica dei dati. un colore per esmpio ha poco senso trasformarlo così in intero, mentre elemntare -media- diploma - laurea - dottorato può avere senso, ma che peso gli do?
+bte, per categorizzare una cosa posso creare variabili booleane:
+categorie: {blu, giallo, verde} posso dividerle in 3 colonne: blu{v, f}, giallo{v, f}, verde{v, f}
+se ho tanta roba per evitare di avere millemila colonne posso prendere solo le più frequenti e poi buttare il resto su "altro" -> posso gestire cosi anche i null.
+
+# per la consegna
+* no il notebook, serve unico file con varie funnzioni.
+## elaborazione deati
+importante fare sempre un predittore stupido per avere un lower bound di controllo.
+controllare F-score sulle slide 
