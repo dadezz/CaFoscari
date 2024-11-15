@@ -61,3 +61,19 @@ l'algoritmo richiede la distanza. è poblematico per vari motivi come abbiamo gi
 * ward: calcolo l'incremento di SSE
 
 differneza particolare tra single e gli altri. basta che abbiano un punto vicino e, stando in media lontanissimi, e li considera roba unica. da un lato è uno svantaggio perché rischia di sottostimare la distanza tra cluster belli lontani. lo svantaggio è che riesco a seguire forme molto strane (risolverebbe il clustering di uno smile). favorisce classi ben separate di qualsiasi forma, sfavorisce classi poco separate.
+
+# Density Based Clustering
+anche questo dice appartiene/non appartiene, ma con la diffferenza che gestisce il rumore, ovvero può non metere qualcosa in nesssun cluster.
+L'idea è che se ho una regione di spazio piena di punti, probabilmente quello è un cluster
+
+## quando è che ho un area densa?
+1. un punto è _core_ se esntro un certo raggio ho almeno _min_ punti
+2. chiamo _vicini_ i punti interni al raggio
+3. un punto è rumore se è fuori da tutti i raggi
+
+i core point se sono abbastanza vicini sono _connessi_, e se sufficientemente connessi formano un cluster a loro volta.
+un punto si dice raggiungibile da un alro se esiste una catena di cores in cui ogni cores è interno alla naighbour del core precedente.e l'ulitmo punto deve essere interno al neighbour, ma non deve per forza essere un core. 
+sta roba però non è simmetrica (per il motivo dei core).
+si risolve dicendo che due punti sono connessi (e quindi raggiungibili) se esiste un'origine da cui posso raggiungere entrambi (così rimetto la simmetria)
+
+ma ovviamente, come faccio a trovare o parametri corretti? (definizione di core e raggio)
