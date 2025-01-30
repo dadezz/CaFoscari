@@ -53,9 +53,9 @@ WHERE ndu.nautori = (
 -- libri di genere fantasy e il numero di libri di genere avventura che ha preso in prestito. Se un
 -- utente non ha preso alcun libro per quel genere restituire 0.
 SELECT u.NumTessera, u.nome,
-    COUNT(CASE WHEN genere='giallo' THEN 1 ELSE NULL END) AS gialli,
-    COUNT(CASE WHEN genere='fantasy' THEN 1 ELSE NULL END) AS fantasy,
-    COUNT(CASE WHEN genere='avventura' THEN 1 ELSE NULL END) AS avventura
+    COUNT(CASE WHEN l.genere='giallo' THEN 1 ELSE NULL END) AS gialli,
+    COUNT(CASE WHEN l.genere='fantasy' THEN 1 ELSE NULL END) AS fantasy,
+    COUNT(CASE WHEN l.genere='avventura' THEN 1 ELSE NULL END) AS avventura
 FROM utenti u LEFT 
     LEFT JOIN prestiti p USING (NumTessera) 
     JOIN Libri l ON l.id = p.idLibro
