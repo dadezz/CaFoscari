@@ -53,11 +53,10 @@ with lista_docenti (matricola, docente, E.Data) AS
 SELECT e.idStud, c.Professore, e.data
 FROM esami e join corsi c on ... JOIN dottrandi d ON ... JOIN Professori p ON ... 
 WHERE d.disciplina = p.disciplina
-GROUP BY e.idStud, c.Professore, e.data
 ORDER BY e.data
 
 UPDATE TABLE Dottorandi 
-SET Professore = (
+SET Relatore = (
     SELECT docente
     FROM lista_docenti ls
     WHERE ls.docente  IN (
