@@ -13,7 +13,7 @@ with open(r"C:\\Users\\Dav\\Downloads\\saw-enigma-the-return.txt", mode='r') as 
     content = file.read()
 
     # what is 16 characters long, either starts or ends with a star, and alternates between a letter and a digit?
-    url_pattern = r"\*[A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9][A-Za-z]"
+    url_pattern = r"\*([A-Za-z][0-9]){7}[A-Za-z]"
     result = re.findall(url_pattern, content)
     print("starts with a star and a letter")
     print(result)
