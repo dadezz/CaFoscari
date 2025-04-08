@@ -51,16 +51,16 @@ $$ \phi(n) = ({n \in \N : x<n \land gcd(x, n) = 1}) $$
 * $ \phi(p) = p-1 $
 * $ \phi(ab)  = \phi(a)\phi(b) $
 * $ n = p*q $
-* da cui $ \phi(n) = (p-1)*(q-1) $ù
-il teorema di eulero fermat ci dice che se a e n sono coprimi,$ a^{\phi(n)} = 1 mod n $
+* da cui $ \phi(n) = (p-1)*(q-1) $
+il teorema di eulero fermat ci dice che se a e n sono coprimi,$ a^{\phi(n)} = 1 \mod n $
 
 ciò signfica che, sempre modulo n, $ a^x = a^y \implies x=n \mod \phi(n) $
 
 #### algoritmo
 1. prendo due numeri primi p, q
 2. computo $ n = p*q $, il nostro modulo
-3. computo $ phi(n) = (p.1)(q-1) $
-4. scelgo un esopnente $ e >1 $ compreso tra $ 2,  phi(n) $ e che sia coprimo di n. $ e $ è la nostra chiave pubblica.
+3. computo $ phi(n) = (p-1)(q-1) $
+4. scelgo un esopnente $ e >1 $ compreso tra $ 2,\  phi(n) $ e che sia coprimo di n. $ e $ è la nostra chiave pubblica.
 5. derivo d risolvendo l'equazione $ e*d = 1 \mod \phi(n) $
 
 ora: 
