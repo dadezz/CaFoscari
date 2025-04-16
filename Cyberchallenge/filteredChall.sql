@@ -1,4 +1,6 @@
-select * from posts where id =          -- 
+select * 
+from utenti 
+where nome =  'gino' and pass = ' or 1=1 -- -'
 
 
 -- - capiamo il tipo di sql inj. può essere error based.
