@@ -1,0 +1,386 @@
+---
+title: 'Lab 6: Regressione lineare'  
+subtitle: "Analisi dei Dati 2024-25" 
+author: "Cristiano Varin"
+output:
+  html_document: 
+    df_print: paged
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = TRUE)
+```  
+
+# Il peso del cervello dei mammiferi 
+
+## Analisi esplorative
+
+Iniziamo con i dati relativi al peso del corpo e del cervello di 62 specie di mammiferi contenuti nel dataset  `mammals` del pacchetto **openintro** che va preliminarmente installato:
+```{r eval=FALSE}
+install.packages("openintro")
+```
+Carichiamo il pacchetto **openintro**:
+```{r message = FALSE}
+library("openintro")
+```
+Caricato il pacchetto, possiamo accedere ai dati:
+```{r }
+data(mammals)
+```
+Vediamo le prime righe di `mammals`:
+```{r }
+head(mammals)
+```
+I dati sono organizzati in un oggetto un po' più complicato del solito `data.frame` come si può capire dalla classe dell'oggetto `mammals`:
+```{r }
+class(mammals)
+```
+Per gli obiettivi di questo corso, modifichiamo la classe di `mammals` in modo che sia un comune `data.frame`:
+```{r }
+mammals <- as.data.frame(mammals)
+```
+Ora la classe di `mammals` è semplicemente `data.frame`:
+```{r }
+class(mammals)
+```
+e le prime righe di `mammals` hanno l'aspetto a cui siamo abituati:
+```{r }
+head(mammals)
+```
+Le due variabili che ci interessano sono il peso corporeo `body_wt` misurato in chilogrammi e il peso del cervello `brain_wt` misurato in grammi. Notate che la guida in linea di `mammals` riporta erroneamente che anche il peso del cervello è misurato in chilogrammi:
+```{r eval=FALSE}
+help("mammals")
+```
+Non è, infatti, possibile che il cervello sia misurato in chilogrammi come si capisce immediatamente osservando, per esempio, la riga di `mammals` corrispondente alla specie umana:
+```{r }
+mammals[mammals$species == "Man", ]
+```
+Prima di procedere con l'analisi di regressione, è utile visualizzare i dati. Disegniamo i boxplot delle variabili `body_wt` e `brain_wt`:
+```{r}
+## dividiamo la finestra grafica in un riga e due colonne
+par(mfrow = c(1, 2))
+with(mammals, boxplot(body_wt, main = "Peso corporeo"))
+with(mammals, boxplot(brain_wt, main = "Peso cervello"))
+## torniamo alla finestra grafica non suddivisa
+par(mfrow = c(1, 1))
+```
+I boxplot mostrano che le due variabili hanno una distribuzione fortemente asimmetrica, come era d'aspettarsi visto che in questo dataset ci sono elefanti e... toporagni. Inoltre, vediamo il grafico a dispersione delle due variabili: 
+```{r}
+plot(brain_wt ~ body_wt, data = mammals, xlab = "Peso del corpo [Kg]", ylab = "Peso del cervello [gr]")
+```
+
+Il grafico a dispersione conferma l'ovvia relazione positiva fra il peso del cervello e il peso del corpo. Inoltre, si notano due osservazioni particolarmente distanti dalle altre che corrispondono agli elefanti:
+```{r }
+which(mammals$brain_wt > 4000)
+mammals$species[1]
+mammals$species[5]
+``` 
+
+
+## Retta di regressione 
+
+Stimiamo ora il modello di regressione per prevedere il peso del cervello con il peso corporeo. Per comodità costruiamo due copie delle variabili  `body_wt` e `brain_wt` che chiamiamo `y` e `x`:
+```{r }
+y <- mammals$brain_wt
+x <- mammals$body_wt
+```
+Calcoliamo le stime ai minimi quadrati dei parametri di modello di regressione:
+```{r }
+beta1 <- cov(x, y) / var(x)
+beta1
+beta0 <- mean(y) - beta1 * mean(x)
+beta0
+```
+L'indice di determinazione $R^2$ è pari a 
+```{r }
+R2 <- cor(x, y) ^ 2
+R2
+```
+Verifichiamo che l'indice $R^2$ coincide con la proporzione della varianza totale spiegata dal modello:
+```{r }
+yhat <- beta0 + beta1 * x
+## somma dei quadrati spiegata
+SQreg <- sum((yhat - mean(y)) ^ 2) 
+## somma dei quadrati totale
+SQtot <- sum((y - mean(y)) ^ 2)
+## R2
+SQreg / SQtot
+```
+Otteniamo ora la varianza di $\hat{\beta}_1$. Per prima cosa dobbiamo calcolare la varianza campionaria dei residui:
+```{r }
+e <- y - yhat
+sigma2 <- sum(e ^ 2) / (length(x) - 2)
+```
+Quindi, la varianza di $\hat{\beta}_1$ è
+```{r }
+var.beta1 <- sigma2 / (var(x) * (length(y) - 1))
+```
+Per valutare la significatività di $\beta_1$ calcoliamo il valore osservato della statistica test T:
+```{r }
+t <- beta1 / sqrt(var.beta1)
+```
+Il livello di significatività osservata è nullo: 
+```{r }
+2 * (1 - pt(abs(t), df = length(x) - 2))
+```
+Se vogliamo calcolare il livello di significatività osservata con maggiore precisione usiamo l'opzione **lower.tail = FALSE** nella funzione **pt**:
+```{r }
+2 * pt(abs(t), df = length(x) - 2, lower.tail = FALSE)
+```
+ma non ci serve tutta questa precisione per concludere che il livello di significatività osservata indica in modo molto netto che il peso corporeo è un predittore significativo del peso del cervello (e forse non ci serve neanche la statistica per giungere a questa conclusione!). 
+
+Le quantità appena calcolate potevano essere ottenute in modo più veloce usando la funzione `lm` (**l**inear **m**odel). Innanzitutto, stimiamo il modello di regressione digitando:
+```{r }
+mod <- lm(brain_wt ~ body_wt, data = mammals)
+mod
+```
+Il modello è stato specificato con la "formula simbolica" `y ~ x` che corrisponde al modello 
+$$
+Y=\beta_0 + \beta_1 x + \epsilon.
+$$
+La funzione `lm` permette di stimare modelli più complicati che coinvolgono diversi predittori usando opportune formule simboliche come vedrete nel corso di **Analisi predittiva**.  
+
+I coefficienti di regressione stimati possono essere estratti con la funzione `coef`:
+```{r }
+coef(mod)
+coef(mod)[1]
+coef(mod)[2]
+```
+Notate che in **R** gli indici dei vettori partono da uno e non da zero come, per esempio, in **C** o **C++**. La funzione `summary` applicata ad un oggetto di classe `lm` permette di ottenere le principali quantità di interesse del modello di regressione stimato:
+```{r }
+summary(mod)
+```
+La funzione `summary` classifica il livello di significatività delle componenti del modello con degli asterischi. Un asterisco indica una componente debolmente significativa (p-value da 0.01 a 0.05), due asterischi significativa (p-value da 0.001 a 0.01), tre asterischi fortemente significativa (p-value inferiore a 0.001). Nel nostro caso, il peso del corpo è un predittore fortemente significativo del peso del cervello.  Il coefficiente di determinazione $R^2$ viene chiamato nel modello `Multiple R-squared` perché la funzione `lm` è costruita per stimare modelli di regressione multipla in cui appiano diversi predittori.  
+
+Una volta stimato un modello con la funzione `lm`, possiamo estrarre i valori stimati $\widehat{y}_i$ con la funzione `fitted`:
+```{r }
+head(fitted(mod))
+```
+e i residui $e_i$ con la funzione `residuals`, che può essere abbreviata come `resid`:
+```{r }
+head(residuals(mod))
+head(resid(mod))
+```
+(Verificate che queste quantità ottenute da `lm` coincidono con i vettori `yhat` ed `e` calcolati precedentemente). 
+
+Disegniamo ora il grafico a dispersione delle 62 osservazioni con la retta di regressione stimata: 
+```{r }
+plot(y ~ x, xlab = "Peso corpo", ylab = "Peso cervello")
+abline(a = beta0, b = beta1, col = "blue", lwd = 1.5)
+```
+
+Risulta difficile valutare quanto bene la retta di regressione si adatti ai dati a causa dei due elefanti che fanno sì che la gran parte delle osservazioni siano "schiacciate" vicino all'origine del grafico. Valutiamo, inoltre, la normalità dei residui con il  **grafico quantile-quantile**:
+```{r, message = FALSE}
+library("car")
+qqPlot(e, ylab = "Quantili empirici", xlab = "Quantili teorici")
+```
+Il grafico indica che i residui sono lontani dall'assunzione di normalità e mostra la presenza di alcuni valori anomali che corrispondono agli elefanti e all'uomo (controllate). Il grafico  quantile-quantile implementato nella funzione `qqPlot` riporta di *default* le due osservazioni più estreme. Se vogliamo individuare i tre *outliers* che vediamo nel grafico quantitle-quantile, possiamo ordinare i valori assoluti dei residui con la funzione `sort` in ordine decrescente e prendere i primi tre elementi: 
+```{r }
+sort(abs(e), decreasing = TRUE)[1:3]
+```
+Ora sappiamo che i tre *outliers* assumono valori più grandi di 810 grammi. Con la funzione `which` individuamo gli indici di questi *outliers*:
+```{r }
+indici <- which(abs(e) > 810)
+indici
+```
+Infine, vediamo a quali specie corrispondono gli indici:
+```{r }
+mammals$species[indici]
+```
+Sono due elefanti e l'uomo. Il residuo dell'uomo è
+```{r }
+e[mammals$species == "Man"]
+```
+Quindi, il modello sottostima il peso del cervello dell'uomo di 1169 grammi. Si tratta di una sottostima notevole visto che il cervello dell'uomo pesa in media 
+```{r} 
+with(mammals, brain_wt[species == "Man"])
+```
+grammi!
+
+
+## Retta di regressione su scala logaritmica
+
+Quando i residui non sono soddisfacenti, si può provare a trasformare le variabili in modo da "linearizzare" la relazione fra di loro. La trasformazione logaritmica è comunemente usata per variabili positive con distribuzione asimmetrica. Di seguito visualizziamo la trasformazione logaritmica applicata alla risposta, al predittore e sia alla risposta che al predittore: 
+```{r }
+par(mfrow = c(2, 2))
+plot(y ~ x, xlab = "Peso corpo", ylab = "Peso cervello")
+plot(log(y) ~ x, xlab = "Peso corpo (log)", ylab = "Peso cervello")
+plot(y ~ log(x), xlab = "Peso corpo", ylab = "Peso cervello (log)")
+plot(log(y) ~ log(x), xlab = "Peso corpo (log)", ylab = "Peso cervello (log)")
+par(mfrow = c(1,1))
+```
+Chiaramente, è necessario trasformare sia la risposta che il predittore per linearizzare la relazione fra queste due variabili. Stimiamo, quindi, il modello di regressione fra le due variabili trasformate:
+```{r }
+modlog <- lm(log(brain_wt) ~ log(body_wt), data = mammals)
+modlog
+summary(modlog)
+```
+Il logaritmo del peso corporeo è un predittore fortemente significativo del logaritmo del peso del cervello. L'indice $R^2$ vale $0.92$ ad indicare che questo modello spiega il 92\% della variabilità del peso del cervello su scala logaritmica.  
+
+Visualizziamo la retta di regressione stimata:
+```{r}
+plot(log(y) ~ log(x), xlab = "Peso corpo (log)", ylab = "Peso cervello (log)")
+abline(modlog, col = "blue", lwd = 1.5)
+```
+
+Il grafico mostra l'ottimo adattamento della retta di regressione alle osservazioni trasformate. Vediamo ora il modello stimato sulla scala originale:
+```{r}
+plot(y ~ x, xlab = "Peso corpo", ylab = "Peso cervello")
+beta0 <- coef(modlog)[1]; beta1 <- coef(modlog)[2]
+curve(exp(beta0 + beta1 * log(x)), lwd = 1.5, col = "blue", add = TRUE)
+```
+
+
+Il grafico quantile-quantile indica che l'assunzione di normalità può ritenersi soddisfatta:
+```{r }
+qqPlot(resid(modlog), ylab = "Quantili empirici", xlab = "Quantili teorici")
+```
+Controlliamo anche le assunzioni di linearità e di omoschedasticità:
+```{r }
+plot(resid(modlog) ~ log(x), ylab = "Residui", xlab = "Peso del corpo (log)")
+abline(h = 0, col = "red", lty = "dashed", lwd = 1.5)
+```
+
+e l'assunzione di indipendenza:
+```{r }
+plot(resid(modlog), ylab = "Residui", xlab = "Indice osservazioni")
+abline(h = 0, col = "red", lty = "dashed", lwd = 1.5)
+```
+
+I grafici dei residui sono soddisfacenti per cui concludiamo che il modello log-log è appropriato per descrivere la relazione fra il peso del cervello e il peso del corpo nei mammiferi.
+
+## Previsioni
+Calcoliamo la previsione basata sul modello stimato del logaritmo del peso del cervello di un mammifero che pesa 60 chili usando la funzione ``predict``. Il valore del predittore in ``predict`` va indicato nell'argomento ``newdata`` attraverso un oggetto di tipo ``data.frame``:
+```{r }
+predict(modlog, newdata = data.frame(body_wt = 60))
+```
+Verifica:
+```{r }
+coef(modlog)[1] + coef(modlog)[2] * log(60)
+```
+La funzione `predict` permette anche di calcolare un intervallo di previsione:
+```{r }
+predict(modlog, newdata = data.frame(body_wt = 60), interval = "prediction")
+```
+Possiamo anche calcolare previsioni e intervalli di previsione per diversi valori del predittore:
+```{r }
+predict(modlog, newdata = data.frame(body_wt = c(60, 70, 80)), interval = "prediction")
+```
+e variare il livello dell'intervallo di previsione: 
+```{r }
+predict(modlog, newdata = data.frame(body_wt = c(60, 70, 80)), interval = "prediction", level = 0.99)
+```
+Tutti gli intervalli di previsione precedenti sono calcolati per il peso del cervello su scala logaritmica. Per ottenere gli intervalli per il peso del cervello in grammi dobbiamo semplicemente trasformare gli estremi dell'intervallo con la funzione esponenziale:
+```{r }
+prev <- predict(modlog, newdata = data.frame(body_wt = c(60, 70, 80)), interval = "prediction")
+exp(prev)
+```
+Gli intervalli di previsione che abbiamo ottenuto sono ragionevoli per la gran parte delle specie di mammiferi nel dataset, ma non per la specie umana per cui il peso del cervello è molto più alto di quanto predetto dal modello:
+```{r }
+uomo <- which(mammals$species == "Man")
+mammals[uomo, ]$body_wt
+mammals[uomo, ]$brain_wt
+```
+Il cervello umano ha un peso anomalo rispetto agli altri mammiferi che non viene colto dal modello stimato come illustrato nel seguente grafico:
+```{r  }
+plot(y ~ x, xlab = "Peso corpo", ylab = "Peso cervello")
+curve(exp(beta0 + beta1 * log(x)), lwd = 1.5, col = "blue", add = TRUE)
+points(x[uomo], y[uomo], pch = 20, col = "blue")
+```
+
+
+# Il peso dei diamanti
+
+## Analisi esplorative
+
+Analizziamo, ora, i dati relativi alla relazione fra il prezzo e il peso dei diamanti contenuti nel file **Diamand.csv**:
+```{r echo = FALSE}
+diamanti <- read.csv("../../dati/Diamond.csv")
+```
+```{r eval = FALSE}
+diamanti <- read.csv("Diamond.csv")
+```
+Vediamo le prime righe del dataset: 
+```{r }
+head(diamanti)
+```
+Le variabili che ci interessano sono ``price`` e ``carat``. Iniziamo con qualche analisi grafica prima separatamente per le due variabili:
+```{r}
+par(mfrow = c(1, 2))
+boxplot(diamanti$price, main = "Prezzo dei diamanti")
+boxplot(diamanti$carat, main = "Peso dei diamanti (carati)")
+par(mfrow = c(1, 1))
+```
+I due boxplot indicano che il prezzo ha una distribuzione asimmetrica mentre il peso ha una distribuzione simmetrica. Visualizziamo ora congiuntamente le due variabili tramite un grafico a dispersione:
+```{r }
+plot(price ~ carat, data = diamanti, xlab = "Carati", ylab = "Prezzo")
+```
+
+## Retta di regressione
+
+Il grafico a dispersione mostra una relazione crescente fra peso e prezzo. La relazione fra le due variabili però non è lineare e inoltre vi è anche una crescente variabilità del prezzo all'aumentare del peso. Stimiamo, comunque, la retta ai minimi quadrati: 
+```{r }
+mod1 <- lm(price ~ carat, data = diamanti)
+summary(mod1)
+```
+Il modello stimato indica che il peso delle pietre è un predittore fortemente significativo del prezzo, inoltre l'indice $R^2$ è pari a 0.89 ad indicare che il modello spiega quasi il 90\% della variabilità dei prezzi dei diamanti. Il modello però non è accettabile perché porta a valori stimati del prezzo negativi:
+```{r }
+summary(fitted(mod1))
+``` 
+Per evitare previsioni negative, trasformiamo il prezzo su scala logaritmica: 
+```{r }
+mod2 <- lm(log(price) ~ carat, data = diamanti)
+summary(mod2)
+```
+Anche nel modello su scala logaritmica, il peso è un predittore fortemente significativo del prezzo. Il modello spiega il  93.5\% della variabilità del prezzo ma su scala logaritmica per cui non possiamo confrontare questo valore dell'indice $R^2$ con quello del modello precedente. Visualizziamo il modello stimato:
+```{r }
+plot(log(price) ~ carat, data = diamanti)
+abline(mod2, lwd = 1.5, col = "blue")
+```
+
+L'ultimo comando usato per aggiungere la retta di regressione al grafico di dispersione è equivalente al comando esplicito:
+```{r eval=FALSE}
+abline(a = coef(mod2)[1], b = coef(mod2)[2], lwd = 1.5, col = "blue")
+```
+Il grafico mostra un adattamento della retta di regressione ai dati non soddisfacente: la relazione fra il logaritmo del prezzo e i carati non è lineare, come risulta evidente dal grafico dei residui: 
+```{r }
+plot(resid(mod2) ~ carat, data = diamanti, xlab = "Carati", ylab = "Residui")
+abline(h = 0, lwd = 1.5, lty = "dashed", col = "darkred")
+```
+
+## Modelli di regressione polinomiale
+
+Consideriamo il modello con effetto quadratico del preso che specifichiamo aggiornando il modello `mod2` con la funzione `update`. Per includere una potenza del predittore nel modello di regressione bisogna usare l'operatore `I`:
+```{r }
+mod3 <- update(mod2, . ~ . + I(carat ^ 2))
+summary(mod3)
+```
+Sia il termine lineare che quello quadratico sono fortemente significativi. L'indice $R^2$ è cresciuto al 96\% così come l'indice $R^2$ aggiustato ad indicare che questo modello è preferibile al modello lineare. Per visualizzare il modello stimato non possiamo usare la funzione **abline** ma dovremo usare la funzione **curve** come segue:
+```{r }
+## grafico a dispersione
+plot(log(price) ~ carat, data = diamanti, xlab = "Carati", ylab = "Prezzo (log)")
+## modello lineare
+abline(mod2, lwd = 1.5, col = "darkred")
+## modello quadratico 
+curve(coef(mod3)[1] + coef(mod3)[2] * x + coef(mod3)[3] * x^2, col = "blue", lwd = 1.5, add = TRUE) ## ricordarsi di scrivere add = TRUE
+```
+
+Il grafico suggerisce che il modello quadratico descrive meglio l'andamento della relazione fra peso e prezzo rispetto al modello lineare. Controlliamo i residui:
+```{r }
+plot(resid(mod3) ~ carat, data = diamanti, xlab = "Carati", ylab = "Residui")
+abline(h = 0, lwd = 1.5, lty = "dashed", col = "darkred")
+```
+
+I residui del modello quadratico sono decisamente migliorati rispetto al modello lineare. Controlliamo anche l'assunzione di normalità: 
+```{r, message = FALSE}
+qqPlot(resid(mod3), ylab = "Quantili empirici", xlab = "Quantili teorici")
+```
+Il grafico quantile-quantile non è completamente soddisfacente per quanto la quasi totalità delle osservazioni cadono nelle bande di confidenza: infatti, il grafico suggerisce che i residui provengono da una distribuzione con code più `pesanti' di quelle della distribuzione normale. Proviamo ora a considerare anche un effetto cubico:
+```{r }
+mod4 <- update(mod3, . ~ . + I(carat ^ 3))
+summary(mod4)
+``` 
+Il modello stimato indica che il temine cubico non è statisticamente significativo, inoltre l'indice $R^2$ aggiustato non è aumentato. Concludiamo, quindi, che il modello quadratico è sufficiente per descrivere l'andamento della relazione fra il logaritmo del prezzo e il peso dei diamanti nonostante la riserva sull'assunzione di normalità. 

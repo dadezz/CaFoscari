@@ -1,0 +1,218 @@
+# esempio 1: ammontare di tempo casuale nell'instsallazione software, intervallo di confidenza T, differenza tra 2, satterthwaite, t.test(dati, conf.level = 0.95)
+
+
+L’installazione di un software su un computer richiede un ammontare di tempo casuale. Un tecnico informatico installa il software in un laboratorio composto da 24 computer con un tempo medio di installazione per singolo computer di 4.5 minuti con deviazione standard di 2.7 minuti. Assumendo che il tempo di installazione sia normalmente distribuito si risponda ai seguenti quesiti:
+1. Si calcoli un intervallo di confidenza al 95% per il tempo medio di installazione del software su un singolo computer. Sulla base dei calcoli effettuati possiamo ritenere corretta l’affermazione che "il tempo di installazione del software su un singolo computer è approssimativamete pari a 5 minuti"? [3 punti]
+2. Dopo sei mesi viene rilasciata una nuova versione del software che viene installata in un secondo laboratorio che consiste di 18 computer dello stesso modello dei computer del primo laboratorio. Il tempo medio per installare il software su un singolo computer è pari a 3.7 minuti con una deviazione standard di 2 minuti. Il tempo di installazione della nuova versione software è davvero più veloce di quello della precedente versione del software? Si risponda alla domanda ad un livello di significatività del 1% [3 punti];
+3. Rispondere ai quesiti dei punti precedenti utillizzando i dati completi sui tempi di installazione delle due versioni del software contenuti nei file vecchia_versione.csv e nuova_versione.csv [2 punti].
+
+-------------------------------------------------------------------------------------------------------
+
+[1] Vista l'assunzione di normalità, possiamo calcolare un'intervallo di confidenza per il tempo di installazione con livello 95\% con la statistica T:
+
+```{r, error = TRUE}
+4.5 + c(-1, 1) * qt(0.975, df = 23) * 2.7 / sqrt(24)
+```
+
+Siccome un tempo di installazione di 5 minuti è compreso nell'intervallo di confidenza al 95\%, \emph{non} possiamo concludere che l'affermazione \emph{non} sia corretta ad un livello di significatiità del 5\%.
+
+[2] Dobbiamo valutare il sistema d'ipotesi
+
+$H_0: \mu_v = \mu_n$ contro $H_A: \mu_v > \mu_n$
+
+dove $\mu_v$ e $\mu_n$ sono i tempo medi di installazione del software su un singolo computer con la vecchia e il nuova versione del software. Possiamo valutare le ipotesi con la statistica T con valore osservato
+
+```{r, error = TRUE}
+t <- (4.5 - 3.7) / sqrt(2.7 ^ 2 / 24 + 2 ^ 2 /18) 
+t
+```
+
+Sotto l'ipotesi nulla, secondo la formula di Satterthwaite la  statistica T ha una distribuzione approssimativamente T di Student con 
+```{r}
+gradi <- (2.7 ^ 2 / 24 + 2 ^ 2 / 18) ^ 2 / ( 2.7 ^ 4 / (24 ^ 2 * 23) + 2 ^ 4 / (18 ^ 2 * 17))
+gradi
+```
+gradi di libertà. Il corrispondente p-value è
+```{r, error = TRUE}
+1 - pt(t, df = gradi)
+```
+Siccome il p-value è superiore a 0.01 concludiamo che non possiamo rifiutare l'ipotesi nulla al livello di significatività del 1\%.
+
+[3] Leggiamo i dati completi: 
+```{r, error = TRUE}
+dati_vecchi <- read.csv("vecchia_versione.csv")
+dati_nuovi <- read.csv("nuova_versione.csv")
+```
+I dati sono contenuti in due dataframes ciascuna di una singola colonna:
+```{r}
+dati_vecchi
+dati_nuovi
+```
+Per semplicità salviamo i due vettori di dati in due oggetti distinti:
+```{r}
+vecchi <- dati_vecchi$x
+nuovi <- dati_nuovi$x
+```
+
+Verifichiamo la normalità dei dati:
+```{r, error = TRUE}
+library("car")
+qqPlot(vecchi)
+qqPlot(nuovi)
+```
+
+I grafici quantile-quantile sono del tutto soddisfacenti percui riteniamo l'assunzione di normalità soddisfatta. 
+
+Risposta al primo quesito:
+```{r, error = TRUE}
+t.test(vecchi, conf.level = 0.95)
+```
+Il calcolo conferma il risultato ottenuto al punto [1].
+
+Risposta al secondo quesito:
+```{r, error = TRUE}
+t.test(vecchi, nuovi, alternative = "greater")
+```
+Il calcolo conferma il risultato ottenuto al punto [2].
+
+
+# esempoio 2: poisson
+In 60 giornate ci sono state 150 interruzioni alle trasmissioni di un’emittente radiofonica. Al fine di migliorare il servizio, l’emittente ha acquistato una nuova antenna. In 54 giorni successivi all’entrata in funzione della nuova antenna ci sono state 116 interruzioni alle trasmissioni.
+Supponendo che il numero di interruzioni segua una distribuzione di Poisson, si risponda ai seguenti quesiti:
+1. possiamo ritenere che il numero medio di interruzioni giornaliere prima dell’acquisto della nuova antenna fosse significativamente superiore a 2? Si risponda al quesito ad un livello di significatività del 3% [3 punti];
+2. possiamo affermare che l’acquisto della nuova antenna abbia portato ad una riduzione del numero medio di interruzioni giornaliere? Si risponda al quesito ad un livello di significatività del 6% [3 punti].
+3. Rispondere ai quesiti dei punti precedenti utillizzando i dati completi sulle interruzioni alle trasmissioni nei due campioni contenuti nei file vecchia_antenna.csv e nuova_antenna.csv [2 punti].
+---------------------------------------------------------------------------------------------------------
+
+[1] Dobbiamo valutare il sistema di ipotesi
+
+$H_0: \lambda = 2$ contro $H_A: \lambda > 2,$
+ 
+dove $\lambda$ è il numero atteso di interruzioni. Possiamo valutare le ipotesi con una statistica Z approssimata. Il valore osservato della statistica Z è
+```{r, error = TRUE}
+mean1 <- 150 / 60
+z <- (mean1 - 2) / sqrt(2 / 60)
+z
+```
+Il p-value è
+```{r, error = TRUE}
+1 - pnorm(z)
+```
+Il valore del p-value ci porta a rifiutare l'ipotesi nulla e concludere che il numero di interruzioni sia significativamente superiore a 2 ad un livello di significatività del 3\%. 
+
+[2] Dobbiamo valutare il sistema d'ipotesi 
+
+$H_0: \lambda_1 = \lambda_2$ contro $H_1: \lambda_1 > \lambda_2,$
+
+dove $\lambda_1$ è il numero atteso di interruzioni con la vecchia antenna e $\lambda_2$ è il numero atteso di interruzioni con la nuova antenna.
+
+Possiamo valutare le ipotesi con la statistica Z approssimata con valore osservato
+```{r, error = TRUE}
+mean2 <- 116 / 54
+mean_pooled <- (150 + 116) / (60 + 54)
+z <- (mean1 - mean2) / sqrt(mean_pooled * (1 / 60 + 1 / 54))
+z
+```
+Il p-value è 
+```{r, error = TRUE}
+1 - pnorm(z)
+```
+e non ci permette di rifiutare l'ipotesi nulla ad un livello di significatività del 6\% ovvero di escludere che in realtà la nuova antenna non abbia portato alcun miglioramento sul numero di interruzioni. 
+
+[3] Leggiamo i dati:
+```{r, error = TRUE}
+vecchia <- read.csv("vecchia_antenna.csv")
+nuova <- read.csv("nuova_antenna.csv")
+```
+Vediamo la struttura dei dati:
+```{r}
+head(vecchia)
+head(nuova)
+```
+Risposta al primo quesito:
+```{r, error = TRUE}
+library("BSDA")
+z.test(vecchia$interruzioni, mu = 2, sigma.x = sqrt(2), alternative = "greater")
+```
+Il calcolo conferma il risultato ottenuto al punto [1].
+
+Risposta al secondo quesito:
+```{r, error = TRUE}
+mean_pooled <- mean(c(vecchia$interruzioni, nuova$interruzioni))
+z.test(vecchia$interruzioni, nuova$interruzioni, sigma.x = sqrt(mean_pooled), sigma.y = sqrt(mean_pooled), alternative = "greater")
+```
+Il calcolo conferma il risultato ottenuto al punto [2].
+
+# esempio 3: bernoulli
+L’azienda di elettronica di consumo Simsang vuole valutare due diverse strategie per promuovere le vendite di un nuovo televisore. La prima strategia consiste nel vendere la televisione con in omaggio un abbonamento di tre anni ad un servizio di streaming di serie TV e film. La seconda strategia, invece, consiste nel vendere il televisore con uno sconto. Per valutare quale delle due strategie sia più gradita, viene intervistato un campione casuale di 200 clienti. Il numero di clienti che dichiarano di preferire il televisore con lo sconto è stato 110.
+1. si valuti se vi sia differenza nel livello di gradimento verso le due strategie di promozione al livello di significatività del 5% calcolando un opportuno intervallo di confidenza [3 punti];
+2. dopo mezzo anno viene intervistato un secondo campione casuale di 250 clienti. Il numero di clienti in questo secondo campione che dichiara di preferire il televisore con lo sconto è 105. Questo risultato indica che i clienti ora preferiscono maggiormente l’abbonamento di quanto non lo preferissero prima? [3 punti]
+3. Rispondere ai quesiti dei punti precedenti utillizzando i dati completi sulle preferenze dichiarate dai clienti nei due campioni contenuti nei file primo_campione.csv e secondo_campione.csv [2 punti].
+-------------------------------------------------------------------------------------------------------
+
+[1] Indichiamo con p la probabilità di preferire l'abbonamento allo sconto. L'intervallo di confidenza richiesto è
+```{r, error = TRUE}
+phat <- 90 / 200
+phat
+phat + c(-1, 1) * qnorm(0.975) * sqrt(phat * (1 - phat) / 200)
+```
+Siccome l'intervallo di confidenza contiene il valore $p=0.5$ concludiamo che non vi è una differenza significativa fra le due strategie di promozione ad un livello di significatività del 5\%.
+
+[2] Indichiamo con $p_1$ la probabilità di preferire l'abbonamento allo sconto al tempo della prima rilevazione e con $p_2$ la stessa probabilità dopo mezzo anno. Dobbiamo valutare il sistema d'ipotesi
+
+$H_0: p_1= p_2$ contro $H_A: p_1 < p_2$.
+
+Possiamo valutare le ipotesi con la statistica Z usando la proporzione "pooled":
+```{r, error = TRUE}
+p1hat <- 90 / 200
+p1hat
+p2hat <- 145 / 250
+p2hat
+pooled <- (90 + 145) / (450)
+pooled
+```
+
+Il valore osservato della statistica Z è
+
+```{r, error = TRUE}
+z <- (p1hat - p2hat) / sqrt(pooled * (1 - pooled) * (1 / 200 + 1 / 250)) 
+z
+```
+
+Il p-value è 
+```{r}
+pnorm(z)
+```
+Il p-value indica che il test è significativo, quindi rifiutiamo l'ipotesi nulla e concludiamo che ora i clienti preferiscono maggiormente l'abbonamento.
+
+[3] Leggiamo i dati:
+```{r, error = TRUE}
+campione1 <- read.csv("primo_campione.csv")
+campione2 <- read.csv("secondo_campione.csv")
+```
+Vediamo la struttura dei dati: 
+```{r, error = TRUE}
+head(campione1)
+head(campione2)
+```
+Creiamo due vettori che indicano se vi sia preferenza per l'abbonamento:
+```{r, error = TRUE}
+campione1 <- (campione1$x == "streaming")
+head(campione1)
+campione2 <- (campione2$x == "streaming")
+head(campione2)
+```
+Risposta al primo quesito:
+```{r, error = TRUE}
+library("BSDA")
+z.test(campione1, mu = 0.5, sigma.x = 0.5)
+```
+Il calcolo conferma il risultato ottenuto al punto [1].
+
+Risposta al secondo quesito:
+```{r, error = TRUE}
+sigma <- sqrt(pooled * (1 - pooled))
+z.test(campione1, campione2, sigma.x = sigma, sigma.y = sigma, alternative = "less")
+```
+Il calcolo conferma il risultato ottenuto al punto [2].
+ 

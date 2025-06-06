@@ -1,0 +1,105 @@
+---
+title: "Davide Zambon - Esercizio 4"
+output:
+  html_document: 
+    df_print: paged
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+
+# Soluzione quesito 1
+
+```{r, error=true}
+library(car)
+
+dati <- read.csv("performance_studente.csv")
+head(dati)
+plot(voto_esame ~ ore_studio, data = dati)
+```
+uso per primo un modello lineare
+
+```r
+mod <- lm(dati$voto_esame ~ dati$ore_studio)
+abline(mod)
+summary(mod)
+```
+la retta potrebbe avere senso ma stampandolo sui dati secondo me ha il coefficiente angolare che dovrebbe essere più alto, e infatti il R^2 non è buono
+
+vedo i residui
+```r
+plot(residuals(mod) ~ fitted(mod))
+abline(h = 0, col = "red")
+```
+```r
+qqPlot(residuals(mod))
+```
+in effetti i residui hanno una tendenza quadratica e i dati non fittano bene l'assunzione di normalità.
+
+provo un modello quadratico
+
+```r
+modq <- lm(dati$voto_esame ~ dati$ore_studio + I(dati$ore_studio ^ 2))
+summary(modq)
+plot(residuals(modq) ~ fitted(modq))
+abline(h = 0, col = "red")
+```
+né il summary né i residui sono soddisfacenti. provo passando al logaritmo
+
+
+```r
+plot( dati$voto_esame ~ log(dati$ore_studio))
+modlog <- lm( dati$voto_esame ~ log(dati$ore_studio) )
+abline(modlog)
+summary(modlog)
+```
+
+
+
+continua a non essere soddisfacente, secondo me ci sono 2 outliers, uno in alto a sinistra e uno in basso a destra che "abbassano la curva".  il R^2 non è buono.
+provo togliendo gli outlier. 
+
+
+```r
+
+outliers1 <- which(dati$ore_studio < 20 & dati$voto_esame > 25)
+outliers1
+outliers2 <- which(dati$ore_studio > 80 & dati$voto_esame < 10)
+outliers2
+
+outliers <- c(outliers1, outliers2)
+```
+
+```r
+mod2 <- lm(dati$voto_esame ~ dati$ore_studio, subset = -outliers)
+summary(mod2)
+```
+
+non riporto il plot, ma continua a non essere del tutto soddisfacente l'analisi e la normalità dei residui. provo passando al logaritmo delle ore di studio
+
+```{r, error=true}
+mod2log <- lm(voto_esame ~ log(ore_studio), data = dati, subset = -outliers)
+summary(mod2log)
+```
+
+```{r, error=true}
+qqPlot(residuals(mod2log))
+plot(residuals(mod2log) ~ fitted(mod2log))
+abline(h = 0, col = "red")
+```
+
+decisamente migliorata e dentro la banda di normalità
+
+# soluzione quesito 2
+
+Il modello log(ore_studio) senza outlier fornisce una migliore aderenza ai dati sia in termini di variabilità spiegata (R²) in quanto spiega circa l'80% della variabilità dei dati, sia di residui. È da considerare come modello finale preferibile, se si accetta l’interpretazione logaritmica.
+
+
+
+# Soluzione quesito 3
+
+```r
+nuovi_dati <- data.frame(ore_studio = c(30, 80))
+predict(mod2log, newdata = nuovi_dati, interval = "prediction", level = 0.96)
+```

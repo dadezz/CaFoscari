@@ -1,0 +1,287 @@
+# Istruzioni: 
+Si riportino le analisi svolte in R accompagnate da commenti sulle operazioni svolte per:
+1. stimare il modello;
+2. validare il modello stimato con l’analisi dei residui;
+3. illustrare il modello stimato.
+
+# mammiferi: trasformazioni di entrambe le variabili in log + intervallo di previsione
+Il dataset mammiferi.csv contiene i dati relativi al peso del cervello e del corpo di 62 specie di mammiferi. Il peso del cervello è espresso in grammi, mentre il peso del corpo in chilogrammi.
+1. si costruisca un modello per prevedere il peso del cervello di un mammifero sulla base del peso del suo corpo;
+2. si illustri il modello calcolando un intervallo di previsione al 90% per il peso del cervello di un mammifero di (i) 50 chilogrammi e (ii) 100 chilogrammi.
+--------------------------------------------------------------------------------------------------------
+
+Leggiamo i dati:
+```{r}
+mammiferi <- read.csv("mammiferi.csv")
+```
+
+Visualizziamo i dati:
+```{r}
+plot(cervello ~ corpo, data = mammiferi)
+```
+
+Il grafico non è di facile interpretazione a causa di due osservazioni anomale che corrispondono alle due specie di elefanti.
+
+Stimiamo la retta di regressione:
+```{r}
+mod <- lm(cervello ~ corpo, data = mammiferi)
+summary(mod)
+```
+
+Analisi dei residui:
+```{r, message = FALSE}
+library(car)
+par(mfrow = c(1, 2))
+plot(residuals(mod) ~ corpo, data = mammiferi)
+abline(h = 0, col = "red")
+qqPlot(residuals(mod))
+```
+L'analisi dei residui, e in particolare il grafico quantile-quantile, indica che il modello non è adeguato.
+
+Proviamo a trasformare le variabili su scala logaritmica:
+```{r}
+par(mfrow = c(2, 2))
+plot(cervello ~ corpo, data = mammiferi)
+plot(log(cervello) ~ corpo, data = mammiferi)
+plot(cervello ~ log(corpo), data = mammiferi)
+plot(log(cervello) ~ log(corpo), data = mammiferi)
+```
+
+I grafici suggeriscono di trasformare entrambe le variabili.
+
+Stimiamo la retta di regressione con le variabili trasformate:
+```{r}
+mod <- lm(log(cervello) ~ log(corpo), data = mammiferi)
+summary(mod)
+```
+
+Il modello stimato:
+
+* spiega il 92\% della variabilità del peso del cervello dei mammiferi su scala logaritmica [r-squared]
+
+* indica che il logaritmo del peso del corpo è un predittore fortemente significativo del logaritmo del peso del cervello e che la relazione è crescente.
+
+Visualizziamo il modello stimato: 
+```{r}
+plot(log(cervello) ~ log(corpo), data = mammiferi)
+abline(mod, col = "red")
+```
+
+Il grafico suggerisce che la retta di regressione è adeguata per descrivere la relazione fra il logaritmo del peso del cervello e il logaritmo del peso del corpo.
+
+L'analisi dei residui ora è soddisfacente:
+```{r}
+par(mfrow = c(1, 2))
+plot(residuals(mod) ~ log(corpo), data = mammiferi)
+abline(h = 0, col = "red")
+qqPlot(residuals(mod))
+```
+
+Calcoliamo l'intervallo di previsione al 90% per il peso del cervello di un mammifero di 50 kg:
+```{r}
+pr <- predict(mod, newdata = data.frame(corpo = 50), interval = "prediction", level = 0.9)
+exp(pr)
+```
+
+Se il mammifero invece pesasse 100 kg allora il peso del cervello previsto dal modello sarebbe: 
+```{r}
+pr <- predict(mod, newdata = data.frame(corpo = 100), interval = "prediction", level = 0.9)
+exp(pr)
+```
+
+
+
+# diamanti: relazione non lineare
+Il dataset diamanti.csv contiene i dati relativi al peso e al prezzo di un campione di 308 diamanti. Il peso è espresso in carati, mentre il prezzo in dollari di Singapore.
+1. si costruiscano almeno due modelli alternativi per prevedere il prezzo dei diamanti sulla base del loro peso e si spieghi quale dei modelli considerati sia preferibile;
+2. si illustri il modello scelto al punto precedente calcolando un intervallo di previsione al 99% per il prezzo di un diamante con un peso (i) di 0.5 carati e (ii) di 1 carato.
+---------------------------------------------------------------------------------------------------------
+
+Leggiamo i dati:
+```{r}
+diamanti <- read.csv("diamanti.csv")
+```
+
+Visualizziamo i dati:
+```{r}
+plot(prezzo ~ peso, data = diamanti)
+```
+
+Il grafico mostra una relazione crescente non lineare fra prezzo e peso. Si nota anche un aumento della dispersione dei prezzi al crescere del peso. 
+
+
+Stimiamo la retta di regressione:
+```{r}
+mod <- lm(prezzo ~ peso, data = diamanti)
+summary(mod)
+```
+
+Analisi dei residui:
+```{r, message = FALSE}
+library(car)
+par(mfrow = c(1, 2))
+plot(residuals(mod) ~ peso, data = diamanti)
+abline(h = 0, col = "red")
+qqPlot(residuals(mod))
+```
+L'analisi dei residui indica che il modello non è adeguato. 
+
+Inoltre, il modello porta a stime del prezzo negative:
+```{r}
+summary(fitted(mod))
+```
+
+Per evitare previsioni negative, stimiamo il modello di regressione su scala logaritmica:
+```{r}
+mod <- lm(log(prezzo) ~ peso, data = diamanti)
+summary(mod)
+```
+
+Analisi dei residui:
+```{r, message = FALSE}
+library(car)
+par(mfrow = c(1, 2))
+plot(residuals(mod) ~ peso, data = diamanti)
+abline(h = 0, col = "red")
+qqPlot(residuals(mod))
+```
+L'analisi dei residui indica che il modello non è adeguato e suggerisce una relazione non lineare fra il logaritmo del prezzo e il peso dei diamanti.
+
+Aggiungiamo un effetto quadratico: 
+```{r}
+mod2 <- update(mod, . ~ . + I(peso ^ 2))
+summary(mod2)
+```
+
+Il modello quadratico ha un valore dell'indice $R^2$ aggiustato più alto del modello lineare. Proviamo il modello cubico:
+```{r}
+mod3 <- update(mod2, . ~ . + I(peso ^ 3))
+summary(mod3)
+```
+
+Non vi è miglioramento nel passare al modello cubico. 
+
+L'analisi dei residui del modello quadratico:
+```{r}
+library(car)
+par(mfrow = c(1, 2))
+plot(residuals(mod2) ~ peso, data = diamanti)
+abline(h = 0, col = "red")
+qqPlot(residuals(mod2))
+```
+
+Il residui del modello quadratico sono decisamente migliorati rispetto al modello lineare anche se il grafico quantile-quantile non è del tutto soddisfacente sulle code. 
+
+Il modello quadratico spiega il 96\% della variabilità del prezzo su scala logaritmica. 
+
+Visualizziamo il modello stimato:
+```{r}
+plot(log(prezzo) ~ peso, data = diamanti)
+curve(coef(mod2)[1] + coef(mod2)[2] * x + coef(mod2)[3] * x^2, from = min(diamanti$peso), to = max(diamanti$peso), add = TRUE, col = "red")
+```
+
+Calcoliamo l'intervallo di previsione al 99% per il prezzo di un diamante di 0.5 carati:
+```{r}
+pr <- predict(mod2, newdata = data.frame(peso = 0.5), interval = "prediction", level = 0.99)
+exp(pr)
+```
+
+Se la pietra pesasse 1 carato allora il prezzo previsto dal modello sarebbe: 
+```{r}
+pr <- predict(mod2, newdata = data.frame(peso = 1), interval = "prediction", level = 0.99)
+exp(pr)
+```
+
+
+# efficienza.csv: osservazioni anomale, outliers
+L’efficienza di un programma dipende dalla dimensione dei dati che riceve come input. In generale, dataset di dimensioni più grandi richiedono tempi di elaborazione più elevati, riducendo il numero di processi elaborati in una data unità di tempo. Il dataset efficienza.csv contiene il numero di richieste elaborate per ora per un campione casuale di 29 dataset di varie dimensioni misurate in Gigabyte.
+1. si costruisca un modello per prevedere quanti processi vengono elaborati in un’ora in funzione della dimensione dei dati ricevuti dal programma;
+2.si illustri il modello calcolando un intervallo di previsione al 95% per il numero di processi elaborati in un’ora nel caso di (i) un dataset di dimensione 10 Gigabyte e (ii) nel caso di un dataset di dimensione 15 Gigabyte.
+---------------------------------------------------------------------------------------------------------
+
+Leggiamo i dati:
+```{r, error = TRUE}
+efficienza <- read.csv("efficienza.csv")
+```
+
+Visualizziamo i dati: 
+```{r, error = TRUE}
+plot(processi ~ dimensione, data = efficienza)
+```
+
+Il grafico mostra un andamento decrescente non lineare del numero di processi in funzione della dimensione per la gran parte delle osservazioni a meno di un grappolo di quattro osservazioni con valori del numero di processi elaborati anomalmente grandi. 
+
+Le osservazioni anomale sono:
+```{r, error = TRUE}
+outliers <- which(efficienza$processi > 80)
+outliers
+```
+
+Stimiamo un modello quadratico su tutti i dati:
+```{r, error = TRUE}
+mod <- lm(processi ~ dimensione + I(dimensione ^ 2), data = efficienza)
+summary(mod)
+```
+
+e poi togliendo i dati anomali:
+```{r, error = TRUE}
+mod2 <- lm(processi ~ dimensione + I(dimensione ^ 2), data = efficienza,
+           subset = -outliers)
+summary(mod2)
+```
+
+
+Visualizziamo i due modelli stimati:
+```{r, error = TRUE}
+plot(processi ~ dimensione, data = efficienza)
+curve(coef(mod)[1] + coef(mod)[2] * x + coef(mod)[3] * x ^ 2, from = min(efficienza$processi), to = max(efficienza$processi), add = TRUE)
+curve(coef(mod2)[1] + coef(mod2)[2] * x + coef(mod2)[3] * x ^ 2, from = min(efficienza$processi), to = max(efficienza$processi), add = TRUE, col = "red")
+```
+
+Il modello stimato togliendo i quattro outliers è significativamente diverso e si adatta meglio alle rimanenti osservazioni a confermare che i punti anomali andavano rimossi. 
+
+Consideriamo anche un modello cubico:
+```{r, error = TRUE}
+mod3 <- update(mod2, . ~ . + I(dimensione ^ 3))
+summary(mod3)
+```
+La non significatività dei coefficienti del modello cubico e la riduzione dell'indice $R^2$ aggiustato suggeriscono di fermarsi al modello quadratico senza outliers.
+
+Analisi dei residui del modello quadratico con gli outliers rimossi:
+```{r, error = TRUE, message = FALSE}
+library(car)
+par(mfrow = c(1, 2))
+plot(residuals(mod2) ~ dimensione[-outliers], data = efficienza)
+abline(h = 0, col = "red")
+qqPlot(residuals(mod2))
+```
+
+
+L'analisi dei residui è relativamente adeguata tenendo conto delle poche osservazioni. 
+
+Il modello stimato sui dati senza gli outliers: 
+
+* spiega l'85\% della variabilità del numero di processi elaborati;
+
+* conferma la relazione decrescente non lineare fra numero di processi elaborati e dimensione dei datasets. 
+ 
+ 
+Calcoliamo l'intervallo di previsione al 95% per il numero di processi elaborati con un dataset di dimensione 10 Gigabyte:
+```{r, error = TRUE}
+predict(mod2, newdata = data.frame(dimensione = 10), interval = "prediction")
+```
+
+Se invece la dimensione fosse pari a 15 Gigabyte allora il numero di processi elaborati previsto dal modello scende a: 
+```{r, error = TRUE}
+predict(mod2, newdata = data.frame(dimensione = 15), interval = "prediction")
+```
+# visualizzare dati e linea/curva
+grafico: plot(log(mammiferi$corpo) ~ log(mammiferi$cervello))
+linea:  mod <- m(mammiferi$corpo ~ mammiferi$cervello) e poi visualizzata con abline(mod)
+curva: mod <- lm(mammiferi$corpo ~ mammiferi$cervello + I(mammiferi$cervello^2)) e poi visualizzata con
+    curve(coef(mod)[1] + coef(mod)[2] * x + coef(mod)[3] * x^2,
+      from = min(efficienza$dimensione), 
+      to = max(efficienza$dimensione), 
+      add = TRUE)
+# predizione
+predict(log, newdata = data.frame(body_wt = 60)

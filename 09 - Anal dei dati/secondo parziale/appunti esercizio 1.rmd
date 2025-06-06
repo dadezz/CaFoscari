@@ -1,0 +1,412 @@
+# statistica Z o statistica T normali
+
+risposta standard: scegli una delle 2
+
+Vista la numerosità campionaria, possiamo calcolare un intervallo di confidenza usando la statistica Z n>=30
+Dal momento che il campione non è sufficientemente numeroso, uso la statistica T
+
+la formula generale per la statistica z è
+
+$$ \hat \theta \pm z_{\alpha / 2} \hat{SE}(\hat \theta) $$
+
+la formula generale per la statistica t è
+
+$$ \hat \theta \pm t_{\alpha / 2} \hat{SE}(\hat \theta) $$
+
+se so la media e la varianza (sigma^2), oppure lo scarto quadratico medio, AKA deviazione standard AKA sigma, la formula diventa, al posto di SE:
+
+$$  \frac{\sigma}{\sqrt{n}}  $$
+
+Ok. ora fai effettivamente i conti.
+
+```r
+media <- 0                  # buttaci la media
+sigma <- 0                  # buttaci la deviazione standard
+n <- 1                      # buttaci la grandezza del campione
+
+z <- qnorm(.95)             # .95 è l'intervallo di confidenza mezzi (in sto caso sarebbe quindi per un intervallo al 90%)
+t <- qt(0.95, df = n - 1)   # t di Student al 90%
+
+
+intervallo_z <- media + c(-1, 1) * z * sigma / sqrt(n)
+intervallo_t <- media + c(-1, 1) * t * sigma / sqrt(n)
+```
+
+# intervallo per la differenza
+uso la statistica T se le varianze non sono note. 
+## in caso di statistica Z
+
+siamo interessati al parametro x1 - x2 
+
+formula generale: 
+$$    (X - Y ) \pm z_{\alpha /2} \sqrt { \frac{\sigma_X^2}{n} + \frac{\sigma_Y^2}{m}}  $$
+
+in R:
+```r
+n <- dimensione del primo campione
+m <- dimensione del secondo campione
+diff <- differenza X-Y
+
+sigma_x <- deviazione standard primo campione
+sigma_y <- deviazione standard secondo campione
+
+z <- qnorm(...)
+
+intervallo_z <- diff + c(-1, 1) * z * sqrt(sigma_x ^ 2 / n + sigma_y ^ 2 / m)
+```
+## in caso di statistica t
+
+siamo interessati al parametro x1 - x2
+formula generale: 
+$$ \bar{X} - \bar{Y} \pm t_{\alpha/2} S_p \sqrt{ \frac{1}{n} + \frac{1}{m} } $$
+
+S_p è la varianza pooled:
+
+$$ s_p^2 = \frac{(n_X - 1)s_X^2 + (n_Y - 1)s_Y^2}{n_X + n_Y - 2} $$
+da  cui: 
+
+```r
+n <-                # dimensione primo campione
+m <-                # dimensione secondo campione
+s_x <-              # deviazione standard primo campione
+s_y <-              # deviazione standard secondo campione
+
+
+diff <-             # differenza X - Y
+
+# varianza pooled
+S_p <- ((n_x - 1) * s_x^2 + (n_y - 1) * s_y^2) / (n_x + n_y - 2)
+t <- qt(0.975, n+m−2)
+intervallo_t <- diff + c(-1, 1) * t * S_p *  sqrt((1/n) + (1/m))
+
+```
+
+
+
+### se le varianze non sono uguali
+Siccome le varianze non sono uguali, non posso usare n+m-2 come gradi di libertà: devo usare la formula di Satterthwaite:
+ $$ \nu = \frac{ \left( \frac{s_X^2}{n} + \frac{s_Y^2}{m} \right)^2 }{ \frac{ s_X^4 }{ n^2 (n - 1) } + \frac{ s_Y^4 }{ m^2 (m - 1) } } $$
+
+
+```r
+s_x <- deviazione standard campionaria primo campione
+s_y <- deviazione standard campionaria secondo campione
+n <- dimensione del primo campione
+m <- dimensione del secondo campione
+
+numeratore <- (s_x^2 / n + s_y^2 / m)^2
+denominatore <- (s_x^4) / (n^2 * (n - 1)) + (s_y^4) / (m^2 * (m - 1))
+df <- numeratore / denominatore
+
+```
+# Abbiamo una lista di osservazioni distribuite in un certo modo con media e varianza ignote
+si calcola media e varianza 
+
+```r
+x <- c(9, 9, 6, 10, 3, 9, 4, 5, 3, 7)
+n <- length(x)
+media <- mean(x)
+s <- sd(x)
+
+```
+
+e poi si usa t di student
+
+# "quanto dovrebbe essere grande il campione per far sì che il margine d'errore sia ... ?
+$$
+n \geq \left( \frac{z_{\alpha/2} \sigma}{E} \right)^2
+$$
+dove E è il margine d'errore
+```r
+E <- 0.5
+z <- qnorm(1 - alpha/2)
+
+n_min <- ceiling((z * s / E)^2)
+n_min
+```
+dove `ceiling` è l'arrotondamento per eccesso (il minimo intero  maggiore o uguale superiore al numero trovato)
+
+# riconosco n immagini su tot.
+Data la numerosità del campione, possiamo sfruttare il teorema del limite centrale. Possiamo rappresentare il problema con una distribuzione Bernoulliana
+
+$$ 
+\hat{p} \pm z_{\alpha/2} \cdot \sqrt{\frac{ \hat{p}_1 (1 - \hat{p}_1) }{n_1} }
+$$
+
+
+## c'è differenza tra le due aziende?
+1. calcolo l'intervallo di confidenza per la differenza 
+
+$$  (\hat{p}_1 - \hat{p}_2) \pm z_{\alpha/2} \cdot \sqrt{\frac{ \hat{p}_1 (1 - \hat{p}_1) }{n_1} + \frac{ \hat{p}_2 (1 - \hat{p}_2) }{n_2}}  $$
+```r
+p1 <- 479 / 500
+p2 <- 488 / 500
+n1 <- n2 <- 500
+z <- qnorm(0.975)
+
+diff <- p1 - p2
+errore <- z * sqrt(p1 * (1 - p1) / n1 + p2 * (1 - p2) / n2)
+intervallo_diff <- diff + c(-1, 1) * errore
+intervallo_diff
+```
+
+# intervalli di confidenza per le proporzioni
+se il campione è sufficientemente grande,
+```r
+x <- numero_successi
+n <- dimensione_campione
+alpha <- 0.05
+
+phat <- x / n
+z_alpha <- qnorm(1 - alpha / 2)
+se <- sqrt(phat * (1 - phat) / n)
+
+ci_lower <- phat - z_alpha * se
+ci_upper <- phat + z_alpha * se
+
+cat("IC al 95% per p:", ci_lower, "-", ci_upper, "\n")
+
+```
+## differenza tra due proporzioni
+Nel caso dell'intervallo di confidenza per la differenza tra due proporzioni, di solito non si usa il pooled.
+```r
+x1 <- successi_1
+x2 <- successi_2
+n1 <- campione_1
+n2 <- campione_2
+alpha <- 0.05
+
+p1 <- x1 / n1
+p2 <- x2 / n2
+
+se_diff <- sqrt(p1 * (1 - p1) / n1 + p2 * (1 - p2) / n2)
+z_alpha <- qnorm(1 - alpha / 2)
+
+diff <- p1 - p2
+ci_lower <- diff - z_alpha * se_diff
+ci_upper <- diff + z_alpha * se_diff
+
+cat("IC al 95% per p1 - p2:", ci_lower, "-", ci_upper, "\n")
+```
+
+#------------------------------------- VERIFICA IPOTESI ---------------------------------------------
+# CASO STATISTICA Z
+# procedimento generale
+1. CALCOLO DELLA STATISTICA TEST, SOTTO L'IPOTESI NULLA
+$$ 
+Z = \frac {\hat p - p_0}{SE}
+$$
+per esempio, per una distribuzione bernoulliana, abbiamo che p cappello è il la proporzione di risultati "positivi":
+
+$$ 
+Z = \frac {\hat p - p_0}{\sqrt{\frac{p_0(1-p_0)}{n}}}
+$$
+in r:
+```r
+x <- numero_successi
+n <- dimensione_campione
+p0 <- proporzione_attesa
+alpha <- 0.05
+
+phat <- x / n
+z <- (phat - p0) / sqrt(p0 * (1 - p0) / n)
+```
+
+
+p cappello è il valore che vogliamo testare, p_0 è invece l'ipotesi nulla.
+
+2. UNA VOLTA CHE TROVO Z, con pnorm vedo a quanto corrisponde (p-value)
+
+se |pvalue| > |alfa|, rifiuto l'ipotesi nulla. se il test è bilaterale, controllo 2*pvalue
+
+oppure posso dire: "ah, ho trovato z = 1.4, a me serve un livello di significatività del 95%. siccome z_0.025 = ±1.96,  e Z=1.41 <1.9, allora non rifiuto H_0"
+
+in r:
+```r
+
+p_value <- 2 * (1 - pnorm(abs(z)))   # bilaterale
+
+if (p_value < alpha) {
+  decisione <- "Rifiutare H0"
+} else {
+  decisione <- "Non rifiutare H0"
+}
+
+cat("Statistica Z:", z, "\n")
+cat("p-value:", p_value, "\n")
+cat("Decisione:", decisione, "\n")
+```
+# ipotesi nulla: le due osservazioni differiscono di tot
+si usa la formula "differenza di due medie (pagina 5 del formulario):
+$$
+Z = \frac {\bar X - \bar Y -D}{\sqrt{\frac{S^2_X}{n} +\frac{S^2_Y}{m} }}
+$$
+```r
+x <-
+y <-
+d <- 
+n <-
+m <-
+sigmax <-
+sigmay <-
+Z = (x-y-d) / ( (sigmax/sqrt(n)) + sigmay/sqrt(m))
+
+```
+
+# ipotesi nulla: la prima oss è uguale alla seconda (differiscono di 0), ipotesi alternativa: le due sono diverse. oppure 
+notare che ci si può ricondurre al caso di prima, usando D=0
+# CASO STATISTICA T
+# differenza tra due osservazioni
+## varianze uguali -> pooled
+```r
+x_bar <- media_X
+y_bar <- media_Y
+s_x <- dev_standard_X
+s_y <- dev_standard_Y
+n <- dimensione_X
+m <- dimensione_Y
+d <- 0  # differenza attesa sotto H0
+
+# varianza pooled
+S_p2 <- ((n - 1) * s_x^2 + (m - 1) * s_y^2) / (n + m - 2)
+S_p <- sqrt(S_p2)
+
+t <- (x_bar - y_bar - d) / (S_p * sqrt(1/n + 1/m))
+df <- n + m - 2
+
+p_value <- 2 * (1 - pt(abs(t), df))  # test bilaterale
+```
+## varianze diverse -> satterthwaite
+```r
+x_bar <- media_X
+y_bar <- media_Y
+s_x <- dev_standard_X
+s_y <- dev_standard_Y
+n <- dimensione_X
+m <- dimensione_Y
+d <- 0  # differenza attesa sotto H0
+
+# statistica t
+se <- sqrt(s_x^2 / n + s_y^2 / m)
+t <- (x_bar - y_bar - d) / se
+
+# gradi di libertà (Satterthwaite)
+numeratore <- (s_x^2 / n + s_y^2 / m)^2
+denominatore <- (s_x^4) / (n^2 * (n - 1)) + (s_y^4) / (m^2 * (m - 1))
+df <- numeratore / denominatore
+
+p_value <- 2 * (1 - pt(abs(t), df))  # test bilaterale
+```
+#
+# PROPORZIONI
+## singola
+```r
+x <- numero_successi
+n <- dimensione_campione
+p0 <- proporzione_attesa
+alpha <- 0.05
+
+phat <- x / n
+z <- (phat - p0) / sqrt(p0 * (1 - p0) / n)
+p_value <- 2 * (1 - pnorm(abs(z)))
+
+cat("Statistica Z:", z, "\n")
+cat("p-value:", p_value, "\n")
+```
+## differenza di proporzioni
+```r
+x1 <- successi_1
+x2 <- successi_2
+n1 <- campione_1
+n2 <- campione_2
+
+p1 <- x1 / n1
+p2 <- x2 / n2
+p_pooled <- (x1 + x2) / (n1 + n2)
+
+z <- (p1 - p2) / sqrt(p_pooled * (1 - p_pooled) * (1/n1 + 1/n2))
+p_value <- 2 * (1 - pnorm(abs(z)))
+
+cat("Statistica Z:", z, "\n")
+cat("p-value:", p_value, "\n")
+```
+#
+#
+#
+# LETTURA DA FILE
+```r
+library("car")
+file <- read.csv("file.csv")
+head(file)
+
+# Vediamo il grafico quantile-quantile, con cui vedo se sono normalmente distribuiti
+qqPlot(monet$price, ylab = "quantili empirici", xlab = "quantili teorici", main = "Prezzi dipinti di Monet")
+
+# suddivido in sottogruppi filtrando per una caratteristica
+x <- with(monet, price[signed == 1])
+y <- with(monet, price[signed == 0])
+
+## il seguente comando divide la finestra grafica in una riga e due
+## colonne in modo da poter disegnare i due grafici appaiati
+par(mfrow = c(1, 2))
+
+qqPlot(x, ylab = "quantili empirici", xlab = "quantili teorici", main = "Prezzi dipinti di Monet firmati") 
+qqPlot(y, ylab = "quantili empirici", xlab = "quantili teorici", main = "Prezzi dipinti di Monet non firmati")
+
+
+# passaggio a scala logaritmica
+qqPlot(log(monet$price), ylab = "quantili empirici", xlab = "quantili
+teorici", main = "Log-prezzi dipinti di Monet")
+
+
+# estraiamo una variabile binaria
+firmato <- as.factor(monet$signed)
+levels(firmato) <- c("No", "Sì")
+
+# boxplottiamo
+boxplot(log(monet$price) ~ firmato, xlab = "Firmato?", ylab = "Prezzo al logaritmo")
+
+# costruisco vettori che contengono i prezzi dei quadri con una data caratteristica (essere firmati)
+x <- log(monet$price[firmato == "Sì"])
+y <- log(monet$price[firmato == "No"])
+
+# procedo col test Z
+library("BSDA")
+z.test(x, y, sigma.x = sd(x) , sigma.y = sd(y), alternative = "greater")
+
+# esempio di statistica su proporzione
+# Costruiamo le variabili binarie corrispondenti alle due case d’asta
+x <- with(monet, signed[house == 1])
+y <- with(monet, signed[house == 2])
+mean(x)
+mean(y)
+
+# Valutiamo il sistema d’ipotesi con test Z:
+sd.x <- sqrt(mean(x) * (1 - mean(x)))
+sd.y <- sqrt(mean(y) * (1 - mean(y)))
+z.test(x, y, sigma.x = sd.x, sigma.y = sd.y)
+```
+e se invece voglio fare un test con la statistica T come faccio?
+
+Possiamo rispondere al quesito valutando se la temperatura media dei lanci in
+cui sono avvenute rotture dei o-ring sia significativamente più bassa della temperatura me-
+dia dei lanci in cui non sono avvenute rotture dei o-ring, ovvero valutare il sistema d’ipotesi
+H0 : µX = µY
+contro
+HA : µX < µY,
+dove µX è la temperatura media dei lanci con rottura di o-ring mente µY è la temperatura
+media dei lanci senza rottura di o-ring.
+```r
+challenger <- read.csv("challenger.csv")
+head(challenger)
+
+x <- with(challenger, temperature[failure])
+y <- with(challenger, temperature[!failure])
+t.test(x, y, alternative = "less")
+```
+
+
+
+
+
+

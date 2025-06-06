@@ -1,0 +1,137 @@
+---
+title: "Davide Zambon - Esercizio 3"
+output:
+  html_document: 
+    df_print: paged
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+
+# Soluzione quesito 1
+
+data la numerosità del campione, si può usare la statistica Z.
+per una proporzione la formula è
+$$
+\hat{p} \pm z_{\alpha/2} \sqrt{ \frac{ \hat{p}(1 - \hat{p}) }{n} }
+$$
+
+```{r, error = TRUE}
+n1 <- 320
+x1 <- 31
+p1 <- x1 / n1 
+
+n2 <- 320
+x2 <- 17
+p2 <- x2 / n2
+
+n1
+x1
+n2
+x2
+p1
+p2
+
+z <- qnorm(0.995)
+
+ic_p1 <- p1 + c(-1, 1) * z * sqrt(p1 * (1 - p1) / n1)
+ic_p2 <- p2 + c(-1, 1) * z * sqrt(p2 * (1 - p2) / n2)
+ic_p1
+ic_p2
+```
+L'intervallo di cofidenza al 99% della prima ispezione è [0.0542836 0.1394664]
+L'intervallo di cofidenza al 99% della seconda ispezione è [0.02082981 0.08542019]
+
+
+# Soluzione quesito 2
+H0: p1=p2; H1 :p1>p2 
+(ipotesi nulla: non c'è stata riduzione del tasso di non conformità; ipotesi alternativa: il tasso di non conformità nel primo caso è maggiore che nel secondo)
+
+$$
+Z = \frac{ \hat{p}_1 - \hat{p}_2 }{ \sqrt{ \hat{p}(1 - \hat{p}) \left( \frac{1}{n_1} + \frac{1}{n_2} \right) } }
+$$
+con p pooled
+$$
+\hat{p} = \frac{x_1 + x_2}{n_1 + n_2}
+$$
+```{r, error=TRUE}
+p_pooled <- (x1 + x2) / (n1 + n2)
+
+se <- sqrt(p_pooled * (1 - p_pooled) * (1 / n1 + 1 / n2))
+z_test <- (p1 - p2) / se
+
+p_value <- 1 - pnorm(z_test)
+
+z_test
+p_value
+```
+la statistica Z vale  2.101051
+il p_vaule vale   0.01781825
+
+
+siccome $ \alpha $ vale 0.1, il p value è significativamente inferiore e possiamo rifiutare l'ipotesi nulla
+
+# Soluzione quesito 3
+
+nei vari blocchi di codice: 
+
+1. leggo i dati e li stampo
+2. assegno x e p cntando le occorrenze degli 1 e il numero di riche
+3. stampo
+
+poi da qui in poi il codice è analogo a quanto fatto sopra
+
+4. calcolo intervallo di confidenza
+5. calcolo p value 
+```{r, error=TRUE}
+
+pre <- read.csv("campione_pre_audit.csv")
+post <- read.csv("campione_post_audit.csv")
+head(pre)
+head(post)
+
+x1 <- sum(pre$conform)
+n1 <- nrow(pre)
+p1 <- p1 <- x1 / n1
+
+
+x2 <- sum(post$conform)
+n2 <- nrow(post)
+p2 <- x2 / n2
+
+n1
+x1
+n2
+x2
+p1
+p2
+
+z <- qnorm(0.995)
+ic_p1 <- p1 + c(-1, 1) * z * sqrt(p1 * (1 - p1) / n1)
+ic_p2 <- p2 + c(-1, 1) * z * sqrt(p2 * (1 - p2) / n2)
+ic_p1
+ic_p2
+
+p_pooled <- (x1 + x2) / (n1 + n2)
+se <- sqrt(p_pooled * (1 - p_pooled) * (1 / n1 + 1 / n2))
+z_test <- (p1 - p2) / se
+p_value <- 1 - pnorm(z_test)
+z_test
+p_value
+```
+
+il risultato
+    > ic_p1
+    [1] 0.0542836 0.1394664
+    > ic_p2
+    [1] 0.02082981 0.08542019
+è conforme a quanto calcolato al punto 1
+
+ugualmente, 
+    > z_test
+    [1] 2.101051
+    > p_value
+    [1] 0.01781825
+
+è conforme a quanto calcolato al punto 2
