@@ -1,0 +1,193 @@
+---
+title: "Esercizio 3 - Modelli generalizzati"
+author: "Inserite il vostro nome"
+output: html_document
+---
+
+Si prenda in esame il dataset `fHH1.csv`: 
+
+```{r}
+fhh <- read.csv("fHH1.csv")
+```
+
+Il dataset comprende informazioni sulle famiglie raccolte in un'analisi campionaria svolta dall'Istituto Nazionale Statistico delle Filippine. L'istituto svolge ogni 3 anni la Family Income and Expenditure Survey (FIES), in cui sono raccolti dati sulle famiglie, i loro redditi e le loro spese. I dati a nostra disposizione sono un sotto-campione di 1500 unità campionarie dall'indagine svolta nel 2015 in 5 regioni del paese. Le variabili a nostra disposizione sono:
+
+- `location` = dove è la casa campionata (Central Luzon, Davao Region, Ilocos Region, Metro Manila, o Visayas)
+- `age` = l'età del capofamiglia
+- `total` = il numero di persone che compone la famiglia (oltre al capofamiglia)
+- `numLT5` =  il numero di persone nella famiglia sotto i 5 anni
+- `roof` = il tipo di tetto della famiglia (uno tra `Predominantly Light/Salvaged Material`, o `Predominantly Strong Material`, dove l'uso di materiali più durevoli viene utilizzato come indicatore di maggiore ricchezza)
+
+
+Si desidera studiare a quale età un capofamiglia filippino può in media aspettarsi che la famiglia raggiunga la sua dimensione più grande. Inoltre si vuole indagare se questa età è influenzata dalla ricchezza della famiglia e dalla regione in cui si trova la famiglia. Per indagare queste domande si utilizza una regressione di Poisson, cioè un GLM. 
+
+*1. Si visualizzi la relazione tra `age` e `total`: vi è una chiara relazione tra le variabili?*
+
+
+```{r}
+plot(jitter(fhh$age,0.3), jitter(fhh$total,0.3), pch = 16,
+     xlab = "age", ylab = "No. Components")
+```
+
+La relazione non è così chiara ma sembra essere essenzialmente polinomiale (quadratica?): il numero più alto di componenti della famiglia si ha per capofamiglia di mezza età. 
+
+*2. Si visualizzi la relazione tra `age` e il valore medio di `total` per ogni età di capofamiglia registrata nel campione. La relazione diventa più chiara? Si visualizzai la relazione sulla scala misurata (il numero totale di persone) e sulla scala della funzione legame canonica.*
+
+
+```{r}
+par(mfrow = c(1,2))
+plot(sort(unique(fhh$age)), tapply(fhh$total, factor(fhh$age), mean), pch = 16, col = 1)
+plot(sort(unique(fhh$age)), log(tapply(fhh$total, factor(fhh$age), mean)), pch = 16, col = 1)
+```
+
+Si conferma l'intuizione di una relazione polinomiale. Si nota che in alcune età alte ci sono alcuni inaspettati valori molto alti e bassi (ma in queste fasce d'età ci sono poche osservazioni, la media risulta essere molto variabile). 
+
+*3. Si visualizzi la relazione tra `age` e il valore medio di `total` per ogni età di capofamiglia registrata nel campione per le famiglie con tetti in materiali durevoli o non durevoli: c'è una differenza notevole? E per le diverse regioni del paese?* 
+
+```{r}
+plot(jitter(fhh$age,amount = 0.3), jitter(fhh$total,0.3), pch = 16, 
+     col = 1+(fhh$roof == "Predominantly Strong Material"),
+     xlab = "age", ylab = "No. Components")
+plot(sort(unique(fhh$age)), tapply(fhh$total, factor(fhh$age), mean), 
+     pch = 16, col = 1,
+     xlab = "age", ylab = "No. Components")
+with(fhh[fhh$roof == "Predominantly Strong Material",],
+      points(sort(unique(age)), tapply(total, factor(age), mean), pch = 15, col = 4))
+with(fhh[fhh$roof != "Predominantly Strong Material",],
+      points(sort(unique(age)), tapply(total, factor(age), mean), pch = 16, col = 3))
+
+plot(sort(unique(fhh$age)), tapply(fhh$total, factor(fhh$age), mean), 
+     pch = 1, col = 1,xlab = "age", ylab = "No. Components")
+cind <- 1
+for(j in unique(fhh$location)){
+  cind <- cind + 1
+  tdat <- fhh[fhh$location == j,]
+  points(sort(unique(tdat$age)), tapply(tdat$total, factor(tdat$age), mean), col = cind, type = "b", pch = 16)
+} 
+```
+
+La famiglie con tetto in materiali più durevoli tendono ad essere meno numerose quando il capofamiglia è in età avanzata. 
+Non si notano chiare differenze per le diverse aree del paese. 
+
+*4. Si stimi un modello GLM di Poisson che metta in relazione l'età del capofamiglia con la dimensione della famiglia. A che età un capofamiglia può aspettarsi di avere la famiglia più grande nel suo percorso di vita (attenzione però a questa interpretazione: i dati non seguono i singoli individui nel loro percorsi di vita).* 
+
+
+```{r}
+fitA1<-  glm(total ~ age, data = fhh, family = poisson()); summary(fitA1)
+fitA2 <-  glm(total ~ poly(age,2), data = fhh, family = poisson()); summary(fitA2)
+fitA3 <-  glm(total ~ poly(age,3), data = fhh, family = poisson()); summary(fitA3)
+fitA4 <-  glm(total ~ poly(age,4), data = fhh, family = poisson()); summary(fitA4)
+```
+
+Un polinomio di terzo grado sembra fornire un buon adattamento ai dati.
+
+
+*5. Si crei una Figura che permetta di visualizzare la relazione stimata dal modello stimato al punto 4.*
+
+Guardiamo la stima sulla scala del predittore lineare e sulla scala delle osservazioni, sia per i dati originali che per i dati "sintetizzati".
+
+
+```{r}
+par(mfrow = c(1,2))
+plot(jitter(fhh$age,0.3), jitter(log(pmax(fhh$total,0.1)),0.3), 
+     pch = 16, col = "grey",
+     main = "scala del predittore lineare",xlab = "age", ylab = "No. Components - log")
+nd <- data.frame(age = seq(19,102, by = 0.5))
+lines(nd$age,predict(fitA3, nd, type = "link"), col = 2)
+plot(jitter(fhh$age,0.3), jitter(fhh$total,0.3), pch = 16, col = "grey",
+     main = "scala della risposta", xlab = "age", ylab = "No. Components")
+nd <- data.frame(age = seq(19,102, by = 0.5))
+lines(nd$age,predict(fitA3, nd, type = "r"), col = 2)
+```
+
+
+```{r}
+par(mfrow = c(1,2))
+plot(sort(unique(fhh$age)), log(tapply(fhh$total, factor(fhh$age), mean)), 
+     main = "Medie per età - p. lineare", xlab = "age", ylab = "No. Components - log", pch = 16, col = 1)
+nd <- data.frame(age = seq(19,102, by = 0.5))
+lines(nd$age,predict(fitA3, nd, type = "link"), col = 2)
+lines(nd$age,predict(fitA2, nd, type = "link"), col = 4)
+plot(sort(unique(fhh$age)), tapply(fhh$total, factor(fhh$age), mean), 
+     main = "Medie per età - risposta" , xlab = "age", ylab = "No. Components", pch = 16, col = 1)
+nd <- data.frame(age = seq(19,102, by = 0.5))
+lines(nd$age,predict(fitA3, nd, type = "response"), col = 2)
+lines(nd$age,predict(fitA2, nd, type = "response"), col = 4)
+```
+
+Possiamo anche confrontare la stima con il modello quadratico, che decade molto velocemente. 
+
+Tenendo come modello migliore il modello polinomiale di 3o grado possiamo notare come l'età in cui un capofamiglia ha una famiglia più grande è attorno a $\exp\{\beta_0 + \beta_1 x + \beta_2 x^2 + \beta_3 x^3\} * (\beta_0 + \beta_1 x + \beta_2 x^2) = 0$ (cioè il punto in cui la derivata prima è pari a 0). 
+
+
+
+*6. Si verifichi se il modello al punto 4. può essere migliorato aggiungendo `roof` o `location`: si creino delle visualizzazioni che permettono di visualizzare la relazione stimata dal modello in cui `roof` e/o `location` sono usati come predittori nel modello*  
+
+```{r}
+fitA3 <-  glm(total ~ poly(age,3), data = fhh, family = poisson())
+fitA3roof <-  glm(total ~ poly(age,3)+roof, data = fhh, family = poisson()); summary(fitA3roof)
+# fitA3iroof <-  glm(total ~ poly(age,3)*roof, data = fhh, family = poisson()); summary(fitA3iroof)
+fitA3loc <-  glm(total ~ poly(age,3)+location, data = fhh, family = poisson()); summary(fitA3loc)
+# fitA3iloc <-  glm(total ~ poly(age,3)*location, data = fhh, family = poisson()); summary(fitA3iloc)
+BIC(fitA3, fitA3roof, fitA3loc)
+```
+
+`roof` non sembra essere significativa quando aggiunta al modello che include `age`, mentre uno dei possibili valori di `location` risulta essere significativo, proviamo a visualizzare questi modelli stimati: 
+
+```{r}
+par(mfrow = c(1,2))
+plot(jitter(fhh$age,0.3), jitter(log(pmax(fhh$total,0.1)),0.3), pch = 16, main = "scala del predittore lineare",xlab = "age", ylab = "No. Components - log", col = "grey")
+nd <- data.frame(age = seq(19,102, by = 0.5), roof = "Predominantly Strong Material")
+lines(nd$age,predict(fitA3roof, nd, type = "link"), col = 2)
+nd <- data.frame(age = seq(19,102, by = 0.5), roof = "Predominantly Light/Salvaged Material")
+lines(nd$age,predict(fitA3roof, nd, type = "link", col = 4))
+# quasi nessuna differenza nella stima
+plot(jitter(fhh$age,0.3), jitter(log(pmax(fhh$total,0.1)),0.3), pch = 16, 
+     main = "scala del predittore lineare", col = "grey",xlab = "age", ylab = "No. Components - log")
+for(j in unique(fhh$location)){
+  nd <- data.frame(age = seq(19,102, by = 0.5), location = j)
+  lines(nd$age,predict(fitA3loc, nd, type = "link"), col = 1+which(unique(fhh$location) == j))
+} 
+# quasi nessuna differenza nella stima - solo una linea ha un valore un po' diverso 
+
+```
+
+*7. Si utilizzi il miglior modello individuato al punto 6. per costruire degli intervalli di confidenza al livello di confidenza del 94% per la numerosità delle famiglie specificate nel dataset `nd`:*  
+
+
+```{r}
+nd <- data.frame(location = c("CentralLuzon", "MetroManila", "DavaoRegion","Visayas","IlocosRegion",
+                              "CentralLuzon", "MetroManila", "DavaoRegion","Visayas","IlocosRegion"),
+                 age = c(30,30,30,30,30,60,60,60,60,60), 
+                 numLT5 = rep(1,10), roof = "Predominantly Strong Material")
+```
+
+```{r}
+alpha = 0.06
+pred <- predict(fitA3, nd, type = "link", se.fit = TRUE)
+cbind(pred$fit+qnorm(alpha/2)*pred$se.fit,
+      pred$fit+qnorm(1-alpha/2)*pred$se.fit)
+```
+
+
+```{r}
+# let's make a visulization which shows the confidence interval 
+nd <- data.frame(age = seq(15,110, by = 5))
+alpha = 0.06
+par(mfrow = c(1,2))
+plot(jitter(fhh$age,0.3), jitter(log(pmax(fhh$total,0.1)),0.3),
+     xlab = "age", ylab = "No. Components - log", 
+     col = "grey", pch = 16, main = "scala del predittore lineare")
+pred <- predict(fitA3, nd, type = "link", se.fit = TRUE)
+lines(nd$age,pred$fit, col = 2)
+lines(nd$age,pred$fit+qnorm(alpha/2)*pred$se.fit, col = 2, lty = 2)
+lines(nd$age,pred$fit+qnorm(1-alpha/2)*pred$se.fit, col = 2, lty = 2)
+plot(jitter(fhh$age,0.3), jitter(fhh$total,0.3),
+     xlab = "age", ylab = "No. Components", 
+     col = "grey", pch = 16, main = "scala della risposta")
+lines(nd$age,exp(pred$fit), col = 2)
+lines(nd$age,exp(pred$fit+qnorm(alpha/2)*pred$se.fit), col = 2, lty = 2)
+lines(nd$age,exp(pred$fit+qnorm(1-alpha/2)*pred$se.fit), col = 2, lty = 2)
+```
+
+

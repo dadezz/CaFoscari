@@ -1,0 +1,68 @@
+---
+title: "DownerCows"
+author: "Me Myself and I"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Esercizio 2 degli Esercizi - Downer 
+
+1. Si calcoli la proporzione media di vacche che sopravvivono e si derivi il valore del log-odd-ratio relativo. Si confronti il valore derivato con la stima dell'intercetta ottenuta in un modello GLM con distribuzione binomiale in cui nessun predittore è utilizzato. Si usi il livello \texttt{survived} come il livello la cui probabilità di occorrenza si è interessati a stimare. 
+
+```{r}
+Downer <- read.csv("Downer.csv", header = TRUE)
+Downer$outcome <- factor(Downer$outcome)
+```
+
+```{r}
+log((166/435)/(269/435))
+glm(factor(outcome)  ~ 1, family = "binomial", data = Downer)
+```
+
+2. Si stimi un modello GLM per la variabile `outcome` utilizzando `ast` come predittore. Si visualizzi la relazione tra le variabili mostrando anche il valore stimato della probabilità che una vacca sopravviva in funzione del suo livello di `ast`. 
+
+```{r}
+fitast <- glm(outcome  ~ ast, family = "binomial", data = Downer)
+summary(fitast)
+with(Downer, plot(ast, as.numeric(outcome == "survived")))
+nd <- data.frame(ast = seq(0, 2500))
+lines(nd$ast, predict(fitast, newdata = nd, type = "response"), col = 2)
+```
+
+3. Si stimi ora un modello in cui l'unico predittore usato è `urea`. Si confronti la bontà di adattamento di questo modello con quella del modello stimato al punto 2. 
+
+```{r}
+fiturea <- glm(outcome  ~ urea, family = "binomial", data = Downer)
+summary(fiturea)
+# il confronto può solo essere fatto tramite AIC - i modelli non sono annidati 
+# dato però che entrambi i modelli usano un solo predittore questo corrisponde a confrontare le devianze 
+AIC(fitast, fiturea)
+```
+
+Ci accorgiamo però che ci sono dei dati mancanti, non possiamo confrontare direttamente AIC/devianze. 
+Possiamo stimare i modelli sullo stesso sottoinsieme di dati: 
+
+```{r}
+subfurea <- glm(outcome  ~ urea, family = "binomial", data = na.omit(Downer[,c("outcome", "urea", "ast")]))
+subfast  <- glm(outcome  ~ ast , family = "binomial", data = na.omit(Downer[,c("outcome", "urea", "ast")]))
+AIC(subfast, subfurea)
+deviance(subfast); deviance(subfurea)
+```
+
+Teniamo il modello con `ast`
+
+4. Usando il modello identificato come migliore al punto 3 si stimi la probabilità che le vacche con caratteristiche indicate nel dataset `nd` sopravvivano, dando anche un intervallo di confidenza al 92\% per la probabilità calcolata.
+
+
+```{r}
+nd <- data.frame(ast = c(500, 1400,2000), 
+                 urea = c(5, 20, 30))
+pv <- predict(fitast, newdata = nd, type = "link", se.fit = TRUE)
+binomial()$linkinv(pv$fit)
+cbind(binomial()$linkinv(pv$fit + qnorm(0.04) * pv$se.fit),
+      binomial()$linkinv(pv$fit + qnorm(0.96) * pv$se.fit))
+```
+
