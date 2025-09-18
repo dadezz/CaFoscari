@@ -1,1 +1,1 @@
-raccolta di quanto fatto durante l'università (in corso)
+raccolta di parte di quanto fatto durante l'università
