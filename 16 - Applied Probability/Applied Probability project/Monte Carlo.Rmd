@@ -1,0 +1,364 @@
+---
+title: "Monte Carlo Methods"
+author: "Mission Improbable"
+date: "2025-11-14"
+output: html_document
+---
+
+
+```{ .python }
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Definition of the function to integrate
+def f(x):
+    return x**2  # Simple parabola
+
+# Integration interval
+a, b = 0, 1
+
+# Number of random points
+N = 5000
+
+# Generate random points inside the rectangular region:
+# x between a and b, y between 0 and the maximum value of the function in the interval (here 1)
+x_random = np.random.uniform(a, b, N)
+y_random = np.random.uniform(0, 1, N)
+
+# Evaluate the function at the random x points
+y_values = f(x_random)
+
+# Count points below and above the curve
+below = np.sum(y_random <= y_values)
+above = np.sum(y_random > y_values)
+
+# Estimate of the integral: area of the rectangle * (points below / total points)
+rectangle_area = (b - a) * 1  # max y = 1
+integral_estimate = rectangle_area * (below / N)
+
+# Exact value of the integral for comparison: ∫₀→₁ x² dx = 1/3
+exact_value = 1/3
+
+# Output results
+print(f"Points below the curve: {below}")
+print(f"Points above the curve: {above}")
+print(f"Estimated integral: {integral_estimate}")
+print(f"Exact value: {exact_value}")
+
+# Plot
+x = np.linspace(a, b, 200)
+plt.plot(x, f(x), label='f(x) = x^2', color='blue')
+
+# Color the points
+plt.scatter(x_random[y_random <= y_values], y_random[y_random <= y_values],
+            s=5, color='green', label='Below the curve')
+plt.scatter(x_random[y_random > y_values], y_random[y_random > y_values],
+            s=5, color='red', label='Above the curve')
+
+plt.title("Monte Carlo Simulation of the Integral of f(x) = x^2")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.show()
+```
+
+# Result
+![Monte Carlo Integration of x^2](simpleIntegral.png)
+
+
+
+```{ .python }
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Function to integrate
+def f(x):
+    return 1 / np.log(x)
+
+# Integration interval (avoid log(1)=0 which is undefined)
+a, b = 1.1, 3
+
+# Total number of Monte Carlo samples
+N = 100000
+
+# Generate random sample points in the interval
+x_random = np.random.uniform(a, b, N)
+
+# Evaluate the function at each random x
+y_values = f(x_random)
+
+# Compute cumulative partial means:
+# partial_means[k] = average of first k samples
+partial_means = np.cumsum(y_values) / np.arange(1, N + 1)
+
+# Convert partial means into integral estimates:
+# Integral ≈ (b - a) * mean(f(x))
+I_partial = (b - a) * partial_means
+
+# Final Monte Carlo estimate (last partial value)
+I_est = I_partial[-1]
+
+# Output result
+print(f"Final Monte Carlo estimate of the integral = {I_est:.6f}")
+
+# Plot the function
+x = np.linspace(a, b, 400)
+plt.figure(figsize=(10,5))
+
+plt.subplot(1,2,1)
+plt.plot(x, f(x), color='blue', label='f(x)=1/log(x)')
+plt.title('Integrand Function')
+plt.xlabel('x')
+plt.ylabel('f(x)')
+plt.legend()
+
+# Plot convergence of the Monte Carlo estimator
+plt.subplot(1,2,2)
+plt.plot(I_partial, color='red')
+plt.axhline(I_est, color='green', linestyle='--', label='Final estimate')
+plt.title('Convergence of Monte Carlo Estimate')
+plt.xlabel('Number of samples')
+plt.ylabel('Integral estimate')
+plt.legend()
+
+plt.tight_layout()
+plt.show()
+```
+
+
+
+```{r}
+f <- function(x) {
+  1 / log(x)
+}
+
+# Integration interval
+a <- 1.1
+b <- 3
+
+# Number of samples
+N <- 100000
+
+# Generate random x values
+x_random <- runif(N, min = a, max = b)
+
+# Evaluate function
+y_values <- f(x_random)
+
+# Cumulative partial means
+partial_means <- cumsum(y_values) / seq_len(N)
+
+# Convert to integral estimates
+I_partial <- (b - a) * partial_means
+
+# Final estimate
+I_est <- I_partial[N]
+
+cat(sprintf("Final Monte Carlo estimate of the integral = %.6f\n", I_est))
+
+# ---- Plotting ----
+# Load plotting library
+library(ggplot2)
+
+# Prepare data for plotting the function f(x)
+x_vals <- seq(a, b, length.out = 400)
+df_func <- data.frame(x = x_vals, y = f(x_vals))
+
+# Plot integrand function
+plot1 <- ggplot(df_func, aes(x, y)) +
+  geom_line(color = "blue") +
+  ggtitle("Integrand Function") +
+  xlab("x") + ylab("f(x)")
+
+# Prepare data for convergence plot
+df_conv <- data.frame(n = 1:N, estimate = I_partial)
+
+plot2 <- ggplot(df_conv, aes(n, estimate)) +
+  geom_line(color = "red") +
+  geom_hline(yintercept = I_est, color = "green", linetype = "dashed") +
+  ggtitle("Convergence of Monte Carlo Estimate") +
+  xlab("Number of samples") +
+  ylab("Integral estimate")
+```
+
+# Display both plots
+
+```{r}
+library(gridExtra)
+grid.arrange(plot1, plot2, ncol = 2)
+```
+
+
+
+
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+# Monte Carlo Integration — Explanation With Formulas
+
+This document explains the Monte Carlo method used to estimate the integral:
+
+[
+\int_{0}^{1} x^2 , dx
+]
+
+---
+
+## 1. Define the function and interval
+
+We want to integrate the function:
+
+[
+f(x) = x^2
+]
+
+over the interval:
+
+[
+[a, b] = [0, 1]
+]
+
+---
+
+## 2. Bounding rectangle
+
+To apply the hit-or-miss Monte Carlo method, we place the graph of the function inside the smallest possible axis-aligned rectangle.
+
+The maximum value of ( f(x) = x^2 ) on the interval ([0,1]) is:
+
+[
+f_{\max} = 1
+]
+
+Thus the rectangle has:
+
+* **Width**: ( b - a = 1 - 0 = 1 )
+* **Height**: ( f_{\max} = 1 )
+
+Its area is:
+
+[
+A_{\text{rect}} = (b - a) \cdot f_{\max} = 1 \cdot 1 = 1
+]
+
+---
+
+## 3. Generate random points
+
+We generate ( N ) random points uniformly inside this rectangle:
+
+[
+x_i \sim U(a,b) = U(0,1)
+]
+
+[
+y_i \sim U(0,f_{\max}) = U(0,1)
+]
+
+Each point ( (x_i, y_i) ) is equally likely to fall anywhere in the rectangle.
+
+---
+
+## 4. Count points below the curve
+
+A point is **below** the curve if:
+
+[
+y_i \le f(x_i)
+]
+
+Let:
+
+* ( N_{\text{below}} = ) number of points under the curve
+* ( N = ) total number of points
+
+The fraction of points under the curve approximates the probability that a random point in the rectangle lies below the graph of (f(x)):
+
+[
+\frac{N_{\text{below}}}{N}
+]
+
+---
+
+## 5. Monte Carlo estimate of the integral
+
+The integral is approximated by:
+
+[
+\int_a^b f(x) , dx \approx A_{\text{rect}} \cdot \frac{N_{\text{below}}}{N}
+]
+
+In our case:
+
+[
+\int_0^1 x^2 , dx \approx 1 \cdot \frac{N_{\text{below}}}{N}
+]
+
+---
+
+## 6. Exact value for comparison
+
+The integral of ( x^2 ) can be computed analytically:
+
+[
+\int_0^1 x^2 , dx = \left[ \frac{x^3}{3} \right]_0^1 = \frac{1}{3}
+]
+
+---
+
+## Summary
+
+The Monte Carlo estimate used in the code follows the formula:
+
+[
+\boxed{
+\int_a^b f(x),dx \approx (b-a),f_{\max} \cdot \frac{N_{\text{below}}}{N}
+}
+]
+
+Where:
+
+* ( a = 0 )
+* ( b = 1 )
+* ( f_{\max} = 1 )
+* ( N = ) number of random points
+
+This method converges to the true value ( \frac{1}{3} ) as ( N ) increases.
+
+
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

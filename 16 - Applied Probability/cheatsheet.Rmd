@@ -1,0 +1,291 @@
+---
+title: "Cheat Sheet"
+output: html_document
+date: "2026-01-25"
+---
+```{r, error=TRUE}
+library(MASS)
+library(expm)
+```
+# Disegnare tabella probabilità 
+$$
+\begin{array}{c|cc}
+ & y=1 & y=2 \\
+\hline
+p_{Y|X}(y|0) & 0.5 & 0.5 \\
+p_{Y|X}(y|1) & 0.1 & 0.9 \\
+p_{Y|X}(y|2) & 0.4 & 0.6
+\end{array}
+$$
+
+# Integrali in R 
+
+  integrate ( f, low, up )
+
+nel caso di improprio, si scrive `Inf`
+esempio: 
+```{r, error=TRUE}
+integrate(function(x) {1/x^2}, lower = 1, upper = Inf)
+```
+
+# matrici in generale 
+
+define the Matrix
+```{R, error=TRUE}
+P <- matrix(c(0.4, 0.6,
+              0.6, 0.4), nrow = 2, byrow = TRUE)
+```
+compute the product:
+```{R, error=TRUE}
+P2 <- P %*% P   # sì, il prodotto comprende i %
+```
+3. altre cose:
+*: Element-by-element multiplication
+solve(A): Finds the inverse matrix (A−1).
+t(A): Transposes the matrix.
+
+Per trovare lo steady state, si puù fare il tutto 1000 volte (controlla che sia uguale a 1001):
+
+```{R, error = TRUE}
+P_steady <- P
+for(i in 1:10000) { P_steady <- P_steady %*% P }
+print(P_steady)
+```
+
+per calcolare time dependent probability (e^Gt): 
+```{R, error = TRUE}
+
+# 1. Define the Rate Matrix Q
+Q <- matrix(c(-3,  2,  1,
+               4, -5,  1,
+               1,  0, -1), nrow=3, byrow=TRUE)
+
+# 2. Define the time t
+t <- 2.5
+
+# 3. Calculate P(t) = e^(Qt)
+# proportional to probability of transition over time t
+P_t <- expm(Q * t)
+print(P_t)
+```
+
+The output P_t is a probability matrix (rows sum to 1) -> Entry [1, 2]: The probability that you are in State 2 at time t=2.5, given that you started in State 1.
+Row 1: The full probability distribution at time t=2.5 if you started in State 1.
+
+# CTMC SOLVER DATA: GET P FROM G(Q) e stato pi0 
+
+Dato il vettore dello stato di partenza e la matrice di generazione, Calcola la matrice di probabilità di transizione P(t) e la distribuzione finale π(t).
+
+Devi usare questo script quando nell'esercizio trovi domande di questo tipo:
+1. Ti chiedono cosa succede in un tempo specifico e finito (es. "Qual è la probabilità che il server sia rotto dopo 2.5 ore?"). Nota: Se ti chiedono "a lungo termine" o "steady state", questa funzione va bene solo se metti un t enorme (es. 1000)
+2. Partenza Incerta: Quando il testo dice "All'inizio, c'è il 50% di probabilità che il sistema sia già guasto". Qui il vettore pi0 non sarà solo c(1, 0, 0) ma c(0.5, 0.5, 0), e questa funzione gestisce automaticamente quella media ponderata.
+
+```{R, error=TRUE}
+get_state_probability <- function(Q, pi0, t) {
+  
+  P_t <- expm(Q * t)
+  pi_t <- pi0 %*% P_t
+  
+  return(list(
+    "Transition_Matrix_Pt" = P_t,
+    "Final_Distribution_pi_t" = pi_t
+  ))
+}
+number_row <- 3
+Q <- matrix(c(-0.3,  0.2,  0.1,
+               0.0, -0.5,  0.5,
+               1.0,  0.0, -1.0), 
+            nrow = number_row, byrow = TRUE)
+pi0 <- c(0.5, 0.5, 0.0)
+time <- 2.0
+results <- get_state_probability(Q, pi0, time)
+
+# Print the results nicely
+print("--- THE TRANSITION MATRIX P(t) ---")
+print("This shows the probabilities for ALL possible starting states:")
+print(results$Transition_Matrix_Pt)
+print("--- THE FINAL DISTRIBUTION pi(t) ---")
+print("This is the specific probability for YOUR uncertain start:")
+print(results$Final_Distribution_pi_t)
+```
+
+# GET Q FROM holding times and probability 
+```{R, error=TRUE}
+
+get_Q_matrix <- function(holding_times, P_embedded) {
+     
+     rates <- 1 / holding_times
+     Lambda <- diag(rates)
+     
+     # Apply the Formula: Q = Lambda * (P - I)
+     I <- diag(nrow(P_embedded))
+     Q <- Lambda %*% (P_embedded - I)
+    
+     rownames(Q) <- rownames(P_embedded)
+     colnames(Q) <- colnames(P_embedded)
+     
+     return(Q)
+}
+
+number_row = 3
+
+# avg_times: Vector of average times spent in each state
+avg_times <- c(3, 6, 12)
+ 
+# P_embedded: The embedded transition matrix (probabilities of where to go next)
+P_embedded <- matrix(c(0,   1/2, 1/2,
+                       3/4, 0,   1/4,
+                       1/4, 3/4, 0), 
+                     nrow=number_row, byrow=TRUE)
+ 
+# Label them for nicer output
+states <- c("Rain", "Snow", "Clear")
+rownames(P_embedded) <- states
+colnames(P_embedded) <- states
+
+# 2. Call the function
+Q_result <- get_Q_matrix(avg_times, P_embedded)
+ 
+# 3. Print the result (in fractions for easier checking)
+print(fractions(Q_result))
+```
+
+# GET EMBEDDED P FROM Q 
+```{r, error = TRUE}
+get_embedded_P <- function(Q) {
+  P_emb <- Q * 0 # Crea matrice di zeri della stessa dimensione
+  n <- nrow(Q)
+  
+  for (i in 1:n) {
+    # Il rate totale di uscita è l'elemento diagonale (con segno opposto)
+    rate_out <- -Q[i, i]
+    
+    # Se rate_out è 0 (stato assorbente), metti 1 sulla diagonale per convenzione
+    if (rate_out == 0) {
+      P_emb[i, i] <- 1
+    } else {
+      P_emb[i, ] <- Q[i, ] / rate_out
+      P_emb[i, i] <- 0 
+    }
+  }
+  return(P_emb)
+}
+
+P_jump <- get_embedded_P(Q)
+print(P_jump)
+```
+
+
+# USEFUL LATEX 
+
+**Some useful LaTeX commands for writing formulas** 
+
+Inline formulas : $\sin(\pi x)$
+
+Formulas in a separate line:
+$$
+\sin(\pi x)
+$$
+
+Set operations:
+$$
+A \cap B, A\cup B, \bar{A}=\Omega\setminus A
+$$
+Mean and variance:
+$$
+\mu_X, E[X],\bar{X}, \bar{x}, \sigma^2, Var[X]
+$$
+Fractions:
+$$
+\frac{1}{\sqrt{2}} X_i, \frac{X_i}{Y_i}
+$$
+
+Sums: 
+$$
+\sum_{i=1}^n X_i, \sum_{i=1}^n \log X_i, \sum_{i=1}^n \sqrt{X_i}, \sum_{i=1}^n \frac{X_i}{Y_i}
+$$
+Integrals:
+$$
+\int_{0}^1 f(x) dx, \int_{a}^{\infty} f(x) dx, \int_{-\infty}^{\infty} f(x) dx
+$$
+
+Matrices:
+$$\mathbf G=\left[\begin{array}{ccc}
+-4 & 2 & 2\\
+1 & -2 & 1\\
+0.5 & 1 & -1.5\end{array}
+\right]$$
+
+$$\mathbf G^{^\intercal}=\left[\begin{array}{ccc}
+-4 & 2 & 2\\
+1 & -2 & 1\\
+0.5 & 1 & -1.5\end{array}
+\right]$$
+
+**Code chunks and R commands**
+
+```{r, error = TRUE}
+2 * 3 / log(1.2)
+sin(2 * pi / 20)
+a <- 2 * c(1, 2)
+a
+p <- pnorm(0.95)
+p
+G <- matrix(c(-4, 2, 2, 1, -2, 1, 0.5, 1, -1.5),ncol=3, byrow=T)
+G
+```
+
+ Inline R operations $3+4=`r 3+4`$. Or, once a value has been defined in a code chunk (like the one above), $p=`r p`$.
+# SIMULAZIONE PATH MARKOV CHAIN 
+se la domanda è esplicita, guardati questa forma
+
+for(j in 1:5){t<-c(t,t[j]+rexp(1,-G[x,x]))}
+plot(t,c(1,2,1,2,1,2),type="s")}:
+
+```{r, error=TRUE}
+simulate_ctmc_path <- function(G, start_state, n_jumps) {
+  
+  current_time  <- 0
+  current_state <- start_state
+  time_history  <- c(current_time)
+  state_history <- c(current_state)
+  
+  for (i in 1:n_jumps) {
+    
+    lambda <- -G[current_state, current_state] 
+    hold_time <- rexp(1, rate = lambda)
+    
+    probs <- pmax(G[current_state, ], 0) 
+    probs <- probs / sum(probs)
+    
+    next_state <- sample(1:ncol(G), size=1, prob=probs)
+    
+    current_time  <- current_time + hold_time
+    current_state <- next_state
+    
+    time_history  <- c(time_history, current_time)
+    state_history <- c(state_history, current_state)
+  }
+  
+  plot(time_history, state_history, type="s", 
+       main="CTMC trajectory simulation", 
+       xlab="Time", ylab="State", ylim=c(0.5, ncol(G)+0.5),
+       col="blue", lwd=2)
+  
+  return(data.frame(Time=time_history, State=state_history))
+}
+
+# --- ESEMPIO DI UTILIZZO ---
+
+# Definiamo una matrice G 
+# Stato 1 -> Stato 2 con rate 2
+# Stato 2 -> Stato 1 con rate 1
+G_example <- matrix(c(-2,  2,
+                       1, -1), 
+                    nrow=2, byrow=TRUE)
+
+# Simula 5 salti partendo dallo stato 1
+simulazione <- simulate_ctmc_path(G_example, start_state=1, n_jumps=5)
+
+print(simulazione)
+```  

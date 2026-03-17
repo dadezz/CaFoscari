@@ -1,0 +1,47 @@
+ELAISIAN - MODO DI PENSARE PER RISOLVERE UN ESAME. questa è la soluzione di un collega. non ce n'è una singola giusta, basta che sia spiegato percHé si fanno specifiche scelte.
+
+fare assunzioni permette di semplificare alcuni elementi (specialmente se non abbiamo conoscenza di dominio, per esempio sui sensori)
+
+per esempio possiamo generalizzare i vari sensori con un dispositivo generico che collezioni dei dati e li memorizzi in una specifica applicazione. sta applicazione dovrà ovviamente avere un DB suo. tutta sta roba è un'assunzione su come funzioni. l'applicazione è una black box. è da specificare cosa fa (in sto caso store data), non bisogna andare nel dettaglio di come costruirla. 
+
+[andreamo nei dettagli di più riguardo al data management, perché esplicitamente richiesto nell'esame]
+
+2. data management: should be real time. i need a fast way -> in memory DB (redis)
+3. i dati vengono poi passati a un ETL (perché? cos'è?)
+4. e infine a un data wharehouse.
+
+il wharehouse interagisce con l'IA, a sua volta con un Decision Support System, che possiamo assumere che prenda decisioni su alcuni dati.
+
+Ora manca la mobile application. Questa può comunicare con il dss.
+
+
+- IL PROF DICE - 
+there is something wrong. 
+
+1. un'opzione èè di mettere un api gw tra i devices e l'application. 
+2. perché l'ETL? l'etl è quello che elabora/manipla i dati per storarli nel data wharehouse
+
+altro che dice il prof: parliamo di real time. il collega ha usato redis. però prima di redis ci ha messo un application con un database, che non è necessario (e rallenta). e poi, a cosa serve redis? perché i dati vanno direttamente al l'etl e poi al wharehouse. Oltretutto, i dati freschi sono nel redis, ma la mobile app è distantissima. Il redis si può tranquillamente togliere.
+In più, i vari device sono prodotti da diverse aziende e mandano dati diversi. probabilmente l'etl va messo dove c'è il api gw. che allora diventa un ESB. 
+quindi abbiamo i device che comunicano con un ESB. l'esb a sto punto spedisce i dati direttamente al data wharhouse. Poi la consegna chiede: "real time access for monitoring from mobile application", quindi direttamente all'esb si può attaccare un redis da cui i dispositivi mobili leggono i dati (un backend). al BE sono attaccati i vari FE (web, ios, android). 
+Il DataWharehouse è indeed molto utile perché serve a registrare vecchi dati e può essere usato dall'IA per training. cosa significa? al DWH è attaccato il dss col suo LLM. il dss è quindi attaccato al backedn delle due applicazioni (ci sono 2 moduli, uno per il real time e uno per il dss nel singolo backend, così da non dover appensantire tutti  vari frontend, che invece fanno solo da interfaccia). 
+
+infine. per ogni costumer abbiamo l'intera architettura replicata? siccome si parla di cloud, di norma non si usa un environment per ogni cliente, ma si collectano i dati di tutti e la logica è comune. per esempio, dentro al backend c'è la logica di controllo accessi (security controls). sicuramente si usa ssl. poi ci deve essere autenticazione anche tra esp e dwh/redis. si possono usare delle pn per evitare che qualcuno usi le api pubbliche
+
+
+----------------------- processo mentale -----------------------------
+è molto personale e dipende da come si risolvono i problemi di solito. per esempio quello che fa il prof è:
+scrivere tutto ciò che serve come elenco puntato (magari suddiviso in categorie) o come checklist. ogni punto è un topic da pensare per raggiungere l'obbiettivo. se abbiamo molti device, è utile usare un esb. è obbligatorio? no, ma devo usare l'assunzione per esempio che i dati siano già omogenei. etc. ogni singolo punto deve avere il suo corrispettivo nell'architettura e una spiegazione che evidenzi il ragionamento di uel sppecifico argomento.
+
+a noi manca un servizio offerto: consulting. l'architettura è quella per tutti gli altri servizi. consulting cosa significa? che io posso leggere i dati del cliente e dire al cliente cosa gli suggerisco di fare.
+
+posso per esempio pensare di fare un'assunzione: ho uno superuser privilegiato che legge i dati di tutti (e quindi mi collego direttamente al backend ). oppure un Business intelligence che si collega direttamente al DWH
+
+----------------------------------------------------------------------------------------------------------------------------
+ok ora abbiamo parlato dell'architettura. ora manca parlare di security, methodologies and team structure. sempre soluzione del mio collega:
+security: possiamo sia dire banalmente che usiamo SSL, quanto per esempio parlare di autenticazione, vpn etc.
+methodologies: waterfall sicuramente inadatta (basti pensare all'incertezza sul tipo di device/drone etc, che può cambiare). un'idea può essere l'agile con 2 o 3 settimane di sprint; si usa una repo GitHub con un branch production, uno dev, e uno staging. Siccome è un'app in cloud, possiamo usare qualcosa come terraform per configurare l'infrastruttura e hostare le app con aws. usare ci/cd
+team: un team di dev (dss application, RT application, front ends), un project manager for il grouppo agile, un data scientist per la parte di IA e gestione dati,un data warehouse amin, un DB admin, un agronomist con conoscenza di dominio. infine, un QA tester
+
+commenti del prof
+il project manager non c'è nell'agile (ci sarebbe nel waterfall). è necessario un system engineer and un integration specialis. Poi, agile è molto generico. funziona bene per la parte di coding vero e prorio. ma per l'integrazione lascia un po' a desiderare. In effetti, il waterfall per l'intero sistema ha senso (quindi un project manager per la big picture), poi all'interno ogni parte può avere la sua metodologia, per esempio agile. poi si parla di ci/cd e allora servirebbe anche devops (sta cosa non lh' ben capita, devo controllare meglio nelle slide). Il production branch di solito è il master; il dev è giusto, lo staging di solito ha i tag. oltretutto, ci saranno più codebase (una per l'esb, poi per il backend, etc etc). aws o azure è del tutto indifferente, ma va scritto per far capire che si parla di cloud solution. in sto esame non ci sono osservazioni riguardo budgeting o costi, non serve pensarci. chiaro quindi che posso pensare a tutto. se ci fosse esplicitato qualche money constraints, è invece da pensarci. Non serve avere coscienza dei costi reali, ma almeno far capire che ne prendiamo atto. l'esame non valuta se la cosa è fattibile nella realtà, ma come ragioniamo. nel team dobbiamo prestare attenzione a non semplificare troppo la situazione. github non è così essenziale da mettere, sarebbe per esempio più esssenziale parlare di CI/CD, come si vuole implementare etc. potremmo pensare anche a parlare di integration tests

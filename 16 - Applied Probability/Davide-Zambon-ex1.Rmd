@@ -1,0 +1,68 @@
+---
+title: "Davide Zambon (898103) - Exercise N 1"
+output:
+  html_document: 
+    df_print: paged
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+
+# Point a solution
+The constant k an be determined by guaranteeing the continuity of the function, by solving
+$$
+kx^2 = 1, \  \text{when} \ x=10
+$$
+the solution is 
+```{r, error=TRUE}
+k <- 1/100
+k
+```
+# Point b solution
+probability that job A is within specification: 
+since we know k and we have the cdf, we can just compute: 
+$$
+F(B) -F(A)
+$$
+```{r, error=TRUE}
+prob_A = k*8.37^2 - k*3.65^2
+prob_A
+```
+
+
+# Point c solution
+probability that job B is within specification:
+
+point B is a uniform distribution, so the probability of lying between the interval is 
+```{r, error=TRUE}
+length_interest <- 8.37 - 3.65
+length_total <- 12
+prob_B <- length_interest / length_total
+prob_B
+```
+
+
+# Point d solution
+Compute the probability that a randomly selected job executed by the platform is within specification:
+
+We can just compute the proportions:
+
+```{r, error=TRUE}
+prop_A <- 0.63
+prop_B <- 1-prop_A
+
+total_prob = prop_A * prob_A + prop_B * prob_B
+total_prob
+```
+
+# Point e solution
+
+we can use Bayes' Theorem
+```{r, error=TRUE}
+Pa_givenS = 0.63 * prob_A / total_prob
+Pa_givenS
+```
+
+
+

@@ -1,0 +1,93 @@
+---
+title: "Davide Zambon (898102) - Exercise 2"
+output:
+  html_document: 
+    df_print: paged
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+
+# Point a solution
+The system can be described with a CTMC with 3 states:
+State 1 (S) (Standby): The robot is waiting for a task.
+State 2 (T) (Transporting): The robot is actively transporting items.
+State 3 (C) (Charging/Maintenance): The robot is charging or undergoing maintenance.
+
+
+# Point b solution
+to write the generator, use the holding times and the given probability.
+```{r, error=TRUE}
+l_1 <- 1/11
+l_2 <- 1/13
+l_3 <- 1/10
+```
+
+from holding, it always move to transporting
+```{r, error=TRUE}
+q_st <- 1/11
+q_sc <- 0
+q_ss <- -1/11
+```
+
+
+from transporting
+```{r, error=TRUE}
+q_ts <- l_2 * 0.7
+q_tc <- l_2 * 0.3
+q_tt <- -(q_ts + q_tc)
+```
+
+from charging, always moves to Standby (S).
+```{r, error=TRUE}
+q_ct <- 0
+q_cs <- 1/10
+q_cc <- -1/10
+```
+
+finally,
+```{r, error=TRUE}
+library(MASS)
+library(expm)
+Q <- matrix(c(q_ss, q_sc, q_st,
+              q_cs, q_cc, q_ct,
+              q_ts, q_tc, q_tt), nrow = 3, byrow = TRUE)
+Q
+```
+
+# Point c solution
+to find the stationary, we an solve the system or either elevate the generator for a very high time
+
+```{r, error=TRUE}
+get_state_probability <- function(Q, pi0, t) {
+  
+  P_t <- expm(Q * t)
+  pi_t <- pi0 %*% P_t
+  
+  return(list(
+    "Transition_Matrix_Pt" = P_t,
+    "Final_Distribution_pi_t" = pi_t
+  ))
+}
+pi0 <- c(1, 0, 0)
+time <- 20000
+results <- get_state_probability(Q, pi0, time)
+print("--- THE FINAL DISTRIBUTION pi(t) ---")
+print(results$Final_Distribution_pi_t)
+```
+
+# Point d solution
+
+using the same function as above,
+
+```{r, error=TRUE}
+pi0 <- c(1, 0, 0)
+time <- 10
+results <- get_state_probability(Q, pi0, time)
+print(results$Final_Distribution_pi_t)
+
+```
+
+
+

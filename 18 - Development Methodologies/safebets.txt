@@ -1,0 +1,126 @@
+# TEMPLATE
+SECTION: ORGANIZATIONAL SOLUTIONS
+1. Methodology: The Hybrid Model
+To balance strategic planning with execution flexibility, we will adopt a Hybrid Methodology (Gate Waterfall + Agile Scrum)
+.
+• Rationale: We need Waterfall in the initial and final phases to manage the complexity of [INSERIRE QUI IL RISCHIO: es. Legacy ERP integration / Hardware procurement / Security compliance] and ensure budget/time constraints. We use Agile Scrum for software development to handle evolving requirements and ensure rapid delivery
+.
+2. The Roadmap (Project Plan)
+We structure the project lifecycle into 4 distinct phases
+:
+• Phase 1: Discovery & Analysis (Waterfall)
+    ◦ Activity: Stakeholder workshops and technical assessment of [INSERIRE SISTEMA: es. Legacy ERP / IoT Protocols].
+    ◦ Goal: Define "As-Is" vs "To-Be" architecture, freeze requirements, and identify technical risks (Gap Analysis)
+.
+• Phase 2: Foundation (Engineering)
+    ◦ Activity: Setup of Cloud Environment (AWS/Azure) via Terraform and CI/CD pipelines.
+• Phase 3: Realization (Agile Scrum)
+    ◦ Structure: 2-week Sprints with distinct goals
+.
+    ◦ Focus: Iterative development of [INSERIRE MODULI: es. Microservices / API Gateway / Frontend].
+    ◦ Artifacts: MVP releases to get early feedback.
+• Phase 4: Validation & Go-Live (Waterfall)
+    ◦ Activity: User Acceptance Testing (UAT), Security Audit, and controlled rollout
+.
+3. Team Structure (Team Topologies)
+We organize Cross-functional teams to reduce cognitive load and external dependencies
+,
+.
+• Stream-aligned Teams (Product Focus):
+    ◦ Responsible for end-to-end delivery of value.
+    ◦ Composition: Backend Dev + Frontend Dev + QA + Product Owner (Voice of customer) + Scrum Master.
+    ◦ Example: [Team A: Customer App], [Team B: Core Integration].
+• Platform Team (Enablers):
+    ◦ Responsible for the underlying infrastructure used by Stream teams.
+    ◦ Composition: DevOps Engineers + Cloud Architects.
+    ◦ Focus: Kubernetes clusters, CI/CD maintenance, Security standards.
+4. Operational Excellence (DevOps & Quality)
+We implement a "Shift-left" quality strategy
+:
+• Version Control: Git with Gitflow strategy (Main, Develop, Feature branches)
+.
+• CI/CD Pipeline: Automated pipeline (e.g., Jenkins/GitLab) triggered at every commit
+.
+    ◦ Steps: Build → Unit Test → Static Analysis (SonarQube) → Deploy to Staging.
+• Testing Strategy:
+    ◦ Unit/Integration Tests: Automated in the pipeline.
+    ◦ UAT: Manual validation in the Staging environment
+.
+• Documentation: "Living documentation" (ADR - Architecture Decision Records) stored in the repo
+.
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Ecco la lista delle "Safe Bets" (le scelte sicure) da usare all'esame. Queste sono le soluzioni che il professore tende a favorire perché dimostrano maturità nella gestione di progetti complessi, basandosi sulle slide del corso.
+Usa questi blocchi per costruire la tua risposta nella sezione Organizational Solutions.
+
+
+
+1. Metodologia: Il Modello Ibrido (Hybrid Model)
+È quasi sempre la risposta vincente rispetto al "Puro Agile" o "Puro Waterfall", specialmente con sistemi Legacy o requisiti Enterprise.
+• Cosa Scrivere: "We will adopt a Hybrid Methodology (Gate Waterfall + Agile Scrum)."
+• Come strutturarla (Il Disegno):
+    1. Analysis (Waterfall): Fase iniziale bloccante per definire requisiti, budget e architettura macro. Serve a ridurre i rischi iniziali
+.
+    2. Realization (Agile Scrum): Cicli di sviluppo (Sprints di 2 settimane) per rilasciare funzionalità incrementali (MVP) e adattarsi ai cambiamenti
+.
+    3. Go-Live (Waterfall): Fase finale di User Acceptance Testing (UAT) e rilascio controllato in produzione
+.
+• Perché è una Safe Bet: Bilancia la necessità di pianificazione (che piace al management) con la flessibilità dello sviluppo moderno.
+2. Struttura del Team: Team Topologies
+Non limitarti a elencare i ruoli. Organizza i team secondo le Team Topologies citate nelle slide.
+• Cosa Scrivere: "We will form Cross-functional teams following the Team Topologies approach to reduce cognitive load."
+
+
+
+
+
+• I Team da disegnare:
+    ◦ Stream-aligned Team (Team di Prodotto): Il team principale (Backend + Frontend + QA + Product Owner). Si occupa di una funzionalità end-to-end (es. "E-commerce Team")
+.
+    ◦ Platform Team: Il team tecnico (DevOps/SysAdmin) che costruisce l'infrastruttura (Kubernetes, CI/CD) per supportare gli altri team
+.
+    ◦ Enabling Team (Opzionale): Esperti (es. Security o Legacy Specialist) che aiutano temporaneamente gli altri team
+.
+• Perché è una Safe Bet: Dimostra che sai come scalare l'organizzazione senza creare colli di bottiglia.
+
+
+
+
+3. Qualità e Rilascio: CI/CD & Testing
+Questa è la parte "ingegneristica" che va sempre inserita nel Plan.
+• Cosa Scrivere: "We will implement a CI/CD Pipeline with automated quality gates."
+• Gli strumenti "Safe Bet" da citare:
+    ◦ Gitflow: Per la gestione dei branch (Master, Develop, Feature)
+.
+    ◦ SonarQube: Per l'analisi statica del codice (sicurezza e qualità) prima del build
+.
+    ◦ Jenkins / GitLab CI: Per l'automazione del rilascio
+.
+    ◦ Environments: Specifica sempre 3 ambienti separati: Dev (Sviluppo), Staging (uguale alla produzione per i test UAT) e Prod
+.
+• Perché è una Safe Bet: Dimostra professionalità e attenzione alla prevenzione dei bug ("Fail fast").
+
+
+
+
+
+
+4. Documentazione: Design Docs & Decision Logs
+Spesso trascurata, ma fondamentale per il prof.
+• Cosa Scrivere: "We will maintain Living Documentation stored close to the code."
+• Elementi chiave:
+    ◦ Design Docs: Documenti scritti prima del codice per allineare il team sulle scelte tecniche
+.
+    ◦ Decision Logs (ADR): Registro delle decisioni prese (perché abbiamo scelto quella tecnologia?)
+.
+• Perché è una Safe Bet: Dimostra che pensi alla manutenibilità a lungo termine e non solo a scrivere codice velocemente.
+Riassunto Visivo per il Foglio
+Se vuoi andare sul sicuro, il tuo diagramma organizzativo dovrebbe sempre avere questi 3 pilastri:
+1. Timeline: Analysis (Waterfall) → Sprints (Agile) → Go-Live.
+2. Team: Cerchi interconnessi (Product Team + Platform Team).
+3. Processo: Git → CI/CD → Staging → Prod.
+Vuoi provare ad applicare questi 3 pilastri "Safe Bet" scrivendo la sezione organizzativa per l'esame Legacy Update (16 settembre)?

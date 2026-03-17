@@ -1,0 +1,11 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+      - "1337:1337"
+    environment:
+      - FLASK_ENV=production
+      - PVK=redacted_private_key
+      - FLAG=flag{redacted_flag}
+    restart: always
